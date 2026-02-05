@@ -1,4 +1,4 @@
-# NeKoRoSYS-Arch-Linux-Rice
+# NeKoRoSYS's Arch Linux Rice
 Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots). Meant for personal use only.
 
 ## Notes
