@@ -3,7 +3,6 @@ Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots). I 
 <br>
 <br>
 <br>
-![Screenshot](image.png) 
 <br>
 <br>
 ## Features
