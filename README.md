@@ -12,16 +12,6 @@ Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots). I 
 
 <br>
 <br>
-
-![Screenshot](image.png) 
-<br>
-<br>
-![Screenshot](image-3.png) 
-<br>
-<br>
-![Screenshot](image-2.png) 
-<br>
-<br>
 ## Dependencies
 - Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
   - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
@@ -35,6 +25,16 @@ Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots). I 
 - Waybar was set up to use `kitty`, `Mozilla Firefox`, and `dolphin`. You can change this if you want at `~/.config/waybar/config.jsonc`.
 - The screenshot and clipboard features need `grim`, `slurp`, `hyprshot`, `wl-clipboard`, and `cliphist` to run.
   - Install them via `sudo pacman -S grim wl-clipboard cliphist`. (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
+<br>
+
+![Screenshot](image.png) 
+<br>
+<br>
+![Screenshot](image-3.png) 
+<br>
+<br>
+![Screenshot](image-2.png) 
+<br>
 <br>
 
 ## Features
