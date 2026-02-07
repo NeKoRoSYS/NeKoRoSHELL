@@ -83,7 +83,7 @@ Make sure to analyze the directory structure of `~/.config/waybar/skins` and how
 
 You have two options:
 - Install someone else's Waybar setup and then manually adjust its files to correctly import or include; or
-- Make your own.
+- Make your own. ¯\_(ツ)_/¯
 <br>
 
 ## TODO
