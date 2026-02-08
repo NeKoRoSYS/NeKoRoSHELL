@@ -71,12 +71,23 @@ echo -e "${BLUE}Deploying configuration files...${NC}"
 mkdir -p ~/.config
 cp -rv .config ~/
 
-PRIMARY_MONITOR=$(hyprctl monitors | grep "Monitor" | awk '{print $2}' | head -n 1)
+MAPFILE=($(hyprctl monitors | grep "Monitor" | awk '{print $2}'))
+MONITOR_COUNT=${#MAPFILE[@]}
 
-if [ -n "$PRIMARY_MONITOR" ]; then
-    echo -e "${BLUE}Detected monitor: $PRIMARY_MONITOR. Updating configs...${NC}"
-    find "$HOME/.config" -type f -exec sed -i "s/DP-1/$PRIMARY_MONITOR/g" {} +
-    find "$HOME/.config" -type f -exec sed -i "s/eDP-1/$PRIMARY_MONITOR/g" {} +
+if [ "$MONITOR_COUNT" -gt 0 ]; then
+    PRIMARY_MONITOR=${MAPFILE[0]}
+    echo -e "${BLUE}Detected $MONITOR_COUNT monitor(s). Primary: $PRIMARY_MONITOR${NC}"
+
+    sed -i "s/eDP-1/$PRIMARY_MONITOR/g" "$HOME/.config/hypr/configs/monitors.conf"
+
+    if [ "$MONITOR_COUNT" -ge 2 ]; then
+        SECONDARY_MONITOR=${MAPFILE[1]}
+        echo -e "${BLUE}Secondary monitor detected: $SECONDARY_MONITOR${NC}"
+        sed -i "s/DP-1/$SECONDARY_MONITOR/g" "$HOME/.config/hypr/configs/monitors.conf"
+    else
+        echo -e "${BLUE}Only one monitor detected. Disabling secondary monitor line...${NC}"
+        sed -i '/monitor=DP-1/s/^/#/' "$HOME/.config/hypr/configs/monitors.conf"
+    fi
 fi
 
 cp .face.icon ~/
