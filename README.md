@@ -11,7 +11,6 @@ Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots). I 
 | [🚀 Features](#features) |
 | [🔨 Skins and Layouts](#skins-and-layouts) |
 | [📝 Notes](#notes) |
-| [📋 TODO](#todo) |
 
 ## Dependencies
 - Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
@@ -98,11 +97,6 @@ You have two options:
 <br>
 ![Screenshot](image-5.png) 
 <br>
-<br>
-
-## TODO
-- Improve Hyprlock UI
-- Automatically invert waybar color values if wallpaper is too darlk or too light
 <br>
 
 ## Optional
