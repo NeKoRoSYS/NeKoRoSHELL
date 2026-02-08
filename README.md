@@ -132,9 +132,11 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
   
 - Modify `/etc/default/grub`
   - `sudo pacman -S os-prober`
+ 
     ```
     GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet rd.udev.log_level=3 systemd.show_status=auto vt.global_cursor_default=0 nvidia_drm.modeset=1 nvidia_drm.fbdev=1 pci=noaer pcie_aspm=off nvme_core.default_ps_max_latency_us=0 nvidia.NVreg_EnableS0ixPowerManagement=1 intel_pstate=active i915.modeset=1 i915.enable_fbc=1 mitigations=off"
     ```
+
   - `GRUB_THEME="/boot/grub/themes/minegrub-world-selection/theme.txt"`
   - `GRUB_DISABLE_OS_PROBER=false`
   - `sudo grub-mkconfig -o /boot/grub/grub.cfg`
@@ -150,6 +152,7 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
   - `alsamixer`
   - `sudo alsactl store`
   - `nano ~/.config/pipewire/pipewire.conf.d/99-input-denoising.conf`
+
     ```spa json
     context.modules = [
     {  name = libpipewire-module-filter-chain
@@ -183,6 +186,7 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
       }
     ]
     ```
+
   - `wpctl set-default yourNoiceCancelledID` (find in `wpctl status`)
 
 ### Quality-of-Life
