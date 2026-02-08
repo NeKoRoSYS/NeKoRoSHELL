@@ -98,11 +98,9 @@ NeKoRoSYS's HyprDots focuses on simplicity and modularity.
 <br>
 ![Screenshot](image-2.png) 
 <br>
-<br>
 
 > [!WARNING]
 > `start-dashboard.sh` creates a grid layout for a 1920x1080 display, however I also provided a 1280x720 version of the dashboard in `~/.config/hypr/windowrules.conf/`.
-<br>
 
 ## Skins and Layouts
 Make sure to analyze the directory structure of `~/.config/waybar/skins` and `~/.config/hypr/hyprlock/`; and how the files (`hyprlock.conf`, `config.jsonc`, `colors.css`, `style.css`, `layout.jsonc`, `modules.jsonc`) include or import from each other.
