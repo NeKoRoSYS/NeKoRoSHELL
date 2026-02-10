@@ -20,6 +20,6 @@ notify-send \
     "$TITLE" \
     "$MESSAGE"
 
-if [[ -n "$SOUND" ]]; then
+if [[ "$(swaync-client -D)" == "false" && -n "$SOUND" ]]; then
     playsound $SOUND
 fi
