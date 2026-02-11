@@ -1,7 +1,7 @@
 # NeKoRoSYS's NecroDots
 The best way to say "I use Arch btw 🤓" is if your desktop profile looks sleek and suave.
 
-**NecroDots** aims to provide a clean and reliable generic modular framework that lets you easily customize your desktop experience with simple UI design philosophy in mind.
+**NecroDots** aims to provide an out-of-the-box, clean and reliable, generic, and modular framework that lets you easily customize your desktop experience with simple UI design philosophy in mind.
 
 Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots). I initially made this repo because installing Invincible Dots didn't seem to work. Hence, I rebuilt it from the ground up using a lot of the repo's already-working parts so that it works with Hyprland's later versions. Why this fork stands out, you may ask? I added my own flavor to it, such as the support for video wallpapers; a couple of optimizations at the keybinds config file (specifically, the bug that lets you open infinite instances of wofi which can be very unoptimal); and a lot more!
 <br>
