@@ -77,7 +77,7 @@ tooltip {
     opacity: 1;
     border: none;
     border-radius: 10px;
-    background: @colo6;
+    background: @color1;
     min-width: 30px;
 }
 

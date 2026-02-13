@@ -74,21 +74,6 @@ cleanup_backgrounds() {
     set -e
 }
 
-apply_theme() {
-    local img_path="$1"
-    if command -v wal >/dev/null 2>&1; then
-        echo "Updating system theme..."
-	rm -f "$HOME/.cache/wal/schemes/*"
-	wal -i "$img_path" --backend haishoku -n -q || \
-        wal -i "$img_path" --backend colorthief -n -q || \
-        wal -i "$img_path" -n -q # Final fallback to default backend
-	killall waybar && sleep 0.05
-	systemctl --user restart waybar &
-        swaync-client -rs
-        #"$HOME/.config/mako/update-colors.sh"
-    fi
-}
-
 case "$(echo "$EXTENSION" | tr '[:upper:]' '[:lower:]')" in
     mp4|mkv|webm)
         echo "Video detected: $SELECTED_FILE"
@@ -104,7 +89,7 @@ case "$(echo "$EXTENSION" | tr '[:upper:]' '[:lower:]')" in
         ffmpeg -y -ss 00:00:05 -i "$WALL" -frames:v 1 "$TEMP_THUMB" > /dev/null 2>&1
 
         # 2. Apply pywal using the extracted frame
-        apply_theme $TEMP_THUMB
+        bash ~/.config/hypr/scripts/wallpapers/apply-theme.sh $TEMP_THUMB
         
         # Comprehensive mvpaper parameters:
         # -o passes mpv flags: 
@@ -130,8 +115,7 @@ case "$(echo "$EXTENSION" | tr '[:upper:]' '[:lower:]')" in
         swww img "$WALL"
                 
         # Pywal with your specific backends        
-	apply_theme $WALL
-
+        bash ~/.config/hypr/scripts/wallpapers/apply-theme.sh $WALL
         ;;
     *)
         echo "Unsupported format: $EXTENSION"

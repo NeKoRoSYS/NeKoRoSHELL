@@ -13,7 +13,7 @@ window {
 /* Input box */
 #input {
   margin: 5px;
-  border: 1px solid @color7;
+  border: 1px solid @color5;
   color: @color7;
   background-color: rgba(0,0,0,0.25);
   padding: 6px;
@@ -84,12 +84,13 @@ image {
 /* Active entry */
 #entry:selected {
   background-color: @color1;
+  border-bottom: 2px solid @color5;
   border-radius: 5px;
 }
 
 #entry:selected #text {
   font-weight: bold;
-  color: @color7;
+  color: white;
 }
 
 #entry:hover {
