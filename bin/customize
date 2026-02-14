@@ -1,15 +1,14 @@
 #!/bin/bash
 
 pkill -x wofi
-makenotif customize system-run "Customize Desktop" "Choose a feature to customize." "true"
 
 wallpaper="Select Wallpaper"
 waybar="Select Waybar Skin"
-wofi="Select Wofi Skin"
+launcher="Select Launcher Skin"
 lock="Select Lockscreen Layout"
 panel="Select Notification Panel Layout"
 theme="Disable $(cat $HOME/.cache/theme_mode) Mode"
-OPTIONS="$wallpaper\n$waybar\n$wofi\n$lock\n$panel\n$theme"
+OPTIONS="$wallpaper\n$waybar\n$launcher\n$lock\n$panel\n$theme"
 
 CHOICE=$(echo -e "$OPTIONS" | wofi --dmenu --hide-scroll --lines 6 --cache-file /dev/null --prompt "Select Action")
 case "$CHOICE" in
@@ -19,7 +18,7 @@ case "$CHOICE" in
 	"$waybar")
 		bash ~/.config/hypr/scripts/customize-feature.sh waybar
 		;;
-	"$wofi")
+	"$launcher")
 		bash ~/.config/hypr/scripts/customize-feature.sh wofi
 		;;
 	"$lock")
@@ -35,3 +34,4 @@ case "$CHOICE" in
 		exit 1
 		;;
 esac
+
