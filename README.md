@@ -33,7 +33,7 @@ Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots). I 
 <br>
 
 > [!WARNING]
-> These dotfiles still work as I am writing this on February 12, 2026. Future updates could break one or more of the packages and I may or may not be active enough to fix it for you (please do contact me on **Discord** - **@nekorosys** - and I'll be happy to entertain any of your concerns). I do recommend fixing it yourself just in case it happens because it might help you learn more about maintaining your desktop experience!
+> These dotfiles still work as I am writing this on February 12, 2026. Future updates could break one or more of the packages and I may or may not be active enough to fix it for you (please do contact me on **Discord** - **@nekorosys** - and I'll be happy to entertain any of your concerns). Worry not! For as long as I keep using Linux, it's suffice to say that this repo will be maintained for a very long time because it has always been intended to store a clean slate of my desktop environment. I do recommend fixing it yourself just in case it happens because it might help you learn more about maintaining your desktop experience!
 <br>
 
 - Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
