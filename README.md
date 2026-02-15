@@ -72,7 +72,7 @@ NeKoRoDOTS is currently being developed by one person (*cough* [Contribution](#c
 | Dmenu Overhaul - Replace wofi with rofi | ⏳ |
 | Support for other distros | ⏳ |
 
-wallust seems to be bad at handling light mode. It just inverts everything and call's it a day. I don't like that. pywal16 may be slower but it actually correctly represents colors in light mode without gimmicky workarounds.
+wallust seems to be bad at handling light mode. It just inverts everything and call's it a day. I don't like that. pywal16 may be slower but it actually correctly represents colors in light mode without gimmicky workarounds. If anyone can tell me how to fix this, I might actually consider the switch but for now I'll go with pywal16.
 
 The following are what NeKoRoDOTS currently offers:
 - **One-tap Installer Script**
