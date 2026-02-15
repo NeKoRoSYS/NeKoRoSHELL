@@ -74,8 +74,8 @@ NeKoRoDOTS is currently being developed by one person (*cough* [Contribution](#c
 
 The following are what NeKoRoDOTS currently offers:
 - **One-tap Installer Script**
-  - Use `git clone https://github.com/NeKoRoSYS/NeKoRoSYS-NeKoRoDOTS`
-  - Then `cd NeKoRoSYS-NeKoRoDOTS`
+  - Use `git clone https://github.com/NeKoRoSYS/NeKoRoDOTS`
+  - Then `cd NeKoRoDOTS`
   - and finally, `bash install.sh` to install the dotfiles.
     - You can freely customize `flatpak.txt` and `pkglist.txt` before running `install.sh`.
     - The installer assumes you already installed `base-devel`, `git`, `yay`, `flatpak`.
