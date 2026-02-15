@@ -66,6 +66,7 @@ NeKoRoDOTS focuses on simplicity and modularity.
 | Implement base functionality | ✅ |
 | Implement QOL features | ✅ |
 | Optimizations | ⏳ |
+| Color Handling | ⏳ |
 | Dmenu Overhaul | ⏳ |
 <br>
 
