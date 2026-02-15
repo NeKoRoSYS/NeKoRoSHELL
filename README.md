@@ -12,13 +12,12 @@ Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots). I 
 
 | 📌 **Table of Contents** |
 | :---: |
-| [🔗 Dependencies](#dependencies) |
-| [🚀 Features](#features) |
-| [🔨 Skins and Layouts](#skins-and-layouts) |
-| [📝 Notes](#notes) |
-| [🤔 Optional](#optional) |
-| [💸 Sponsorship](#sponsorship) |
-| [🫂 Contribution](#contribution) |
+| 🔗 [Dependencies](#dependencies) |
+| 🚀 [Features](#features) |
+| 🔨 [Skins and Layouts](#skins-and-layouts) |
+| 🤔 [Optional](#optional) |
+| 💸 [Sponsorship](#sponsorship) |
+| 🫂 [Contribution](#contribution) |
 <br>
 
 ## Dependencies
@@ -57,6 +56,17 @@ Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots). I 
 ## Features
 
 NeKoRoDOTS focuses on simplicity and modularity.
+
+### Roadmap
+
+| 📋 **TODO** | **STATUS** |
+| :---: | :---: |
+| Improve base "legacy" theme | ✅ |
+| Implement base functionality | ✅ |
+| Implement QOL features | ✅ |
+| Optimizations | ⏳ |
+| Dmenu Overhaul | ⏳ |
+<br>
 
 - **One-tap Installer Script**
   - Use `git clone https://github.com/NeKoRoSYS/NeKoRoSYS-NeKoRoDOTS`
