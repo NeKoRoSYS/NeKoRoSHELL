@@ -2,6 +2,7 @@
 > Please star the repo if you like the dotfiles. Thank you 🙏
 
 # NeKoRoDOTS 
+<br>
 
 ![Screenshot](showcase/image-5.png) 
 <br>
