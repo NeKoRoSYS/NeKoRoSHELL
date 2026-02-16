@@ -2,6 +2,12 @@
 > Please star the repo if you like the dotfiles. Thank you 🙏
 
 # NeKoRoDOTS 
+<br>
+
+![Screenshot](showcase/image.png) 
+<br>
+<br>
+
 The best way to say "I use Arch btw 🤓" is if your desktop profile looks sleek and suave.
 
 **NeKoRoDOTS** aims to provide an out-of-the-box, clean and reliable, generic, and modular framework that lets you easily customize your desktop experience with simple UI design philosophy in mind.
@@ -115,19 +121,19 @@ The following are what NeKoRoDOTS currently offers:
     - Border colors and UI elements have dynamic color schemes.
 <br>
 
-![Screenshot](image.png) 
+![Screenshot](showcase/image-5.png) 
 <br>
 <br>
 <br>
-![Screenshot](image-3.png) 
+![Screenshot](showcase/image-3.png) 
 <br>
 <br>
 <br>
-![Screenshot](image-1.png) 
+![Screenshot](showcase/image-1.png) 
 <br>
 <br>
 <br>
-![Screenshot](image-2.png) 
+![Screenshot](showcase/image-2.png) 
 <br>
 <br>
 
@@ -144,15 +150,15 @@ You have two options:
 <br>
 <br>
 
-![Screenshot](image-4.png) 
+![Screenshot](showcase/image-8.png) 
 <br>
 <br>
 <br>
-![Screenshot](image-5.png) 
+![Screenshot](showcase/image-7.png) 
 <br>
 <br>
 <br>
-![Screenshot](image-6.png) 
+![Screenshot](showcase/image-6.png) 
 <br>
 <br>
 
