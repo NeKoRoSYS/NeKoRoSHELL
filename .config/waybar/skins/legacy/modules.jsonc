@@ -150,9 +150,9 @@
         "format": "{icon}",
         "tooltip-format": "Power Profile: {profile}",
         "format-icons": {
-            "Performance": "",
-            "Balanced": " ",
-            "Power-Saver": "󰂄"
+            "performance": "",
+            "balanced": " ",
+            "power-saver": "󰂄"
         }
     },
 
