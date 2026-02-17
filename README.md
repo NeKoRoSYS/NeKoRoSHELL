@@ -17,39 +17,10 @@ The best way to say "I use Arch btw 🤓" is if your desktop profile looks sleek
 
 | 📌 **Table of Contents** |
 | :---: |
-| 🔗 [Dependencies](#dependencies) |
 | 🚀 [Features](#features) |
 | 🔨 [Skins and Layouts](#skins-and-layouts) |
+| 🔗 [Dependencies](#dependencies) |
 | 🤔 [Optional](#optional) |
-| 💸 [Sponsorship](#sponsorship) |
-| 🫂 [Contribution](#contribution) |
-<br>
-
-## Dependencies
-
-> [!CAUTION]
-> **HARDWARE SPECIFIC CONFIGURATION**<br>
->
-> Some environment variables and params at `~/.config/hypr/configs/environment.conf/` and `~/.config/hypr/scripts/set-wallpaper.sh/` (also check the `check-video.sh` script, `mpvpaper` uses a "hwdec=nvdec" param) **require an NVIDIA graphics card**. Although it may be generally safe to leave it as is upon installing to a machine without such GPU, I recommend commenting it out or replacing it with a variable that goes according to your GPU.
-> 
-> The [System Booting](#system-booting) section contains settings specifically optimized for a dual-GPU laptop (Intel 620/Nvidia 940MX). 
-> **Do not** copy the `GRUB_CMDLINE_LINUX_DEFAULT` or `mkinitcpio` modules unless you have identical hardware, as this may **prevent your system from booting**.
-
-- Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
-  - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
- 
-- This rice uses `wofi` to run actions and apps.
-  - Some apps like `mpvpaper` needs to be ran using `prime-run` and `gamemoderun`
-    - Install via `sudo pacman -S nvidia-prime gamemode`.
-  - (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
-
-- `hyprland` uses `hypridle` and `hyprlock`.
-  - Install them via `sudo pacman -S hyprlock hypridle`. (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
-
-- Waybar was set up to use `kitty`, `Mozilla Firefox`, and `dolphin`. You can change this if you want at `~/.config/waybar/config.jsonc`.
-
-- The screenshot and clipboard features need `grim`, `slurp`, `hyprshot`, `wl-clipboard`, and `cliphist` to run.
-  - Install them via `sudo pacman -S grim wl-clipboard cliphist`. (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
 <br>
 
 ## Features
@@ -155,6 +126,33 @@ You have two options:
 <br>
 ![Screenshot](showcase/image-6.png) 
 <br>
+<br>
+
+## Dependencies
+
+> [!CAUTION]
+> **HARDWARE SPECIFIC CONFIGURATION**<br>
+>
+> Some environment variables and params at `~/.config/hypr/configs/environment.conf/` and `~/.config/hypr/scripts/set-wallpaper.sh/` (also check the `check-video.sh` script, `mpvpaper` uses a "hwdec=nvdec" param) **require an NVIDIA graphics card**. Although it may be generally safe to leave it as is upon installing to a machine without such GPU, I recommend commenting it out or replacing it with a variable that goes according to your GPU.
+> 
+> The [System Booting](#system-booting) section contains settings specifically optimized for a dual-GPU laptop (Intel 620/Nvidia 940MX). 
+> **Do not** copy the `GRUB_CMDLINE_LINUX_DEFAULT` or `mkinitcpio` modules unless you have identical hardware, as this may **prevent your system from booting**.
+
+- Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
+  - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
+ 
+- This rice uses `wofi` to run actions and apps.
+  - Some apps like `mpvpaper` needs to be ran using `prime-run` and `gamemoderun`
+    - Install via `sudo pacman -S nvidia-prime gamemode`.
+  - (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
+
+- `hyprland` uses `hypridle` and `hyprlock`.
+  - Install them via `sudo pacman -S hyprlock hypridle`. (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
+
+- Waybar was set up to use `kitty`, `Mozilla Firefox`, and `dolphin`. You can change this if you want at `~/.config/waybar/config.jsonc`.
+
+- The screenshot and clipboard features need `grim`, `slurp`, `hyprshot`, `wl-clipboard`, and `cliphist` to run.
+  - Install them via `sudo pacman -S grim wl-clipboard cliphist`. (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
 <br>
 
 ## Optional
