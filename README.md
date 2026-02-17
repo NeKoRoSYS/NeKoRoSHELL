@@ -1,88 +1,42 @@
 > [!TIP]
 > Please star the repo if you like the dotfiles. Thank you 🙏
-
-# NeKoRoDOTS 
 <br>
 
 ![Screenshot](showcase/image.png) 
 <br>
 <br>
 
+# NeKoRoSHELL 
+
+![GitHub Repo stars](https://img.shields.io/github/stars/NeKoRoSYS/NeKoRoSHELL?style=for-the-badge&color=%23FFD700)
+ ![GitHub Release](https://img.shields.io/github/v/release/NeKoRoSYS/NeKoRoSHELL?display_name=tag&style=for-the-badge)
+ ![GitHub last commit](https://img.shields.io/github/last-commit/NeKoRoSYS/NeKoRoSHELL?style=for-the-badge) ![GitHub contributors](https://img.shields.io/github/contributors/NeKoRoSYS/NeKoRoSHELL?style=for-the-badge) ![Discord](https://img.shields.io/discord/774473787394752532?style=for-the-badge&label=Discord&color=%235865F2)
+ <br>
+ <br>
+
 The best way to say "I use Arch btw 🤓" is if your desktop profile looks sleek and suave.
 
-**NeKoRoDOTS** aims to provide an out-of-the-box, clean and reliable, generic, and modular framework that lets you easily customize your desktop experience with simple UI design philosophy in mind.
-
-Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots). I initially made this repo because installing Invincible Dots didn't seem to work. Hence, I rebuilt it from the ground up using a lot of the repo's already-working parts so that it works with Hyprland's later versions. Why this fork stands out, you may ask? I added my own flavor to it, such as the support for video wallpapers; a couple of optimizations at the keybinds config file (specifically, the bug that lets you open infinite instances of wofi which can be very unoptimal); and a lot more!
+**NeKoRoSHELL** aims to provide an out-of-the-box, clean and reliable, generic, and modular framework that lets you easily customize your desktop experience with simple UI design philosophy in mind.
 <br>
 <br>
 
 | 📌 **Table of Contents** |
 | :---: |
-| 🔗 [Dependencies](#dependencies) |
 | 🚀 [Features](#features) |
 | 🔨 [Skins and Layouts](#skins-and-layouts) |
+| 🔗 [Dependencies](#dependencies) |
 | 🤔 [Optional](#optional) |
-| 💸 [Sponsorship](#sponsorship) |
-| 🫂 [Contribution](#contribution) |
 <br>
 
-## Dependencies
+## [Features](CHANGELOG.md)
 
-> [!CAUTION]
-> **HARDWARE SPECIFIC CONFIGURATION**<br>
->
-> Some environment variables and params at `~/.config/hypr/configs/environment.conf/` and `~/.config/hypr/scripts/set-wallpaper.sh/` (also check the `check-video.sh` script, `mpvpaper` uses a "hwdec=nvdec" param) **require an NVIDIA graphics card**. Although it may be generally safe to leave it as is upon installing to a machine without such GPU, I recommend commenting it out or replacing it with a variable that goes according to your GPU.
-> 
-> The [System Booting](#system-booting) section contains settings specifically optimized for a dual-GPU laptop (Intel 620/Nvidia 940MX). 
-> **Do not** copy the `GRUB_CMDLINE_LINUX_DEFAULT` or `mkinitcpio` modules unless you have identical hardware, as this may **prevent your system from booting**.
+NeKoRoSHELL focuses on simplicity and modularity.
 <br>
 
-> [!WARNING]
-> These dotfiles still work as I am writing this on February 12, 2026. Future updates could break one or more of the packages and I may or may not be active enough to fix it for you (please do contact me on **Discord** - **@nekorosys** - and I'll be happy to entertain any of your concerns). Worry not! For as long as I keep using Linux, it's suffice to say that this repo will be maintained for a very long time because it has always been intended to store a clean slate of my desktop environment. I do recommend fixing it yourself just in case it happens because it might help you learn more about maintaining your desktop experience!
-<br>
-
-- Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
-  - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
- 
-- This rice uses `wofi` to run actions and apps.
-  - Install via `sudo pacman -S wofi`.
-  - Some apps like `mpvpaper` needs to be ran using `prime-run` and `gamemoderun`
-    - Install via `sudo pacman -S nvidia-prime gamemode`.
-  - (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
-
-- `hyprland` uses `hyprdile` and `hyprlock`.
-  - Install them via `sudo pacman -S hyprlock hypridle`. (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
-
-- Waybar was set up to use `kitty`, `Mozilla Firefox`, and `dolphin`. You can change this if you want at `~/.config/waybar/config.jsonc`.
-
-- The screenshot and clipboard features need `grim`, `slurp`, `hyprshot`, `wl-clipboard`, and `cliphist` to run.
-  - Install them via `sudo pacman -S grim wl-clipboard cliphist`. (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
-<br>
-
-## Features
-
-NeKoRoDOTS focuses on simplicity and modularity.
-<br>
-
-### Roadmap
-
-NeKoRoDOTS is currently being developed by one person (*cough* [Contribution](#contribution) *cough*) and is constantly under rigorous quality assurance for improvement. We always aim to keep a "no-break" promise for every update so that you can safely update to later versions without expecting any breakages.
-
-| 📋 **TODO** | **STATUS** |
-| :---: | :---: |
-| Improve base "legacy" theme | ✅ |
-| Implement base functionality | ✅ |
-| Implement base QOL features | ✅ |
-| Optimizations | ✅ |
-| Color Handling - Replace pywal6 with wallust (BETA, [Issues](https://github.com/NeKoRoSYS/NeKoRoDOTS/issues/1)) | 🛑 |
-| Dmenu Overhaul - Replace wofi with rofi | 🛠 |
-| Support for other distros | ⏳ |
-| Qt and Kvantum integration | 🤔 |
-
-The following are what NeKoRoDOTS currently offers:
+The following are what NeKoRoSHELL currently offers:
 - **One-tap Installer Script**
-  - Use `git clone https://github.com/NeKoRoSYS/NeKoRoDOTS`
-  - Then `cd NeKoRoDOTS`
+  - Use `git clone https://github.com/NeKoRoSYS/NeKoRoSHELL`
+  - Then `cd NeKoRoSHELL`
   - and finally, `bash install.sh` to install the dotfiles.
     - You can freely customize `flatpak.txt` and `pkglist.txt` before running `install.sh`.
     - The installer assumes you already installed `base-devel`, `git`, `yay`, `flatpak`.
@@ -108,11 +62,11 @@ The following are what NeKoRoDOTS currently offers:
 - **Smart Navbar**
   - Uses bash script wrappers for `waybar` for the modes: Static, Dynamic, and Hover.
 <p align="center">
-  <img src="https://github.com/NeKoRoSYS/NeKoRoDOTS/blob/main/showcase/navbar-modes.gif" alt="Navbar Demo" />
+  <img src="https://github.com/NeKoRoSYS/NeKoRoSHELL/blob/main/showcase/navbar-modes.gif" alt="Navbar Demo" />
 </p>
 
-- **Advanced Customization - Make NeKoRoDOTS YOURS!**
-  - NeKoRoDOTS is not just an identity, it is a framework. This repo gives you at most 2 pre-installed out-of-the-box layouts/styling for waybar, hyprlock, and SwayNC. The best part? You can make your own!
+- **Advanced Customization - Make NeKoRoSHELL YOURS!**
+  - NeKoRoSHELL is not just an identity, it is a framework. This repo gives you at most 2 pre-installed out-of-the-box layouts/styling for waybar, hyprlock, and SwayNC. The best part? You can make your own!
   - Credits to [iyiolacak](https://github.com/iyiolacak/iyiolacak-swaync-config?tab=readme-ov-file), [justinmdickey](https://github.com/justinmdickey/publicdots/blob/main/.config/hypr/hyprlock.conf), and [mkhmtolzhas](https://github.com/mkhmtolzhas/mkhmtdots) for their amazing theming.
   - Switch to Dark and Light Mode
   - Select Waybar Skins
@@ -142,8 +96,20 @@ The following are what NeKoRoDOTS currently offers:
 <br>
 <br>
 
-> [!WARNING]
-> `start-dashboard.sh` creates a grid layout for a 1920x1080 display, however I also provided a 1280x720 version of the dashboard in `~/.config/hypr/windowrules.conf/`. Anyhow, if your monitor has a different resolution, my dashboard preset may not appear as intended; I recommend making your own dashboard using the same bash script.
+### Roadmap
+
+NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](https://github.com/NeKoRoSYS/NeKoRoSHELL/tree/main?tab=contributing-ov-file#) *cough*) and is constantly under rigorous quality assurance for improvement. We always aim to keep a "no-break" promise for every update so that you can safely update to later versions without expecting any breakages.
+
+| 📋 **TODO** | **STATUS** |
+| :---: | :---: |
+| Improve base "legacy" theme | ✅ |
+| Implement base functionality | ✅ |
+| Implement base QOL features | ✅ |
+| Optimizations | ✅ |
+| Color Handling - Replace pywal6 with wallust (BETA, [Issues](https://github.com/NeKoRoSYS/NeKoRoSHELL/issues/1)) | 🛑 |
+| Dmenu Overhaul - Replace wofi with rofi | 🛠 |
+| Support for other distros | ⏳ |
+| Qt and Kvantum integration | 🤔 |
 <br>
 
 ## Desktop Customization
@@ -165,6 +131,33 @@ You have two options:
 <br>
 ![Screenshot](showcase/image-6.png) 
 <br>
+<br>
+
+## Dependencies
+
+> [!CAUTION]
+> **HARDWARE SPECIFIC CONFIGURATION**<br>
+>
+> Some environment variables and params at `~/.config/hypr/configs/environment.conf/` and `~/.config/hypr/scripts/set-wallpaper.sh/` (also check the `check-video.sh` script, `mpvpaper` uses a "hwdec=nvdec" param) **require an NVIDIA graphics card**. Although it may be generally safe to leave it as is upon installing to a machine without such GPU, I recommend commenting it out or replacing it with a variable that goes according to your GPU.
+> 
+> The [System Booting](#system-booting) section contains settings specifically optimized for a dual-GPU laptop (Intel 620/Nvidia 940MX). 
+> **Do not** copy the `GRUB_CMDLINE_LINUX_DEFAULT` or `mkinitcpio` modules unless you have identical hardware, as this may **prevent your system from booting**.
+
+- Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
+  - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
+ 
+- This rice uses `wofi` to run actions and apps.
+  - Some apps like `mpvpaper` needs to be ran using `prime-run` and `gamemoderun`
+    - Install via `sudo pacman -S nvidia-prime gamemode`.
+  - (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
+
+- `hyprland` uses `hypridle` and `hyprlock`.
+  - Install them via `sudo pacman -S hyprlock hypridle`. (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
+
+- Waybar was set up to use `kitty`, `Mozilla Firefox`, and `dolphin`. You can change this if you want at `~/.config/waybar/config.jsonc`.
+
+- The screenshot and clipboard features need `grim`, `slurp`, `hyprshot`, `wl-clipboard`, and `cliphist` to run.
+  - Install them via `sudo pacman -S grim wl-clipboard cliphist`. (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
 <br>
 
 ## Optional
@@ -249,12 +242,3 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
   yay -S sni-qt
   ```
   Make sure you're not killing waybar using -SIGUSER2 when refreshing the config.
-<br>
-
-## Sponsorship
-I am an aspiring software and game developer that currently do stuff solo. [Donating](https://ko-fi.com/nekorosys) is not a must, but it will be immensely cherished and appreciated!
-
-<br>
-
-## Contribution
-Something's wrong with the repo or you know better workarounds and alternatives? You can either make an issue or a pull request. It will be very much appreciated!

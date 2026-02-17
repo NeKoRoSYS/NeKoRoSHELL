@@ -1,11 +1,11 @@
 #!/bin/bash
 
 echo -e "# ======================================================= #"
-echo -e "#             NeKoRoDOTS Installation Wizard              #"
+echo -e "#             NeKoRoSHELL Installation Wizard             #"
 echo -e "# ======================================================= #\n "
 
 while true; do
-    echo -ne "\033[0;34mDo you want to start the NeKoRoDOTS installation? (y/n): \033[0m"
+    echo -ne "\033[0;34mDo you want to start the NeKoRoSHELL installation? (y/n): \033[0m"
     read -r yn
     case $yn in
         [yY]* ) break;;
