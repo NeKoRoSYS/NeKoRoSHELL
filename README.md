@@ -11,8 +11,6 @@
 The best way to say "I use Arch btw 🤓" is if your desktop profile looks sleek and suave.
 
 **NeKoRoDOTS** aims to provide an out-of-the-box, clean and reliable, generic, and modular framework that lets you easily customize your desktop experience with simple UI design philosophy in mind.
-
-Based on [mkhmtolzhas' rice](https://github.com/mkhmtolzhas/Invincible-Dots).
 <br>
 <br>
 
