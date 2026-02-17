@@ -242,7 +242,3 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
   yay -S sni-qt
   ```
   Make sure you're not killing waybar using -SIGUSER2 when refreshing the config.
-<br>
-
-## Sponsorship
-I am an aspiring software and game developer that currently do stuff solo. [Donating](https://ko-fi.com/nekorosys) is not a must, but it will be immensely cherished and appreciated!
