@@ -1,11 +1,11 @@
 > [!TIP]
 > Please star the repo if you like the dotfiles. Thank you 🙏
 
-# NeKoRoDOTS 
-<br>
-
 ![Screenshot](showcase/image.png) 
 <br>
+<br>
+
+# NeKoRoDOTS 
 <br>
 
 The best way to say "I use Arch btw 🤓" is if your desktop profile looks sleek and suave.
