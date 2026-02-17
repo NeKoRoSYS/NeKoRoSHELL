@@ -34,18 +34,16 @@ The best way to say "I use Arch btw 🤓" is if your desktop profile looks sleek
 > 
 > The [System Booting](#system-booting) section contains settings specifically optimized for a dual-GPU laptop (Intel 620/Nvidia 940MX). 
 > **Do not** copy the `GRUB_CMDLINE_LINUX_DEFAULT` or `mkinitcpio` modules unless you have identical hardware, as this may **prevent your system from booting**.
-<br>
 
 - Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
   - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
  
 - This rice uses `wofi` to run actions and apps.
-  - Install via `sudo pacman -S wofi`.
   - Some apps like `mpvpaper` needs to be ran using `prime-run` and `gamemoderun`
     - Install via `sudo pacman -S nvidia-prime gamemode`.
   - (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
 
-- `hyprland` uses `hyprdile` and `hyprlock`.
+- `hyprland` uses `hypridle` and `hyprlock`.
   - Install them via `sudo pacman -S hyprlock hypridle`. (Automatically provided by `pkglist.txt` if you used the `install.sh` bash file)
 
 - Waybar was set up to use `kitty`, `Mozilla Firefox`, and `dolphin`. You can change this if you want at `~/.config/waybar/config.jsonc`.
