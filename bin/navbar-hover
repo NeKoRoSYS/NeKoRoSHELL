@@ -3,16 +3,17 @@
 HOVER_CONF="$HOME/.cache/navbar-hover.conf"
 STATE="hidden"
 
-# Function to read config
 read_config() {
-    TRIGGER_SIZE=10
+    # Default values
+    ACTIVATE_SIZE=10   # How close to the edge to show the bar
+    DEACTIVATE_SIZE=40 # How far away to move to hide the bar
     BAR_POSITION="top"
+    
+    # Override defaults if config exists
     [ -f "$HOVER_CONF" ] && source "$HOVER_CONF"
 }
 
-# Optimized monitor updates - call once and cache
 update_monitors() {
-    # Only call jq here to minimize process forking
     mapfile -t MONITORS < <(hyprctl monitors -j | jq -r '.[] | "\(.x) \(.y) \(.width) \(.height)"')
 }
 
@@ -35,24 +36,27 @@ while true; do
         CYCLE_COUNT=0
     fi
 
-
     IFS=', ' read -r CX CY < <(hyprctl cursorpos)
+
+    if [ "$STATE" = "hidden" ]; then
+        CURRENT_THRESH=$ACTIVATE_SIZE
+    else
+        CURRENT_THRESH=$DEACTIVATE_SIZE
+    fi
 
     IS_HOVERING=0
     for mon in "${MONITORS[@]}"; do
         read -r mx my mw mh <<< "$mon"
         
-        # Optimized boundary checks using Bash math
         case "$BAR_POSITION" in
-            "top")    (( CX >= mx && CX < mx + mw && CY >= my && CY <= my + TRIGGER_SIZE )) && IS_HOVERING=1 ;;
-            "bottom") (( CX >= mx && CX < mx + mw && CY >= my + mh - TRIGGER_SIZE && CY <= my + mh )) && IS_HOVERING=1 ;;
-            "left")   (( CX >= mx && CX <= mx + TRIGGER_SIZE && CY >= my && CY < my + mh )) && IS_HOVERING=1 ;;
-            "right")  (( CX >= mx + mw - TRIGGER_SIZE && CX <= mx + mw && CY >= my && CY < my + mh )) && IS_HOVERING=1 ;;
+            "top")    (( CX >= mx && CX < mx + mw && CY >= my && CY <= my + CURRENT_THRESH )) && IS_HOVERING=1 ;;
+            "bottom") (( CX >= mx && CX < mx + mw && CY >= my + mh - CURRENT_THRESH && CY <= my + mh )) && IS_HOVERING=1 ;;
+            "left")   (( CX >= mx && CX <= mx + CURRENT_THRESH && CY >= my && CY < my + mh )) && IS_HOVERING=1 ;;
+            "right")  (( CX >= mx + mw - CURRENT_THRESH && CX <= mx + mw && CY >= my && CY < my + mh )) && IS_HOVERING=1 ;;
         esac
         [ "$IS_HOVERING" -eq 1 ] && break
     done
 
-    # State machine toggle to prevent spamming signals
     if [ "$IS_HOVERING" -eq 1 ] && [ "$STATE" = "hidden" ]; then
         pkill -SIGUSR1 waybar
         STATE="visible"
