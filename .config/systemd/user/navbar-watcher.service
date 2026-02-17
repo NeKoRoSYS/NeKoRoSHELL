@@ -5,6 +5,7 @@ Wants=hyprland-session.target
 
 [Service]
 ExecStart=%h/bin/navbar-watcher
+ExecStop=/usr/bin/killall waybar
 Restart=always
 RestartSec=1
 
