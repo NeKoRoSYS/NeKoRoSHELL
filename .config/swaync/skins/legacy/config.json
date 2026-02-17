@@ -4,7 +4,7 @@
   "positionX": "right",
   "positionY": "top",
   "layer": "overlay",
-  "control-center-layer": "top",
+  "control-center-layer": "overlay",
   "layer-shell": true,
   "layer-shell-cover-screen": true,
   "cssPriority": "user",
