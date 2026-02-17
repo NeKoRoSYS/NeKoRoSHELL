@@ -108,7 +108,9 @@ The following are what NeKoRoDOTS currently offers:
 - **Smart Navbar**
   - Uses bash script wrappers for `waybar` for the modes: Static, Dynamic, and Hover.
 <br>
-  [Navbar Demo](showcase/navbar-modes.gif)
+<p align="center">
+  <img src="https://github.com/NeKoRoSYS/NeKoRoDOTS/blob/main/showcase/navbar-modes.gif" alt="Navbar Demo" />
+</p>
 
 - **Advanced Customization - Make NeKoRoDOTS YOURS!**
   - NeKoRoDOTS is not just an identity, it is a framework. This repo gives you at most 2 pre-installed out-of-the-box layouts/styling for waybar, hyprlock, and SwayNC. The best part? You can make your own!
