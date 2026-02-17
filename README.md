@@ -1,5 +1,6 @@
 > [!TIP]
 > Please star the repo if you like the dotfiles. Thank you 🙏
+<br>
 
 ![Screenshot](showcase/image.png) 
 <br>
