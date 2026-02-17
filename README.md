@@ -23,7 +23,7 @@ The best way to say "I use Arch btw 🤓" is if your desktop profile looks sleek
 | 🤔 [Optional](#optional) |
 <br>
 
-## Features
+## [Features](CHANGELOG.md)
 
 NeKoRoDOTS focuses on simplicity and modularity.
 <br>
