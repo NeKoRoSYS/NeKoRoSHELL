@@ -34,7 +34,7 @@ std::string exec(const char* cmd) {
     
     std::unique_ptr<FILE, PipeDeleter> pipe(popen(cmd, "r"));
     
-    if (!pipe) throw std::runtime_error("popen() failed!");
+    if (!pipe) return "";
     
     while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) {
         result += buffer;
@@ -89,27 +89,66 @@ std::vector<Monitor> get_monitors() {
     return monitors;
 }
 
+void wait_for_swaync() {
+    while (true) {
+        std::string layers = exec("hyprctl layers");
+        
+        if (layers.empty()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            continue;
+        }
+
+        if (layers.find("swaync-control-center") != std::string::npos) {
+            if (is_bar_visible) {
+                toggle_waybar(false);
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        } else {
+            break;
+        }
+    }
+}
+
 int main() {
+    wait_for_swaync();
+
     Config cfg = read_config();
     std::vector<Monitor> monitors = get_monitors();
     
     int cycle_count = 0;
+    bool started_waybar = false;
 
     if (system("pgrep -x waybar >/dev/null") != 0) {
         system("waybar &");
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        started_waybar = true;
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
-    system("pkill -SIGUSR1 waybar");
-    is_bar_visible = false; 
+    int retries = 0;
+    const int max_retries = 50; 
+    bool found_layer = false;
+
+    while (retries < max_retries) {
+        std::string layers = exec("hyprctl layers");
+        
+        if (layers.find("waybar") != std::string::npos) {
+            is_bar_visible = true;
+            found_layer = true;
+            break;
+        }
+
+        if (!started_waybar && retries > 5) break; 
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        retries++;
+    }
+
+    if (!found_layer && started_waybar) {
+        is_bar_visible = true;
+    }
 
     while (true) {
-        std::string layers = exec("hyprctl layers");
-        if (layers.find("swaync-control-center") != std::string::npos) {
-            do {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            } while (exec("hyprctl layers").find("swaync-control-center") != std::string::npos);
-        }
+        wait_for_swaync();
 
         if (++cycle_count >= 50) {
             cfg = read_config();

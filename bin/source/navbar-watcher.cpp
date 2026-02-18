@@ -36,7 +36,7 @@ int parse_int_value(const std::string& json, size_t pos) {
     return std::stoi(json.substr(pos));
 }
 
-bool is_waybar_visible = true;
+bool is_waybar_visible = false;
 
 void set_waybar(bool visible) {
     bool process_running = (system("pgrep -x waybar > /dev/null") == 0);
@@ -93,6 +93,9 @@ void check_and_update() {
 }
 
 int main() {
+    std::string layers = exec("hyprctl layers");
+    is_waybar_visible = (layers.find("waybar") != std::string::npos);
+
     const char* runtime_dir = getenv("XDG_RUNTIME_DIR");
     const char* signature = getenv("HYPRLAND_INSTANCE_SIGNATURE");
     
