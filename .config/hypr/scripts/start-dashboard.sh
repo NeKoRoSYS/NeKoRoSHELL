@@ -20,7 +20,8 @@ sleep 0.1
 
 # 3. Bottom Left
 
-hyprctl dispatch focuswindow class:fastfetch-grid hyprctl dispatch layoutmsg presel d 
+hyprctl dispatch focuswindow class:fastfetch-grid
+hyprctl dispatch layoutmsg presel d 
 
 kitty --class cava-grid -e cava & sleep 0.1
 
@@ -28,10 +29,9 @@ kitty --class cava-grid -e cava & sleep 0.1
 # 4. Bottom Right
 
 hyprctl dispatch focuswindow class:clock-grid
-
 hyprctl dispatch layoutmsg presel d
 
 #kitty -o font_size=7 --class btop-grid -e btop & #1080p 
-kitty -o font_size=6 --class btop-grid -e btop & #720p &
+kitty -o font_size=6 --class btop-grid -e btop & #720p
 
-sleep 2 && bash ~/.config/hypr/scripts/eject-forbidden.sh
+sleep 2 && ~/.config/hypr/scripts/eject-forbidden

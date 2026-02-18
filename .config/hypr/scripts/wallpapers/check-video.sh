@@ -13,5 +13,4 @@ if [[ -f "$VIDEO_CACHE" ]]; then
     __NV_PRIME_RENDER_OFFLOAD=1 mpvpaper -o "--input-ipc-server=$SOCKET loop-file=inf --mute --no-osc --no-osd-bar --hwdec=$HWDEC --vo=gpu --gpu-context=wayland --no-input-default-bindings" '*' "$WALL" &
     mpvpaper-stop --socket-path /tmp/mpvsocket --period 500 --fork &
     TEMP_THUMB="/tmp/wall_thumb.jpg"
-    ffmpeg -y -ss 00:00:05 -i "$WALL" -frames:v 1 "$TEMP_THUMB" > /dev/null 2>&1
 fi

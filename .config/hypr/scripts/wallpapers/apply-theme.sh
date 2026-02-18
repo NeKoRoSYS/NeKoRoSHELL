@@ -39,7 +39,7 @@ if command -v wal >/dev/null 2>&1; then
 
 	case "$MANAGEMENT_MODE" in
 	"static")
-		systemctl --user restart waybar.service &
+		systemctl --user restart navbar.service &
 		;;
 	"hover")
 		systemctl --user restart navbar-hover.service &
