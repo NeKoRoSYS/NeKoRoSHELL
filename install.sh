@@ -219,7 +219,7 @@ for conf in "${CONFIGS[@]}"; do
     fi
 done
 
-echo -e "${BLUE}Deploying configuration files...${NC}"
+echo -e "${BLUE}Finalizing directory structure...${NC}"
 mkdir -p "$HOME/.config"
 
 if [[ -d ".config" ]]; then
@@ -379,6 +379,30 @@ if command -v systemctl >/dev/null 2>&1; then
     systemctl --user enable swaync.service 2>/dev/null
 else
     echo -e "${RED}Cannot run systemctl. Please enable waybar and SwayNC manually.${NC}"
+fi
+
+# ==============================================================================
+# FINAL VERIFICATION
+# ==============================================================================
+
+echo -e "\n${BLUE}Performing final system check...${NC}"
+CORE_CMDS=("hyprland" "btop" "cava" "fastfetch" "hypremoji" "waybar" "swaync" "rofi" "kitty" "wallust" "swww")
+MISSING=0
+
+for cmd in "${CORE_CMDS[@]}"; do
+    if command -v "$cmd" &> /dev/null; then
+        echo -e "  [${GREEN}OK${NC}] $cmd is installed."
+    else
+        echo -e "  [${RED}!!${NC}] $cmd is missing from PATH."
+        MISSING=$((MISSING + 1))
+    fi
+done
+
+if [[ "$MISSING" -eq 0 ]]; then
+    echo -e "\n${GREEN}Everything looks good! NeKoRoSHELL is ready.${NC}"
+else
+    echo -e "\n${RED}Warning: $MISSING core component(s) were not found.${NC}"
+    echo -e "If you chose 'Minimal', this is expected. Otherwise, check the logs above."
 fi
 
 echo -e "${GREEN}Installation complete! Please restart your session to apply all changes.${NC}"
