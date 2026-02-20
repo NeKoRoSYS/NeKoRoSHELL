@@ -42,8 +42,6 @@ else
     echo -e "${RED}Warning: pkglist.txt not found! Skipping system pkgs.${NC}"
 fi
 
-$AUR_HELPER -S --needed --noconfirm - < pkglist.txt
-
 if [ -f "flatpak.txt" ]; then
     echo -e "${BLUE}Installing packages from flatpak.txt using flatpak...${NC}"
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
