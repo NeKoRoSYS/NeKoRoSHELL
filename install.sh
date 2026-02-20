@@ -49,8 +49,8 @@ case "$OS" in
             exit 1
         fi
         
-        if [ -f "pkglist.txt" ]; then
-            $AUR_HELPER -S --needed --noconfirm - < pkglist.txt
+        if [ -f "pkglist-arch.txt" ]; then
+            $AUR_HELPER -S --needed --noconfirm - < pkglist-arch.txt
         fi
         ;;
 
