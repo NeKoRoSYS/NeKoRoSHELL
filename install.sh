@@ -227,15 +227,15 @@ if [[ "$MONITOR_COUNT" -gt 0 ]] && [[ -f "$MONITOR_CONF" ]]; then
     PRIMARY_MONITOR=${MONITOR_LIST[0]}
     echo -e "${GREEN}Detected $MONITOR_COUNT monitor(s). Primary: $PRIMARY_MONITOR${NC}"
 
-    sed -i "s/eDP-1/$PRIMARY_MONITOR/g" "$MONITOR_CONF"
+    sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" "$MONITOR_CONF"
 
     if [[ "$MONITOR_COUNT" -ge 2 ]]; then
         SECONDARY_MONITOR=${MONITOR_LIST[1]}
         echo -e "${GREEN}Secondary monitor detected: $SECONDARY_MONITOR${NC}"
-        sed -i "s/DP-1/$SECONDARY_MONITOR/g" "$MONITOR_CONF"
+        sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" "$MONITOR_CONF"
     else
         echo -e "${BLUE}Only one monitor detected. Disabling secondary monitor line...${NC}"
-        sed -i '/monitor=DP-1/s/^/#/' "$MONITOR_CONF"
+        sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' "$MONITOR_CONF"
     fi
 elif [[ ! -f "$MONITOR_CONF" ]]; then
     echo -e "${RED}Warning: $MONITOR_CONF not found. Skipping monitor setup.${NC}"
@@ -322,9 +322,9 @@ fi
 
 if command -v systemctl >/dev/null 2>&1; then
     echo -e "${BLUE}Enabling Wayland services...${NC}"
+    systemctl --user daemon-reload
     systemctl --user enable waybar.service 2>/dev/null
     systemctl --user enable swaync.service 2>/dev/null
-    systemctl --user daemon-reload
 else
     echo -e "${RED}Cannot run systemctl. Please enable waybar and SwayNC manually.${NC}"
 fi
