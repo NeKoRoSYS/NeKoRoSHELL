@@ -107,7 +107,7 @@
 	  "label": "󰔎",
 	  "type": "toggle",  
 	  "active": false,
-	  "command": "bash ~/.config/hypr/scripts/wallpapers/theme-switcher.sh",
+	  "command": "bash ~/.config/hypr/scripts/wallpapers/contrast-switcher.sh",
 	  "update-command": "sh -c '[[ $(cat ~/.cache/theme_mode) == \"Dark\" ]] && echo true || echo false'"
 	},
 	{
