@@ -5,12 +5,12 @@
 #include <sstream>
 #include <cstdio>
 #include <memory>
-#include <stdexcept>
 #include <thread>
 #include <chrono>
 #include <cstdlib>
 #include <algorithm>
-#include <cstring> 
+#include <unistd.h>
+#include <sys/wait.h>
 
 struct PipeDeleter {
     void operator()(FILE* stream) const {
@@ -31,11 +31,8 @@ struct Config {
 std::string exec(const char* cmd) {
     char buffer[4096];
     std::string result = "";
-    
     std::unique_ptr<FILE, PipeDeleter> pipe(popen(cmd, "r"));
-    
     if (!pipe) return "";
-    
     while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) {
         result += buffer;
     }
@@ -50,12 +47,12 @@ int parse_int_value(const std::string& json, size_t pos) {
     return std::stoi(json.substr(pos));
 }
 
-bool is_bar_visible = false; 
+bool is_bar_visible = true;
 
-void toggle_waybar(bool visible) {
-    if (visible != is_bar_visible) {
-        system("pkill -SIGUSR1 waybar");
-        is_bar_visible = visible;
+void toggle_waybar(bool want_visible) {
+    if (want_visible != is_bar_visible) {
+        system("killall -q -SIGUSR1 waybar");
+        is_bar_visible = want_visible;
     }
 }
 
@@ -93,13 +90,10 @@ std::vector<Monitor> get_monitors() {
     size_t pos = 0;
     while ((pos = mon_out.find("\"width\":", pos)) != std::string::npos) {
         int w = parse_int_value(mon_out, pos + 8);
-        
         pos = mon_out.find("\"height\":", pos);
         int h = parse_int_value(mon_out, pos + 9);
-        
         pos = mon_out.find("\"x\":", pos);
         int x = parse_int_value(mon_out, pos + 4);
-        
         pos = mon_out.find("\"y\":", pos);
         int y = parse_int_value(mon_out, pos + 4);
         
@@ -114,12 +108,6 @@ std::vector<Monitor> get_monitors() {
 void wait_for_swaync() {
     while (true) {
         std::string layers = exec("hyprctl layers");
-        
-        if (layers.empty()) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            continue;
-        }
-
         if (layers.find("swaync-control-center") != std::string::npos) {
             if (is_bar_visible) {
                 toggle_waybar(false);
@@ -138,36 +126,19 @@ int main() {
     std::vector<Monitor> monitors = get_monitors();
     
     int cycle_count = 0;
-    bool started_waybar = false;
 
-    if (system("pgrep -x waybar >/dev/null") != 0) {
-        system("waybar &");
-        started_waybar = true;
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    system("killall -q waybar");
+    std::this_thread::sleep_for(std::chrono::milliseconds(150));
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        char* args[] = {(char*)"waybar", nullptr};
+        execvp(args[0], args);
+        exit(1);
     }
 
-    int retries = 0;
-    const int max_retries = 50; 
-    bool found_layer = false;
-
-    while (retries < max_retries) {
-        std::string layers = exec("hyprctl layers");
-        
-        if (layers.find("waybar") != std::string::npos) {
-            is_bar_visible = true;
-            found_layer = true;
-            break;
-        }
-
-        if (!started_waybar && retries > 25) break; 
-        
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        retries++;
-    }
-
-    if (!found_layer && started_waybar) {
-        is_bar_visible = true;
-    }
+    is_bar_visible = true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     while (true) {
         wait_for_swaync();
