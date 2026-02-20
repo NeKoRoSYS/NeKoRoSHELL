@@ -115,7 +115,7 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Qt and Kvantum integration | 🤔 |
 | Quickshell integration | 🤔 |
 
-NOTE: It is **unclear** what I'll have to do to properly execute a Quickshell integration for this repo. Maybe I'll only add widgets; or maybay I'll make an entirely new desktop environment on top of Hyprland, replacing waybar and swaync. Who knows? It doesn't matter for now so please take it with a grain of salt.
+NOTE: It is **unclear** what I'll have to do to properly execute a Quickshell integration for this repo. Maybe I'll only add widgets; or maybe I'll make an entirely new desktop environment on top of Hyprland, replacing waybar and swaync. Who knows? It doesn't matter for now so please take it with a grain of salt.
 
 <br>
 
