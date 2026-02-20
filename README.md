@@ -148,6 +148,15 @@ You have two options:
 > The [System Booting](#system-booting) section contains settings specifically optimized for a dual-GPU laptop (Intel 620/Nvidia 940MX). 
 > **Do not** copy the `GRUB_CMDLINE_LINUX_DEFAULT` or `mkinitcpio` modules unless you have identical hardware, as this may **prevent your system from booting**.
 
+> [!WARNING]
+> **SOFTWARE SPECIFIC CONFIGURATION**<br>
+>
+> This project of mine was originally built only for Arch Linux but is now capable of claiming itself to be Distro-agnostic. However, **installation of this repo in other Linux Distros aside from Arch is more or less UNTESTED.** Please verify using `nano` or your preferred text-editor if your distro supports the packages listed at `pkglist-DISTRO.txt` or if the packages are named correctly.
+>
+> Normal incompatibilities include distros like Artix not being able to run `systemctl` because they use a different init system/manager. For those who experience something similar, manually enable SwayNC and waybar services yourself. Furthermore, some distros have outdated packages and may require building from git, cargo, or go.
+>
+> The installation system for that I implemented can be improved. If you're willing to help, please make a pull request. Your contributions are welcome and will be appreciated! :D
+
 - Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
   - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
  
