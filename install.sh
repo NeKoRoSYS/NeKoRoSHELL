@@ -19,6 +19,21 @@ BLUE='\033[0;34m'
 RED='\033[0;31m'
 NC='\033[0m'
 
+echo -e "${BLUE}Detecting operating system...${NC}"
+
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS=$ID
+    if [ "$OS" = "linuxmint" ] || [ "$OS" = "pop" ]; then
+        OS="ubuntu"
+    fi
+else
+    echo -e "${RED}Cannot detect operating system. /etc/os-release not found.${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}Detected OS: $OS${NC}"
+
 echo -e "${BLUE}Starting installation...${NC}"
 
 if command -v paru &> /dev/null; then
@@ -35,12 +50,58 @@ if ! command -v flatpak &> /dev/null; then
     exit 1
 fi
 
-if [ -f "pkglist.txt" ]; then
-    echo -e "${BLUE}Installing packages from pkglist.txt using $AUR_HELPER...${NC}"
-    $AUR_HELPER -S --needed --noconfirm - < pkglist.txt
-else
-    echo -e "${RED}Warning: pkglist.txt not found! Skipping system pkgs.${NC}"
-fi
+echo -e "${BLUE}Installing system dependencies...${NC}"
+
+case "$OS" in
+    arch|endeavouros|manjaro)
+        if command -v paru &> /dev/null; then
+            AUR_HELPER="paru"
+        elif command -v yay &> /dev/null; then
+            AUR_HELPER="yay"
+        else
+            echo -e "${RED}Error: yay or paru is required for Arch.${NC}"
+            exit 1
+        fi
+        
+        if [ -f "pkglist.txt" ]; then
+            $AUR_HELPER -S --needed --noconfirm - < pkglist.txt
+        fi
+        ;;
+
+    fedora)
+        if [ -f "pkglist-fedora.txt" ]; then
+            sudo dnf install -y $(cat pkglist-fedora.txt)
+        else
+            echo -e "${RED}pkglist-fedora.txt not found!${NC}"
+        fi
+        ;;
+
+    ubuntu|debian)
+        if [ -f "pkglist-debian.txt" ]; then
+            sudo apt-get update
+            sudo apt-get install -y $(cat pkglist-debian.txt)
+        else
+            echo -e "${RED}pkglist-debian.txt not found!${NC}"
+        fi
+        ;;
+        
+    gentoo)
+        if [ -f "pkglist-gentoo.txt" ]; then
+            sudo emerge -av --noreplace $(cat pkglist-gentoo.txt)
+        else
+            echo -e "${RED}pkglist-gentoo.txt not found!${NC}"
+        fi
+        ;;
+
+    *)
+        echo -e "${RED}Unsupported OS: $OS. Please install dependencies manually.${NC}"
+        echo -ne "Do you wish to continue with config deployment anyway? (y/n): "
+        read -r continue_ans
+        if [[ ! "$continue_ans" =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+        ;;
+esac
 
 if [ -f "flatpak.txt" ]; then
     echo -e "${BLUE}Installing packages from flatpak.txt using flatpak...${NC}"
