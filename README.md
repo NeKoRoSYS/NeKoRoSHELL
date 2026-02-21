@@ -26,7 +26,6 @@ The best way to say "I use Linux btw 🤓" is if your desktop profile looks slee
 | 📌 **Table of Contents** |
 | :---: |
 | 🚀 [Features](#features) |
-| 🔨 [Skins and Layouts](#skins-and-layouts) |
 | 🔗 [Dependencies](#dependencies) |
 | 🤔 [Optional](#optional) |
 <br>
@@ -119,27 +118,6 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 
 NOTE: It is **unclear** what I'll have to do to properly execute a Quickshell integration for this repo. Maybe I'll only add widgets; or maybe I'll make an entirely new desktop environment on top of Hyprland, replacing waybar and swaync. Who knows? It doesn't matter for now so please take it with a grain of salt.
 
-<br>
-
-## Desktop Customization
-Make sure to analyze the directory structure of `~/.config/waybar/skins`, `~/.config/hypr/hyprlock/`, and `~/.config/hypr/swaync/`; and how the files (`hyprlock.conf`, `config.jsonc`, `colors.css`, `style.css`, `layout.jsonc`, `modules.jsonc`) include or import from each other. That way, you can easily create more options or looks to choose from!
-
-You have two options:
-- Install someone else's Waybar/Hyprlock setup and then manually adjust its files to correctly import or include; or
-- Make your own. ¯\_(ツ)_/¯
-<br>
-<br>
-
-![Screenshot](showcase/image-8.png) 
-<br>
-<br>
-<br>
-![Screenshot](showcase/image-7.png) 
-<br>
-<br>
-<br>
-![Screenshot](showcase/image-6.png) 
-<br>
 <br>
 
 ## Dependencies
