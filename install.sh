@@ -262,14 +262,19 @@ if [[ "$MONITOR_COUNT" -gt 0 ]]; then
     SECONDARY_MONITOR=${MONITOR_LIST[1]:-$PRIMARY_MONITOR}
 
     echo -e "${GREEN}Detected $MONITOR_COUNT monitor(s). Primary: $PRIMARY_MONITOR${NC}"
-    find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
-    
-    if [[ "$MONITOR_COUNT" -ge 2 ]]; then
-        echo -e "${GREEN}Secondary monitor detected: $SECONDARY_MONITOR${NC}"
-        find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
+
+    if [[ -d "$HOME/.config/hypr" ]]; then
+        find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
+        
+        if [[ "$MONITOR_COUNT" -ge 2 ]]; then
+            echo -e "${GREEN}Secondary monitor detected: $SECONDARY_MONITOR${NC}"
+            find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
+        else
+            echo -e "${BLUE}Only one monitor detected. Commenting out secondary monitor lines...${NC}"
+            find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
+        fi
     else
-        echo -e "${BLUE}Only one monitor detected. Commenting out secondary monitor lines...${NC}"
-        find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
+        echo -e "${RED}Error: $HOME/.config/hypr not found! The config copy likely failed.${NC}"
     fi
 else
     echo -e "${RED}Warning: Could not automatically detect any monitors. Placeholders will remain unchanged.${NC}"
@@ -279,7 +284,7 @@ SEARCH="/home/nekorosys"
 REPLACE="$HOME"
 
 echo -e "${BLUE}Replacing hardcoded paths... ($SEARCH -> $REPLACE)...${NC}"
-find "$HOME/.config" -type f \( -name "*.config" -o -name "*.css" -o -name "*.rasi" -o -name "*.conf" -o -name "*.sh" -o -name "*.json" -o -name "*.jsonc" -o -name "*.lua" -o -name "*.py" -o -name "*.yaml" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|$SEARCH|$REPLACE|g"
+find "$HOME/.config" -type d -name "*_backup_*" -prune -o -type f \( -name "*.config" -o -name "*.css" -o -name "*.rasi" -o -name "*.conf" -o -name "*.sh" -o -name "*.json" -o -name "*.jsonc" -o -name "*.lua" -o -name "*.py" -o -name "*.yaml" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|$SEARCH|$REPLACE|g"
 
 inject_shell_config() {
     local shell_rc="$1"
