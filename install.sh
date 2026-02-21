@@ -255,27 +255,24 @@ else
     done
 fi
 
-MONITOR_COUNT=${#MONITOR_LIST[@]}
-MONITOR_CONF="$HOME/.config/hypr/configs/monitors.conf"
+MONITOR_COUNT=${#MONITOR_LIST[@]}\
 
-if [[ "$MONITOR_COUNT" -gt 0 ]] && [[ -f "$MONITOR_CONF" ]]; then
+if [[ "$MONITOR_COUNT" -gt 0 ]]; then
     PRIMARY_MONITOR=${MONITOR_LIST[0]}
+    SECONDARY_MONITOR=${MONITOR_LIST[1]:-$PRIMARY_MONITOR}
+
     echo -e "${GREEN}Detected $MONITOR_COUNT monitor(s). Primary: $PRIMARY_MONITOR${NC}"
-
-    sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" "$MONITOR_CONF"
-
+    find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
+    
     if [[ "$MONITOR_COUNT" -ge 2 ]]; then
-        SECONDARY_MONITOR=${MONITOR_LIST[1]}
         echo -e "${GREEN}Secondary monitor detected: $SECONDARY_MONITOR${NC}"
-        sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" "$MONITOR_CONF"
+        find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
     else
-        echo -e "${BLUE}Only one monitor detected. Disabling secondary monitor line...${NC}"
-        sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' "$MONITOR_CONF"
+        echo -e "${BLUE}Only one monitor detected. Commenting out secondary monitor lines...${NC}"
+        find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
     fi
-elif [[ ! -f "$MONITOR_CONF" ]]; then
-    echo -e "${RED}Warning: $MONITOR_CONF not found. Skipping monitor setup.${NC}"
 else
-    echo -e "${RED}Warning: Could not automatically detect any monitors.${NC}"
+    echo -e "${RED}Warning: Could not automatically detect any monitors. Placeholders will remain unchanged.${NC}"
 fi
 
 SEARCH="/home/nekorosys"
