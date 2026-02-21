@@ -240,9 +240,9 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
 <div align="center">
 <a href="https://www.star-history.com/#caelestia-dots/shell&Date">
  <picture>
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=top-left"/>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=top-left&theme=dark"/>
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&ttype=date&logscale&legend=top-left"/>
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=bottom-right"/>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=bottom-right&theme=dark"/>
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&ttype=date&logscale&legend=bottom-right"/>
  </picture>
 </a>
 </div>
