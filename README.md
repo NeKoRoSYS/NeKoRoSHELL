@@ -232,3 +232,8 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
 - Install `blueman` and `r-quick-share` for seamless bluetooth support. (Works with Apple Airpods and android phone)
 - Fix waybar tray disappearing after a certain amount of time by installing `sni-qt`.
   Make sure you're not killing waybar using -SIGUSER2 when refreshing the config.
+<br>
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=top-left)](https://www.star-history.com/#nekorosys/nekoroshell&type=date&logscale&legend=top-left)
