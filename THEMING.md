@@ -26,10 +26,12 @@ You usually have two options when making a Skin:
 - Install someone else's packge design/setup and then manually adjust its files to follow the directory and file organization schematics; or
 - Make your own. This page won't teach you how to actually make and modify files, please read the documentation for the packages you want to make a skin for. ¯\_(ツ)_/¯
   - You don't have to, but you can make sure it supports the Dark and Light contrast modes by importing from wallust: `/home/username/.cache/wallust/your-wallust-colors.extension`
+<br>
 
 waybar, rofi, and SwayNC Skins lets you dynamically configure hyprland `layerrule`(s).
   - Each of them has a `layerrule.conf` file.
   - These `layerrule.conf` files are then imported to `.config/hypr/configs/windowrules.conf` (usually found at the bottom).
+<br>
  
 ### Making a Theme
 
