@@ -72,7 +72,7 @@ The following are what NeKoRoSHELL currently offers:
   - NeKoRoSHELL is not just an identity, it is a framework. This repo gives you at most 2 pre-installed out-of-the-box layouts/styling for waybar, hyprlock, and SwayNC. The best part? You can make your own!
   - Credits to [iyiolacak](https://github.com/iyiolacak/iyiolacak-swaync-config?tab=readme-ov-file), [justinmdickey](https://github.com/justinmdickey/publicdots/blob/main/.config/hypr/hyprlock.conf), and [mkhmtolzhas](https://github.com/mkhmtolzhas/mkhmtdots) for their amazing designs.
   - Switch to Dark and Light contrast modes
-  - Dedicated Theming System:
+  - [Dedicated Theming System](THEMING.md):
     - Select individual skins for Waybar, Rofi, Hyprlock, and SwayNC
     - **Wallpaper Handling**
       - Supports both online and offline image (via `swww`) and video (via `mpvpaper`) formats.
@@ -80,7 +80,6 @@ The following are what NeKoRoSHELL currently offers:
         - Paste image or video links with valid file extensions in the rofi prompt and the download will automatically be processed, saved, and set as your new wallpaper.
       - Uses `wallust` to dynamically update border and UI colors based on the percieved colors of from the wallpaper.
     - Make and select your own Themes that automatically apply skins and wallpapers.
-    - For more information, see [THEMING](THEMING.md)
 <br>
 
 ![Screenshot](showcase/image-5.png) 
