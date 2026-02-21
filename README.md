@@ -237,8 +237,7 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
 ## Star History
 <br>
 
-[![Star History Chart](https://api.star-history.com/svg?repos=nekorosys/nekoroshell)](https://www.star-history.com/#nekorosys/nekoroshell&type=date&logscale&legend=top-left)
-
+<div align="center">
 <a href="https://www.star-history.com/#caelestia-dots/shell&Date">
  <picture>
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=top-left"/>
@@ -246,3 +245,4 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&ttype=date&logscale&legend=top-left"/>
  </picture>
 </a>
+</div>
