@@ -81,7 +81,6 @@ prompt_merge() {
         echo -e "\n${YELLOW}Conflict detected in: ${NC}$relative_path"
         echo -ne "Action: [${GREEN}o${NC}]verwrite, [${RED}k${NC}]eep current, [${BLUE}v${NC}]iew diff, [${YELLOW}m${NC}]erge (vimdiff)? "
         
-        # Read normally, no TTY hacks needed anymore
         read -r -n 1 choice 
         echo ""
         
@@ -94,7 +93,6 @@ prompt_merge() {
                 echo -e "${YELLOW}Kept current version.${NC}"
                 break ;;
             v)
-                # Diff streams correctly into less!
                 diff --color=always -u "$target_file" "$new_file" | less -R
                 ;;
             m)
@@ -128,6 +126,23 @@ while IFS= read -r -u 3 new_file; do
     fi
 done 3< <(find "$TEMP_DIR/.config" -type f)
 
+echo -e "\n${BLUE}Scanning for and removing legacy root-level scripts...${NC}"
+
+for legacy_dir in "$HOME/.local/bin" "$HOME/bin"; do
+    if [[ -d "$legacy_dir" ]]; then
+        for new_script in "$TEMP_DIR/bin/"*; do
+            if [[ -f "$new_script" ]]; then
+                script_name=$(basename "$new_script")
+                
+                if [[ -f "$legacy_dir/$script_name" ]]; then
+                    echo -e "${YELLOW}Removing old script to prevent conflicts:${NC} $legacy_dir/$script_name"
+                    rm -f "$legacy_dir/$script_name"
+                fi
+            fi
+        done
+    fi
+done
+
 echo -e "\n${BLUE}Updating core scripts and binaries...${NC}"
 
 if [[ -d "$HOME/.local/bin/nekoroshell" ]]; then
@@ -142,7 +157,29 @@ fi
 if [[ -d "$TEMP_DIR/bin" ]]; then
     cp -r "$TEMP_DIR/bin/"* "$BIN_DIR/" 2>/dev/null
     chmod +x "$BIN_DIR"/* 2>/dev/null
-    echo -e "${GREEN}Successfully updated scripts in $BIN_DIR${NC}"
+    echo -e "${GREEN}Successfully updated bash scripts in $BIN_DIR${NC}"
+fi
+
+echo -e "${BLUE}Recompiling C++ Daemons...${NC}"
+if ! command -v g++ &> /dev/null || ! command -v pkg-config &> /dev/null; then
+    echo -e "${RED}Warning: g++ or pkg-config not found. Skipping C++ recompilation.${NC}"
+else
+    REQUIRED_LIBS="wayland-client" 
+    if ! pkg-config --exists $REQUIRED_LIBS; then
+        echo -e "${RED}Warning: Missing development headers for $REQUIRED_LIBS. Skipping compilation.${NC}"
+    else
+        LIBS=$(pkg-config --cflags --libs $REQUIRED_LIBS)
+        
+        if [[ -f "$TEMP_DIR/bin/source/navbar-hover.cpp" ]]; then
+            g++ -O3 -o "$BIN_DIR/navbar-hover" "$TEMP_DIR/bin/source/navbar-hover.cpp" $LIBS
+            echo -e "  [${GREEN}OK${NC}] Compiled navbar-hover"
+        fi
+        
+        if [[ -f "$TEMP_DIR/bin/source/navbar-watcher.cpp" ]]; then
+            g++ -O3 -o "$BIN_DIR/navbar-watcher" "$TEMP_DIR/bin/source/navbar-watcher.cpp" $LIBS
+            echo -e "  [${GREEN}OK${NC}] Compiled navbar-watcher"
+        fi
+    fi
 fi
 
 rm -rf "$TEMP_DIR"
