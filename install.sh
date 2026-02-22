@@ -340,8 +340,6 @@ inject_shell_config() {
         echo -e "# --- NeKoRoSHELL END ---" >> "$shell_rc"
         echo -e "${GREEN}Updated $shell_rc${NC}"
     fi
-
-    source $1
 }
 
 inject_shell_config "$HOME/.bashrc" ".bashrc"
