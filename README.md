@@ -117,7 +117,7 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Optimizations | ✅ |
 | Color Handling - Replace pywal6 with wallust | ✅ |
 | Dmenu Overhaul - Replace wofi with rofi | ✅ |
-| Support for other distros; BETA | 🔍 |
+| Support for other distros; BETA<br>Verified to be working on: Arch and Debian | 🔍 |
 | Theme System - Set all skins in one go | ✅ |
 | wlogout integration | ⏳ |
 | Example Minecraft Theme| 🤔 |
