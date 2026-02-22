@@ -106,6 +106,7 @@ The following are what NeKoRoSHELL currently offers:
 
 NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](https://github.com/NeKoRoSYS/NeKoRoSHELL/tree/main?tab=contributing-ov-file#) *cough*) and is constantly under rigorous quality assurance for improvement. We always aim to keep a "no-break" promise for every update so that you can safely update to later versions without expecting any breakages.
 
+<br>
 <div align="center">
 
 | 📋 **TODO** | **STATUS** |
@@ -124,6 +125,7 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Quickshell integration | 🤔 |
 
 </div>
+<br>
 
 NOTE: It is **unclear** what I'll have to do to properly execute a Quickshell integration for this repo. Maybe I'll only add widgets; or maybe I'll make an entirely new desktop environment on top of Hyprland, replacing waybar and swaync. Who knows? It doesn't matter for now so please take it with a grain of salt.
 
