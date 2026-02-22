@@ -1,0 +1,159 @@
+#!/bin/bash
+
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+REPO="nekorosys/nekoroshell"
+TEMP_DIR="/tmp/nekoroshell_upgrade"
+
+echo -e "# ======================================================= #"
+echo -e "#             NeKoRoSHELL Upgrade Utility                 #"
+echo -e "# ======================================================= #\n"
+
+echo -e "${BLUE}Fetching latest release info from GitHub...${NC}"
+LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+TARBALL_URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tarball_url":' | sed -E 's/.*"([^"]+)".*/\1/')
+
+if [[ -z "$LATEST_TAG" || -z "$TARBALL_URL" ]]; then
+    echo -e "${RED}Error: Could not fetch release data. Are you connected to the internet?${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}Latest release found: $LATEST_TAG${NC}\n"
+
+echo -ne "${YELLOW}Do you want to proceed with the upgrade to $LATEST_TAG? (y/n): ${NC}"
+read -r confirm
+if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    echo -e "${RED}Upgrade aborted by user.${NC}"
+    exit 0
+fi
+
+echo -e "\n${BLUE}Downloading and extracting...${NC}"
+
+rm -rf "$TEMP_DIR"
+mkdir -p "$TEMP_DIR"
+curl -sL "$TARBALL_URL" | tar -xz -C "$TEMP_DIR" --strip-components=1
+
+if [[ ! -d "$TEMP_DIR/.config" ]]; then
+    echo -e "${RED}Error: Extraction failed or invalid repository structure.${NC}"
+    exit 1
+fi
+
+echo -e "${BLUE}Pre-processing downloaded files to match your system...${NC}"
+
+find "$TEMP_DIR/.config" -type f \( -name "*.conf" -o -name "*.json" -o -name "*.jsonc" -o -name "*.css" -o -name "*.rasi" -o -name "*.sh" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|/home/nekorosys|$HOME|g"
+
+declare -a MONITOR_LIST
+if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]] && command -v hyprctl &> /dev/null; then
+    mapfile -t MONITOR_LIST < <(hyprctl monitors | awk '/Monitor/ {print $2}')
+else
+    for f in /sys/class/drm/*/status; do
+        if grep -q "^connected$" "$f" 2>/dev/null; then
+            monitor_name=$(basename "$(dirname "$f")" | sed -E 's/^card[0-9]+-//')
+            [[ ! " ${MONITOR_LIST[*]} " =~ " ${monitor_name} " ]] && MONITOR_LIST+=("$monitor_name")
+        fi
+    done
+fi
+
+if [[ ${#MONITOR_LIST[@]} -gt 0 ]]; then
+    PRIMARY_MONITOR=${MONITOR_LIST[0]}
+    SECONDARY_MONITOR=${MONITOR_LIST[1]:-$PRIMARY_MONITOR}
+    
+    find "$TEMP_DIR/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
+    if [[ ${#MONITOR_LIST[@]} -ge 2 ]]; then
+        find "$TEMP_DIR/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
+    else
+        find "$TEMP_DIR/.config/hypr" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
+    fi
+fi
+
+echo -e "\n${BLUE}Comparing configurations...${NC}"
+
+prompt_merge() {
+    local new_file="$1"
+    local target_file="$2"
+    local relative_path="${target_file#$HOME/}"
+
+    while true; do
+        echo -e "\n${YELLOW}Conflict detected in: ${NC}$relative_path"
+        echo -ne "Action: [${GREEN}o${NC}]verwrite, [${RED}k${NC}]eep current, [${BLUE}v${NC}]iew diff, [${YELLOW}m${NC}]erge (vimdiff)? "
+        
+        # Read normally, no TTY hacks needed anymore
+        read -r -n 1 choice 
+        echo ""
+        
+        case "${choice,,}" in
+            o)
+                cp "$new_file" "$target_file"
+                echo -e "${GREEN}Overwritten.${NC}"
+                break ;;
+            k)
+                echo -e "${YELLOW}Kept current version.${NC}"
+                break ;;
+            v)
+                # Diff streams correctly into less!
+                diff --color=always -u "$target_file" "$new_file" | less -R
+                ;;
+            m)
+                if command -v vimdiff >/dev/null; then
+                    vimdiff "$target_file" "$new_file"
+                    break
+                else
+                    echo -e "${RED}vimdiff is not installed. Please view diff or overwrite/keep.${NC}"
+                fi
+                ;;
+            *)
+                echo -e "${RED}Invalid choice. Please press o, k, v, or m.${NC}" ;;
+        esac
+    done
+}
+
+while IFS= read -r -u 3 new_file; do
+    relative_path="${new_file#$TEMP_DIR/}"
+    target_file="$HOME/$relative_path"
+    target_dir=$(dirname "$target_file")
+
+    if [[ ! -f "$target_file" ]]; then
+        mkdir -p "$target_dir"
+        cp "$new_file" "$target_file"
+        echo -e "${GREEN}Added new file:${NC} $relative_path"
+        continue
+    fi
+
+    if ! cmp -s "$new_file" "$target_file"; then
+        prompt_merge "$new_file" "$target_file"
+    fi
+done 3< <(find "$TEMP_DIR/.config" -type f)
+
+echo -e "\n${BLUE}Updating core scripts and binaries...${NC}"
+
+if [[ -d "$HOME/.local/bin/nekoroshell" ]]; then
+    BIN_DIR="$HOME/.local/bin/nekoroshell"
+elif [[ -d "$HOME/bin/nekoroshell" ]]; then
+    BIN_DIR="$HOME/bin/nekoroshell"
+else
+    BIN_DIR="$HOME/.local/bin/nekoroshell"
+    mkdir -p "$BIN_DIR"
+fi
+
+if [[ -d "$TEMP_DIR/bin" ]]; then
+    cp -r "$TEMP_DIR/bin/"* "$BIN_DIR/" 2>/dev/null
+    chmod +x "$BIN_DIR"/* 2>/dev/null
+    echo -e "${GREEN}Successfully updated scripts in $BIN_DIR${NC}"
+fi
+
+rm -rf "$TEMP_DIR"
+
+echo -e "\n${BLUE}Reloading services...${NC}"
+if command -v systemctl >/dev/null 2>&1; then
+    systemctl --user daemon-reload
+fi
+
+if command -v hyprctl >/dev/null 2>&1; then
+    hyprctl reload >/dev/null 2>&1
+fi
+
+echo -e "${GREEN}Upgrade to $LATEST_TAG complete!${NC}"
