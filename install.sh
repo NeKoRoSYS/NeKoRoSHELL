@@ -87,7 +87,7 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
     echo -e "${GREEN}Detected OS: $OS${NC}"
     echo -e "${BLUE}Installing system dependencies...${NC}"
 
-    case "$OS" in
+case "$OS" in
         arch|endeavouros|manjaro)
             if command -v paru &> /dev/null; then
                 AUR_HELPER="paru"
@@ -100,11 +100,12 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             
             if [[ -f "packages/pkglist-arch.txt" ]]; then
                 packages=$(sed 's/["'\'']//g' packages/pkglist-arch.txt | tr ' ' '\n' | grep -v -E '^\s*$|^#')
+                pkg_array=($packages)
                 
-                for pkg in $packages; do
-                    echo -e "${BLUE}Installing: $pkg${NC}"
-                    $AUR_HELPER -S --needed --noconfirm "$pkg" || echo -e "${RED}Failed to install $pkg. Skipping...${NC}"
-                done
+                if [[ ${#pkg_array[@]} -gt 0 ]]; then
+                    echo -e "${BLUE}Installing Arch packages in bulk...${NC}"
+                    $AUR_HELPER -S --needed --noconfirm "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check the output above.${NC}"
+                fi
             else
                 echo -e "${RED}Warning: packages/pkglist-arch.txt not found!${NC}"
             fi
@@ -113,10 +114,12 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
         fedora)
             if [[ -f "packages/pkglist-fedora.txt" ]]; then
                 packages=$(sed 's/["'\'']//g' packages/pkglist-fedora.txt | tr ' ' '\n' | grep -v -E '^\s*$|^#')
-                for pkg in $packages; do
-                    echo -e "${BLUE}Installing: $pkg${NC}"
-                    sudo dnf install -y "$pkg" || echo -e "${RED}Failed to install $pkg. Skipping...${NC}"
-                done
+                pkg_array=($packages)
+                
+                if [[ ${#pkg_array[@]} -gt 0 ]]; then
+                    echo -e "${BLUE}Installing Fedora packages in bulk...${NC}"
+                    sudo dnf install -y "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check the output above.${NC}"
+                fi
             else
                 echo -e "${RED}Warning: packages/pkglist-fedora.txt not found!${NC}"
             fi
@@ -129,10 +132,12 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             if [[ -f "packages/pkglist-debian.txt" ]]; then
                 sudo apt-get update
                 packages=$(sed 's/["'\'']//g' packages/pkglist-debian.txt | tr ' ' '\n' | grep -v -E '^\s*$|^#')
-                for pkg in $packages; do
-                    echo -e "${BLUE}Installing: $pkg${NC}"
-                    sudo apt-get install -y "$pkg" || echo -e "${RED}Failed to install $pkg. Skipping...${NC}"
-                done
+                pkg_array=($packages)
+                
+                if [[ ${#pkg_array[@]} -gt 0 ]]; then
+                    echo -e "${BLUE}Installing Debian/Ubuntu packages in bulk...${NC}"
+                    sudo apt-get install -y "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check the output above.${NC}"
+                fi
             else
                 echo -e "${RED}Warning: packages/pkglist-debian.txt not found!${NC}"
             fi
@@ -141,7 +146,12 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
         gentoo)
             if [[ -f "packages/pkglist-gentoo.txt" ]]; then
                 packages=$(sed 's/["'\'']//g' packages/pkglist-gentoo.txt | tr ' ' '\n' | grep -v -E '^\s*$|^#')
-                sudo emerge -av --noreplace $packages
+                pkg_array=($packages)
+                
+                if [[ ${#pkg_array[@]} -gt 0 ]]; then
+                    echo -e "${BLUE}Installing Gentoo packages in bulk...${NC}"
+                    sudo emerge -av --noreplace "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check the output above.${NC}"
+                fi
             else
                 echo -e "${RED}Warning: packages/pkglist-gentoo.txt not found!${NC}"
             fi
