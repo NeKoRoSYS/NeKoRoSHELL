@@ -18,12 +18,15 @@ echo -e "# ======================================================= #\n "
 
 echo -e "${BLUE}Detecting active user bin directory...${NC}"
 if [[ -d "$HOME/.local/bin" ]]; then
-    USER_BIN_DIR="$HOME/.local/bin"
+    BASE_BIN_DIR="$HOME/.local/bin"
 elif [[ -d "$HOME/bin" ]]; then
-    USER_BIN_DIR="$HOME/bin"
+    BASE_BIN_DIR="$HOME/bin"
 else
-    USER_BIN_DIR="$HOME/.local/bin"
+    BASE_BIN_DIR="$HOME/.local/bin"
 fi
+
+USER_BIN_DIR="$BASE_BIN_DIR/nekoroshell"
+
 echo -e "${GREEN}Using $USER_BIN_DIR as the target bin directory.${NC}\n"
 
 echo -e "${BLUE}Please choose your installation type:${NC}"
@@ -419,7 +422,7 @@ fi
 echo -e "${BLUE}Setting script permissions...${NC}"
 find "$HOME/.config/" -type f -name "*.sh" -exec chmod +x {} + 2>/dev/null
 
-for bin_dir in "$HOME/.local/bin" "$HOME/bin"; do
+for bin_dir in "$HOME/.local/bin/nekoroshell" "$HOME/bin/nekoroshell"; do
     if [[ -d "$bin_dir" ]]; then
         find "$bin_dir/" -type f -exec chmod +x {} + 2>/dev/null
     fi
