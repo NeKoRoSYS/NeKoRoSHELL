@@ -5,7 +5,8 @@
 # FAQ / Troubleshooting
 
 1. Help! My keybinds don't work!
-For a quick sanity check, do the following in order:
+   
+   For a quick sanity check, do the following in order:
    - Assuming you've just installed NeKoRoSHELL and you're still in the cloned folder, do `cd` to return to $HOME (or just open another terminal).
    - Type `chmod $HOME/bin/*` and/or `chmod $HOME/.local/bin/*` and then press enter. This will allow the scripts used in the custom hyprland keybinds to be ran by your keyboard.
    - Run `source $HOME/.bashrc` in the terminal, assuming that the PATH variables from the repo has been appended upon prior installation.
