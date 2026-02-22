@@ -86,7 +86,12 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             fi
             
             if [[ -f "packages/pkglist-arch.txt" ]]; then
-                $AUR_HELPER -S --needed --noconfirm - < packages/pkglist-arch.txt
+                packages=$(sed 's/["'\'']//g' packages/pkglist-arch.txt | tr ' ' '\n' | grep -v -E '^\s*$|^#')
+                
+                for pkg in $packages; do
+                    echo -e "${BLUE}Installing: $pkg${NC}"
+                    $AUR_HELPER -S --needed --noconfirm "$pkg" || echo -e "${RED}Failed to install $pkg. Skipping...${NC}"
+                done
             else
                 echo -e "${RED}Warning: packages/pkglist-arch.txt not found!${NC}"
             fi
@@ -99,6 +104,17 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
                 echo -e "${RED}Warning: packages/pkglist-fedora.txt not found!${NC}"
             fi
             ;;
+fedora)
+            if [[ -f "packages/pkglist-fedora.txt" ]]; then
+                packages=$(sed 's/["'\'']//g' packages/pkglist-fedora.txt | tr ' ' '\n' | grep -v -E '^\s*$|^#')
+                for pkg in $packages; do
+                    echo -e "${BLUE}Installing: $pkg${NC}"
+                    sudo dnf install -y "$pkg" || echo -e "${RED}Failed to install $pkg. Skipping...${NC}"
+                done
+            else
+                echo -e "${RED}Warning: packages/pkglist-fedora.txt not found!${NC}"
+            fi
+            ;;
 
         ubuntu|debian)
             echo -e "${RED}WARNING: Debian/Ubuntu do not provide Hyprland or its ecosystem natively.${NC}"
@@ -106,7 +122,11 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             sleep 3
             if [[ -f "packages/pkglist-debian.txt" ]]; then
                 sudo apt-get update
-                grep -vE '^\s*#|^\s*$' packages/pkglist-debian.txt | xargs sudo apt-get install -y
+                packages=$(sed 's/["'\'']//g' packages/pkglist-debian.txt | tr ' ' '\n' | grep -v -E '^\s*$|^#')
+                for pkg in $packages; do
+                    echo -e "${BLUE}Installing: $pkg${NC}"
+                    sudo apt-get install -y "$pkg" || echo -e "${RED}Failed to install $pkg. Skipping...${NC}"
+                done
             else
                 echo -e "${RED}Warning: packages/pkglist-debian.txt not found!${NC}"
             fi
@@ -114,7 +134,8 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             
         gentoo)
             if [[ -f "packages/pkglist-gentoo.txt" ]]; then
-                grep -vE '^\s*#|^\s*$' packages/pkglist-gentoo.txt | xargs sudo emerge -av --noreplace
+                packages=$(sed 's/["'\'']//g' packages/pkglist-gentoo.txt | tr ' ' '\n' | grep -v -E '^\s*$|^#')
+                sudo emerge -av --noreplace $packages
             else
                 echo -e "${RED}Warning: packages/pkglist-gentoo.txt not found!${NC}"
             fi
@@ -250,34 +271,36 @@ else
     done
 fi
 
-MONITOR_COUNT=${#MONITOR_LIST[@]}
-MONITOR_CONF="$HOME/.config/hypr/configs/monitors.conf"
+MONITOR_COUNT=${#MONITOR_LIST[@]}\
 
-if [[ "$MONITOR_COUNT" -gt 0 ]] && [[ -f "$MONITOR_CONF" ]]; then
+if [[ "$MONITOR_COUNT" -gt 0 ]]; then
     PRIMARY_MONITOR=${MONITOR_LIST[0]}
+    SECONDARY_MONITOR=${MONITOR_LIST[1]:-$PRIMARY_MONITOR}
+
     echo -e "${GREEN}Detected $MONITOR_COUNT monitor(s). Primary: $PRIMARY_MONITOR${NC}"
 
-    sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" "$MONITOR_CONF"
-
-    if [[ "$MONITOR_COUNT" -ge 2 ]]; then
-        SECONDARY_MONITOR=${MONITOR_LIST[1]}
-        echo -e "${GREEN}Secondary monitor detected: $SECONDARY_MONITOR${NC}"
-        sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" "$MONITOR_CONF"
+    if [[ -d "$HOME/.config/hypr" ]]; then
+        find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
+        
+        if [[ "$MONITOR_COUNT" -ge 2 ]]; then
+            echo -e "${GREEN}Secondary monitor detected: $SECONDARY_MONITOR${NC}"
+            find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
+        else
+            echo -e "${BLUE}Only one monitor detected. Commenting out secondary monitor lines...${NC}"
+            find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
+        fi
     else
-        echo -e "${BLUE}Only one monitor detected. Disabling secondary monitor line...${NC}"
-        sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' "$MONITOR_CONF"
+        echo -e "${RED}Error: $HOME/.config/hypr not found! The config copy likely failed.${NC}"
     fi
-elif [[ ! -f "$MONITOR_CONF" ]]; then
-    echo -e "${RED}Warning: $MONITOR_CONF not found. Skipping monitor setup.${NC}"
 else
-    echo -e "${RED}Warning: Could not automatically detect any monitors.${NC}"
+    echo -e "${RED}Warning: Could not automatically detect any monitors. Placeholders will remain unchanged.${NC}"
 fi
 
 SEARCH="/home/nekorosys"
 REPLACE="$HOME"
 
 echo -e "${BLUE}Replacing hardcoded paths... ($SEARCH -> $REPLACE)...${NC}"
-find "$HOME/.config" -type f \( -name "*.config" -o -name "*.css" -o -name "*.rasi" -o -name "*.conf" -o -name "*.sh" -o -name "*.json" -o -name "*.jsonc" -o -name "*.lua" -o -name "*.py" -o -name "*.yaml" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|$SEARCH|$REPLACE|g"
+find "$HOME/.config" -type d -name "*_backup_*" -prune -o -type f \( -name "*.config" -o -name "*.css" -o -name "*.rasi" -o -name "*.conf" -o -name "*.sh" -o -name "*.json" -o -name "*.jsonc" -o -name "*.lua" -o -name "*.py" -o -name "*.yaml" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|$SEARCH|$REPLACE|g"
 
 inject_shell_config() {
     local shell_rc="$1"

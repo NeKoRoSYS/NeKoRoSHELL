@@ -28,7 +28,11 @@ gen_thumb() {
 }
 
 if [ -n "${1:-}" ]; then
-    SELECTED_FILE="${1##*/}"
+    if [[ "$1" =~ ^http ]]; then
+        SELECTED_FILE="$1"
+    else
+        SELECTED_FILE="${1##*/}"
+    fi
 else
     shopt -s nocaseglob nullglob
 
@@ -63,6 +67,8 @@ else
     if [[ -f "$RAW_SELECTION" ]]; then
         WALL="$RAW_SELECTION"
         SELECTED_FILE="${RAW_SELECTION##*/}"
+    elif [[ "$RAW_SELECTION" =~ ^http ]]; then
+        SELECTED_FILE="$RAW_SELECTION"
     else
         SELECTED_FILE="${RAW_SELECTION##*/}"
         WALL="$WALL_DIR/$SELECTED_FILE"

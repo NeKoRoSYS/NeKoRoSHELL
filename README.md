@@ -113,6 +113,7 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Support for other distros; BETA, see [CONTRIBUTING](https://github.com/NeKoRoSYS/NeKoRoSHELL/tree/main?tab=contributing-ov-file#) | 🔍 |
 | Theme System - Set all skins in one go | ✅ |
 | wlogout integration | ⏳ |
+| Example Minecraft Theme| 🤔 |
 | Qt and Kvantum integration | 🤔 |
 | Quickshell integration | 🤔 |
 
@@ -230,4 +231,18 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
 - Install [Hypremoji](https://github.com/Musagy/hypremoji)
 - Install `blueman` and `r-quick-share` for seamless bluetooth support. (Works with Apple Airpods and android phone)
 - Fix waybar tray disappearing after a certain amount of time by installing `sni-qt`.
-  Make sure you're not killing waybar using -SIGUSER2 when refreshing the config.
+  Make sure you're not killing waybar using -SIGUSER2 when refreshing the config. NeKoRoSHELL's waybar is a systemd service and not just an executable, reloads are handled via `systemctl`.
+<br>
+
+## Star History
+<br>
+
+<div align="center">
+<a href="https://www.star-history.com/#caelestia-dots/shell&Date">
+ <picture>
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=bottom-right"/>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=bottom-right&theme=dark"/>
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&ttype=date&logscale&legend=bottom-right"/>
+ </picture>
+</a>
+</div>
