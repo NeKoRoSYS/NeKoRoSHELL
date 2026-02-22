@@ -15,6 +15,7 @@ echo -e "# ======================================================= #\n "
 # ==============================================================================
 # ACTIVE BIN DIRECTORY DETECTION
 # ==============================================================================
+
 echo -e "${BLUE}Detecting active user bin directory...${NC}"
 if [[ -d "$HOME/.local/bin" ]]; then
     USER_BIN_DIR="$HOME/.local/bin"
