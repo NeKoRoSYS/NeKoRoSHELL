@@ -5,11 +5,16 @@
 # FAQ / Troubleshooting
 
 1. Help! My keybinds don't work!
-   Make sure the `environment` config file in `.config/hypr/configs/` has this line:
+   For a quick sanity check, do the following in order:
+   - Assuming you've just installed NeKoRoSHELL and you're still in the cloned folder, do `cd` to return to $HOME (or just open another terminal).
+   - Type `chmod $HOME/bin/*` and/or `chmod $HOME/.local/bin/*` and then press enter. This will allow the scripts used in the custom hyprland keybinds to be ran by your keyboard.
+   - Run `source $HOME/.bashrc` in the terminal, assuming that the PATH variables from the repo has been appended upon prior installation.
+   If that didn't work, make sure the `environment` config file in `.config/hypr/configs/` has this line:
    ```bash
    env = PATH,$HOME/bin:$HOME/.local/bin:$HOME/.cargo/bin:$HOME/go/bin:$PATH
    ```
-   If not, type it in and then restart your PC. For a quick sanity check, also run `source $HOME/.bashrc` in the terminal, assuming that the PATH variables from the repo has been appended upon prior installation.
+   If not, type it in and then restart your PC.
+<br>
 
 # Guidelines for Opening an Issue
 
