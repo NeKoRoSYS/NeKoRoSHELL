@@ -247,7 +247,7 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
 <br>
 
 <div align="center">
-<a href="https://www.star-history.com/#caelestia-dots/shell&Date">
+<a href="https://www.star-history.com/#nekorosys/nekoroshell&Date">
  <picture>
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=bottom-right"/>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=bottom-right&theme=dark"/>
