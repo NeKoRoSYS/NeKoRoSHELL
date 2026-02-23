@@ -34,4 +34,4 @@ hyprctl dispatch layoutmsg presel d
 #kitty -o font_size=7 --class btop-grid -e btop & #1080p 
 kitty -o font_size=6 --class btop-grid -e btop & #720p
 
-sleep 2 && ~/.config/hypr/scripts/eject-forbidden
+sleep 2 && eject-forbidden
