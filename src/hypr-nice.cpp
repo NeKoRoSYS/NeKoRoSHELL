@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <sys/resource.h> // Standard Linux header for setpriority
+#include <sys/resource.h>
 #include <memory>
 #include <cstdlib>
 #include <cstdio>

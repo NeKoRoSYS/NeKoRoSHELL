@@ -1,0 +1,7 @@
+# ==========================================
+# NeKoRoSHELL: User Configurations & Scripts
+# ==========================================
+
+.config/hypr/user/configs/*
+.config/hypr/user/scripts/*
+!.config/hypr/user/templates/

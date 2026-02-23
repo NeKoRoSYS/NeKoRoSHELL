@@ -2,12 +2,12 @@
 
 * {
     font-family: 'JetBrains Mono Nerd Font';
-	border: none;
-	border-radius: 0;
-	min-height: 0;
-	margin: 0;
-	padding: 0;
-	text-shadow: none;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    text-shadow: none;
 }
 
 #waybar {
@@ -28,7 +28,6 @@
     padding: 10px;
 }
 
-
 tooltip {
     padding: 8px;
     border-radius: 15px;
@@ -46,19 +45,6 @@ tooltip label {
     outline: none;
 }
 
-#tray menu, menu {
-    background: @text-invert;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    color: @text;
-}
-
-#custom-tray-icon {
-    color: @foreground;
-    padding: 0 10px;
-}
-
 #tray {
     background: @background;
     border: 1px solid @border;
@@ -67,35 +53,73 @@ tooltip label {
     margin-left: 6px;
 }
 
+#tray menu, 
+menu {
+    background: @text-invert;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: @text;
+}
+
+#tray menu > *, 
+menu > * {
+    padding: 3px 0px;
+}
+
+#tray menu > *:hover, 
+menu > *:hover {
+    border-radius: 10px;
+    background-color: @inactive;
+}
+
+#custom-tray-icon {
+    color: @foreground;
+    padding: 0 10px;
+}
+
 #tray-drawer:hover #custom-tray-icon {
     text-shadow: 0 0 5px black, 0 0 4px black, 0 0 2px black;
     color: @accent;
 }
 
-#tray menu > *, menu > * {
-    padding: 3px 0px;
-}
-
-#tray menu > *:hover, menu > *:hover{
-    border-radius: 10px;
-    background-color: @inactive;
-}
-
-/* global paddings */
-#backlight, #wireplumber, #network, #temperature,
-#bluetooth, #battery, #memory, #cpu, #load{
+#backlight, 
+#battery, 
+#bluetooth, 
+#cpu, 
+#idle_inhibitor, 
+#load, 
+#memory, 
+#network, 
+#temperature, 
+#wireplumber {
     padding: 2px 7px;
 }
 
-#workspaces, #bluetooth, #battery, #memory, #temperature,
-#network, #wireplumber, #backlight, #cpu, #load {
+#backlight, 
+#battery, 
+#bluetooth, 
+#cpu, 
+#idle_inhibitor, 
+#load, 
+#memory, 
+#network, 
+#temperature, 
+#wireplumber, 
+#workspaces {
     background: transparent;
     border-radius: 15px;
     margin: 0 2px;
-} 
+}
 
-#custom-start, #custom-logout, #gright1, #gleft1,
-#gright2, #gleft2, #custom-ctlcenter, #power-profiles-daemon {
+#custom-ctlcenter, 
+#custom-logout, 
+#custom-start, 
+#gleft1, 
+#gleft2, 
+#gright1, 
+#gright2, 
+#power-profiles-daemon {
     padding: 2px 9px;
     border-bottom: 2px solid @color5;
     border-radius: 15px;
@@ -109,30 +133,10 @@ tooltip label {
     background: alpha(@background, 0.75);
 }
 
-/* single icons cool size  */
-
-#gright2, #gleft2  {
-    margin: 0 8px;
-}
-
-#gleft1 {
-    margin: 0 0 0 8px;
-}
-
-#gright1 {
-    margin: 0 8px 0 0;
-}
-
-#memory.critical, #cpu.critical,
-#temperature.critical, #battery.critical,
-#network.disconnected{
-	color: @red;
-}
-
-#memory.warning, #cpu.warning,
-#temperature.warning, #battery.warning {
-	color: @yellow;
-}
+#gleft1 { margin: 0 0 0 8px; }
+#gleft2 { margin: 0 8px; }
+#gright1 { margin: 0 8px 0 0; }
+#gright2 { margin: 0 8px; }
 
 #workspaces button {
     color: @workspace-fg;
@@ -163,14 +167,29 @@ tooltip label {
     color: @text;
 }
 
-#power-profiles-daemon.performance {
-    color: red;
+#battery.critical, 
+#cpu.critical, 
+#memory.critical, 
+#temperature.critical, 
+#network.disconnected {
+    color: @red;
 }
 
-#power-profiles-daemon.power-saver {
-    color: green;
+#battery.warning, 
+#cpu.warning, 
+#memory.warning, 
+#temperature.warning {
+    color: @yellow;
 }
 
-#power-profiles-daemon.balanced {
-    color: cornflowerblue;
+#power-profiles-daemon.performance { color: red; }
+#power-profiles-daemon.power-saver { color: green; }
+#power-profiles-daemon.balanced { color: cornflowerblue; }
+
+#idle_inhibitor.activated {
+    color: @accent;
+}
+
+#idle_inhibitor.deactivated {
+    color: @text;
 }

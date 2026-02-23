@@ -58,18 +58,6 @@ else
     done
 fi
 
-if [[ ${#MONITOR_LIST[@]} -gt 0 ]]; then
-    PRIMARY_MONITOR=${MONITOR_LIST[0]}
-    SECONDARY_MONITOR=${MONITOR_LIST[1]:-$PRIMARY_MONITOR}
-    
-    find "$TEMP_DIR/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
-    if [[ ${#MONITOR_LIST[@]} -ge 2 ]]; then
-        find "$TEMP_DIR/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
-    else
-        find "$TEMP_DIR/.config/hypr" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
-    fi
-fi
-
 echo -e "\n${BLUE}Comparing configurations...${NC}"
 
 prompt_merge() {
@@ -126,6 +114,47 @@ while IFS= read -r -u 3 new_file; do
     fi
 done 3< <(find "$TEMP_DIR/.config" -type f)
 
+echo -e "\n${BLUE}Verifying user configuration sandbox...${NC}"
+
+USER_CONF_DIR="$HOME/.config/hypr/user/configs"
+USER_SCRIPT_DIR="$HOME/.config/hypr/user/scripts"
+TEMPLATE_DIR="$HOME/.config/hypr/user/templates"
+
+mkdir -p "$USER_CONF_DIR"
+mkdir -p "$USER_SCRIPT_DIR"
+
+if [[ -d "$TEMPLATE_DIR" ]]; then
+    for file in "$TEMPLATE_DIR"/*.conf; do
+        [ -e "$file" ] || continue
+        filename=$(basename "$file")
+        if [ ! -f "$USER_CONF_DIR/$filename" ]; then
+            cp "$file" "$USER_CONF_DIR/$filename"
+            echo -e "  [${GREEN}New${NC}] Initialized missing user config: $filename"
+        fi
+    done
+fi
+
+if [ ! -f "$USER_SCRIPT_DIR/autostart.sh" ]; then
+    echo "#!/bin/bash" > "$USER_SCRIPT_DIR/autostart.sh"
+    echo "# Add your personal startup commands here" >> "$USER_SCRIPT_DIR/autostart.sh"
+    chmod +x "$USER_SCRIPT_DIR/autostart.sh"
+    echo -e "  [${GREEN}New${NC}] Initialized user autostart script."
+fi
+
+if [[ ${#MONITOR_LIST[@]} -gt 0 ]]; then
+    PRIMARY_MONITOR=${MONITOR_LIST[0]}
+    SECONDARY_MONITOR=${MONITOR_LIST[1]:-$PRIMARY_MONITOR}
+    
+    if [[ -d "$USER_CONF_DIR" ]]; then
+        find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
+        if [[ ${#MONITOR_LIST[@]} -ge 2 ]]; then
+            find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
+        else
+            find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
+        fi
+    fi
+fi
+
 echo -e "\n${BLUE}Scanning for and removing legacy root-level scripts...${NC}"
 
 for legacy_dir in "$HOME/.local/bin" "$HOME/bin"; do
@@ -169,15 +198,25 @@ else
         echo -e "${RED}Warning: Missing development headers for $REQUIRED_LIBS. Skipping compilation.${NC}"
     else
         LIBS=$(pkg-config --cflags --libs $REQUIRED_LIBS)
-        
-        if [[ -f "$TEMP_DIR/bin/source/navbar-hover.cpp" ]]; then
-            g++ -O3 -o "$BIN_DIR/navbar-hover" "$TEMP_DIR/bin/source/navbar-hover.cpp" $LIBS
+
+        if [[ -f "$TEMP_DIR/src/navbar-hover.cpp" ]]; then
+            g++ -O3 -o "$BIN_DIR/navbar-hover" "$TEMP_DIR/src/navbar-hover.cpp" $LIBS
             echo -e "  [${GREEN}OK${NC}] Compiled navbar-hover"
         fi
         
-        if [[ -f "$TEMP_DIR/bin/source/navbar-watcher.cpp" ]]; then
-            g++ -O3 -o "$BIN_DIR/navbar-watcher" "$TEMP_DIR/bin/source/navbar-watcher.cpp" $LIBS
+        if [[ -f "$TEMP_DIR/src/navbar-watcher.cpp" ]]; then
+            g++ -O3 -o "$BIN_DIR/navbar-watcher" "$TEMP_DIR/src/navbar-watcher.cpp" $LIBS
             echo -e "  [${GREEN}OK${NC}] Compiled navbar-watcher"
+        fi
+        
+        if [[ -f "$TEMP_DIR/src/hypr-nice.cpp" ]]; then
+            g++ -O3 -o "$BIN_DIR/hypr-nice" "$TEMP_DIR/src/hypr-nice.cpp"
+            echo -e "  [${GREEN}OK${NC}] Compiled hypr-nice"
+        fi
+
+        if [[ -f "$TEMP_DIR/src/eject-forbidden.cpp" ]]; then
+            g++ -O3 -o "$BIN_DIR/eject-forbidden" "$TEMP_DIR/src/eject-forbidden.cpp"
+            echo -e "  [${GREEN}OK${NC}] Compiled eject-forbidden"
         fi
     fi
 fi

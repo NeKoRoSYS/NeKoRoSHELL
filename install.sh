@@ -270,6 +270,33 @@ else
     echo -e "${RED}Error: .config directory not found in the source repository! Skipping configuration copy.${NC}"
 fi
 
+echo -e "${BLUE}Initializing user configuration sandbox...${NC}"
+
+USER_CONF_DIR="$HOME/.config/hypr/user/configs"
+USER_SCRIPT_DIR="$HOME/.config/hypr/user/scripts"
+TEMPLATE_DIR="$HOME/.config/hypr/user/templates"
+
+mkdir -p "$USER_CONF_DIR"
+mkdir -p "$USER_SCRIPT_DIR"
+
+if [[ -d "$TEMPLATE_DIR" ]]; then
+    for file in "$TEMPLATE_DIR"/*.conf; do
+        [ -e "$file" ] || continue 
+        filename=$(basename "$file")
+        if [ ! -f "$USER_CONF_DIR/$filename" ]; then
+            cp "$file" "$USER_CONF_DIR/$filename"
+            echo -e "  Initialized user config: $filename"
+        fi
+    done
+fi
+
+if [ ! -f "$USER_SCRIPT_DIR/autostart.sh" ]; then
+    echo "#!/bin/bash" > "$USER_SCRIPT_DIR/autostart.sh"
+    echo "# Add your personal startup commands here" >> "$USER_SCRIPT_DIR/autostart.sh"
+    chmod +x "$USER_SCRIPT_DIR/autostart.sh"
+    echo -e "  Initialized user autostart script."
+fi
+
 echo -e "${BLUE}Detecting monitors...${NC}"
 declare -a MONITOR_LIST
 
@@ -301,14 +328,14 @@ if [[ "$MONITOR_COUNT" -gt 0 ]]; then
     echo -e "${GREEN}Detected $MONITOR_COUNT monitor(s). Primary: $PRIMARY_MONITOR${NC}"
 
     if [[ -d "$HOME/.config/hypr" ]]; then
-        find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
+        find "$HOME/.config/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
         
         if [[ "$MONITOR_COUNT" -ge 2 ]]; then
             echo -e "${GREEN}Secondary monitor detected: $SECONDARY_MONITOR${NC}"
-            find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
+            find "$HOME/.config/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
         else
             echo -e "${BLUE}Only one monitor detected. Commenting out secondary monitor lines...${NC}"
-            find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
+            find "$HOME/.config/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
         fi
     else
         echo -e "${RED}Error: $HOME/.config/hypr not found! The config copy likely failed.${NC}"
@@ -394,18 +421,28 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             
             LIBS=$(pkg-config --cflags --libs $REQUIRED_LIBS)
             
-            if [[ -f "bin/source/navbar-hover.cpp" ]]; then
-                g++ -O3 -o "$USER_BIN_DIR/navbar-hover" bin/source/navbar-hover.cpp $LIBS
+            if [[ -f "src/navbar-hover.cpp" ]]; then
+                g++ -O3 -o "$USER_BIN_DIR/navbar-hover" src/navbar-hover.cpp $LIBS
                 echo -e "${GREEN}Successfully compiled navbar-hover.${NC}"
             else
-                echo -e "${RED}Warning: bin/source/navbar-hover.cpp not found.${NC}"
+                echo -e "${RED}Warning: src/navbar-hover.cpp not found.${NC}"
             fi
             
-            if [[ -f "bin/source/navbar-watcher.cpp" ]]; then
-                g++ -O3 -o "$USER_BIN_DIR/navbar-watcher" bin/source/navbar-watcher.cpp $LIBS
+            if [[ -f "src/navbar-watcher.cpp" ]]; then
+                g++ -O3 -o "$USER_BIN_DIR/navbar-watcher" src/navbar-watcher.cpp $LIBS
                 echo -e "${GREEN}Successfully compiled navbar-watcher.${NC}"
             else
-                echo -e "${RED}Warning: bin/source/navbar-watcher.cpp not found.${NC}"
+                echo -e "${RED}Warning: src/navbar-watcher.cpp not found.${NC}"
+            fi
+            
+            if [[ -f "src/hypr-nice.cpp" ]]; then
+                g++ -O3 -o "$USER_BIN_DIR/hypr-nice" src/hypr-nice.cpp
+                echo -e "${GREEN}Successfully compiled hypr-nice.${NC}"
+            fi
+
+            if [[ -f "src/eject-forbidden.cpp" ]]; then
+                g++ -O3 -o "$USER_BIN_DIR/eject-forbidden" src/eject-forbidden.cpp
+                echo -e "${GREEN}Successfully compiled eject-forbidden.${NC}"
             fi
         fi
     fi
