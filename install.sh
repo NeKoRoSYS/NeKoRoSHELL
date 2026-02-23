@@ -394,18 +394,28 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             
             LIBS=$(pkg-config --cflags --libs $REQUIRED_LIBS)
             
-            if [[ -f "bin/source/navbar-hover.cpp" ]]; then
-                g++ -O3 -o "$USER_BIN_DIR/navbar-hover" bin/source/navbar-hover.cpp $LIBS
+            if [[ -f "src/navbar-hover.cpp" ]]; then
+                g++ -O3 -o "$USER_BIN_DIR/navbar-hover" src/navbar-hover.cpp $LIBS
                 echo -e "${GREEN}Successfully compiled navbar-hover.${NC}"
             else
-                echo -e "${RED}Warning: bin/source/navbar-hover.cpp not found.${NC}"
+                echo -e "${RED}Warning: src/navbar-hover.cpp not found.${NC}"
             fi
             
-            if [[ -f "bin/source/navbar-watcher.cpp" ]]; then
-                g++ -O3 -o "$USER_BIN_DIR/navbar-watcher" bin/source/navbar-watcher.cpp $LIBS
+            if [[ -f "src/navbar-watcher.cpp" ]]; then
+                g++ -O3 -o "$USER_BIN_DIR/navbar-watcher" src/navbar-watcher.cpp $LIBS
                 echo -e "${GREEN}Successfully compiled navbar-watcher.${NC}"
             else
-                echo -e "${RED}Warning: bin/source/navbar-watcher.cpp not found.${NC}"
+                echo -e "${RED}Warning: src/navbar-watcher.cpp not found.${NC}"
+            fi
+            
+            if [[ -f "src/hypr-nice.cpp" ]]; then
+                g++ -O3 -o "$USER_BIN_DIR/hypr-nice" src/hypr-nice.cpp
+                echo -e "${GREEN}Successfully compiled hypr-nice.${NC}"
+            fi
+
+            if [[ -f "src/eject-forbidden.cpp" ]]; then
+                g++ -O3 -o "$USER_BIN_DIR/eject-forbidden" src/eject-forbidden.cpp
+                echo -e "${GREEN}Successfully compiled eject-forbidden.${NC}"
             fi
         fi
     fi
