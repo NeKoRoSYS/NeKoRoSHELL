@@ -154,6 +154,8 @@ NOTE: It is **unclear** what I'll have to do to properly execute a Quickshell in
 - Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
   - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
 - Install [Hypremoji](https://github.com/Musagy/hypremoji)
+- Fix waybar tray disappearing after a certain amount of time by installing `sni-qt`.
+  Make sure you're not killing waybar using -SIGUSER2 when refreshing the config. NeKoRoSHELL's waybar is a systemd service and not just an executable, reloads are handled via `systemctl`.
 <br>
 
 ## Optional
@@ -232,8 +234,6 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
 
 ### Quality-of-Life
 - Install `blueman` and `r-quick-share` for seamless bluetooth support. (Works with Apple Airpods and android phone)
-- Fix waybar tray disappearing after a certain amount of time by installing `sni-qt`.
-  Make sure you're not killing waybar using -SIGUSER2 when refreshing the config. NeKoRoSHELL's waybar is a systemd service and not just an executable, reloads are handled via `systemctl`.
 <br>
 
 ## Acknowledgements
