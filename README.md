@@ -150,6 +150,7 @@ NOTE: It is **unclear** what I'll have to do to properly execute a Quickshell in
 >
 > The installation system for that I implemented can be improved. If you're willing to help, please make a pull request. Your contributions are welcome and will be appreciated! :D
 
+- `update-nekoroshell` uses Vim to compare, overwrite, or merge files when updating.
 - Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
   - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
 - Install [Hypremoji](https://github.com/Musagy/hypremoji)
