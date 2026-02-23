@@ -29,7 +29,7 @@ else
 fi
 
 WAYBAR_MODE_FILE="$HOME/.cache/.waybar_mode"
-HYPR="$HOME/.config/hypr/configs/windowrules.conf"
+HYPR="$HOME/.config/hypr/user/configs/windowrules.conf"
 MANAGEMENT_MODE=$(cat "$WAYBAR_MODE_FILE" 2>/dev/null || echo "static")
 
 case $FEATURE in
