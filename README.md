@@ -248,7 +248,7 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
 - Amelie for helping me transition the project from using pywal16 to wallust.
 - April for helping me figure out the cause of the now-fixed "keybinds not working" issue.
 - Credits to [iyiolacak](https://github.com/iyiolacak/iyiolacak-swaync-config?tab=readme-ov-file), [justinmdickey](https://github.com/justinmdickey/publicdots/blob/main/.config/hypr/hyprlock.conf), and [mkhmtolzhas](https://github.com/mkhmtolzhas/mkhmtdots) for their amazing designs.
-  - The `legacy` theme was based on mkhmtolzha's mkhmtcore waybar stylesheet and layout, just heavily modified and made to be thematically-consistent across packages like SwayNC.
+  - The `legacy` theme was based on mkhmtolzha's waybar stylesheet and layout, just heavily modified and made to be thematically-consistent across packages like SwayNC.
 <br>
 
 ## Star History
