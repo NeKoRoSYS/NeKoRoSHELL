@@ -270,6 +270,33 @@ else
     echo -e "${RED}Error: .config directory not found in the source repository! Skipping configuration copy.${NC}"
 fi
 
+echo -e "${BLUE}Initializing user configuration sandbox...${NC}"
+
+USER_CONF_DIR="$HOME/.config/hypr/user/configs"
+USER_SCRIPT_DIR="$HOME/.config/hypr/user/scripts"
+TEMPLATE_DIR="$HOME/.config/hypr/user/templates"
+
+mkdir -p "$USER_CONF_DIR"
+mkdir -p "$USER_SCRIPT_DIR"
+
+if [[ -d "$TEMPLATE_DIR" ]]; then
+    for file in "$TEMPLATE_DIR"/*.conf; do
+        [ -e "$file" ] || continue 
+        filename=$(basename "$file")
+        if [ ! -f "$USER_CONF_DIR/$filename" ]; then
+            cp "$file" "$USER_CONF_DIR/$filename"
+            echo -e "  Initialized user config: $filename"
+        fi
+    done
+fi
+
+if [ ! -f "$USER_SCRIPT_DIR/autostart.sh" ]; then
+    echo "#!/bin/bash" > "$USER_SCRIPT_DIR/autostart.sh"
+    echo "# Add your personal startup commands here" >> "$USER_SCRIPT_DIR/autostart.sh"
+    chmod +x "$USER_SCRIPT_DIR/autostart.sh"
+    echo -e "  Initialized user autostart script."
+fi
+
 echo -e "${BLUE}Detecting monitors...${NC}"
 declare -a MONITOR_LIST
 
