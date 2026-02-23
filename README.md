@@ -120,9 +120,8 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Theme System - Set all skins in one go | ✅ |
 | Make NeKoRoSHELL init-agnostic | ⏳ |
 | wlogout integration | ⏳ |
-| Make a "headless" fork of NeKoRoSHELL - Install to any WM | 🤔 |
-| Example Minecraft Theme | 🤔 |
 | Qt and Kvantum integration | 🤔 |
+| Make a "headless" fork of NeKoRoSHELL - Install to any WM | 🤔 |
 | Quickshell integration | 🤔 |
 
 </div>
