@@ -116,19 +116,13 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Optimizations | ✅ |
 | Color Handling - Replace pywal6 with wallust | ✅ |
 | Dmenu Overhaul - Replace wofi with rofi | ✅ |
-| Support for other distros; BETA<br>Verified to be working on: Arch | 🔍 |
 | Theme System - Set all skins in one go | ✅ |
-| Make NeKoRoSHELL init-agnostic | ⏳ |
 | wlogout integration | ⏳ |
+| Make NeKoRoSHELL init-agnostic | ⏳ |
+| Support for other distros; BETA<br>Verified to be working on: Arch | 🔍 |
 | Qt and Kvantum integration | 🤔 |
-| Make a "headless" fork of NeKoRoSHELL - Install to any WM | 🤔 |
-| Quickshell integration | 🤔 |
 
 </div>
-<br>
-
-NOTE: It is **unclear** what I'll have to do to properly execute a Quickshell integration for this repo. Maybe I'll only add widgets; or maybe I'll make an entirely new desktop environment on top of Hyprland, replacing waybar and swaync. Who knows? It doesn't matter for now so please take it with a grain of salt.
-
 <br>
 
 ## Dependencies
