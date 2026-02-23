@@ -328,14 +328,14 @@ if [[ "$MONITOR_COUNT" -gt 0 ]]; then
     echo -e "${GREEN}Detected $MONITOR_COUNT monitor(s). Primary: $PRIMARY_MONITOR${NC}"
 
     if [[ -d "$HOME/.config/hypr" ]]; then
-        find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
+        find "$HOME/.config/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
         
         if [[ "$MONITOR_COUNT" -ge 2 ]]; then
             echo -e "${GREEN}Secondary monitor detected: $SECONDARY_MONITOR${NC}"
-            find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
+            find "$HOME/.config/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
         else
             echo -e "${BLUE}Only one monitor detected. Commenting out secondary monitor lines...${NC}"
-            find "$HOME/.config/hypr" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
+            find "$HOME/.config/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
         fi
     else
         echo -e "${RED}Error: $HOME/.config/hypr not found! The config copy likely failed.${NC}"
