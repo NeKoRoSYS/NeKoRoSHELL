@@ -58,18 +58,6 @@ else
     done
 fi
 
-if [[ ${#MONITOR_LIST[@]} -gt 0 ]]; then
-    PRIMARY_MONITOR=${MONITOR_LIST[0]}
-    SECONDARY_MONITOR=${MONITOR_LIST[1]:-$PRIMARY_MONITOR}
-    
-    find "$TEMP_DIR/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
-    if [[ ${#MONITOR_LIST[@]} -ge 2 ]]; then
-        find "$TEMP_DIR/.config/hypr" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
-    else
-        find "$TEMP_DIR/.config/hypr" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
-    fi
-fi
-
 echo -e "\n${BLUE}Comparing configurations...${NC}"
 
 prompt_merge() {
@@ -151,6 +139,20 @@ if [ ! -f "$USER_SCRIPT_DIR/autostart.sh" ]; then
     echo "# Add your personal startup commands here" >> "$USER_SCRIPT_DIR/autostart.sh"
     chmod +x "$USER_SCRIPT_DIR/autostart.sh"
     echo -e "  [${GREEN}New${NC}] Initialized user autostart script."
+fi
+
+if [[ ${#MONITOR_LIST[@]} -gt 0 ]]; then
+    PRIMARY_MONITOR=${MONITOR_LIST[0]}
+    SECONDARY_MONITOR=${MONITOR_LIST[1]:-$PRIMARY_MONITOR}
+    
+    if [[ -d "$USER_CONF_DIR" ]]; then
+        find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
+        if [[ ${#MONITOR_LIST[@]} -ge 2 ]]; then
+            find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
+        else
+            find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
+        fi
+    fi
 fi
 
 echo -e "\n${BLUE}Scanning for and removing legacy root-level scripts...${NC}"
