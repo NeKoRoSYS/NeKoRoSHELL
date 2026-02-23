@@ -169,15 +169,25 @@ else
         echo -e "${RED}Warning: Missing development headers for $REQUIRED_LIBS. Skipping compilation.${NC}"
     else
         LIBS=$(pkg-config --cflags --libs $REQUIRED_LIBS)
-        
-        if [[ -f "$TEMP_DIR/bin/source/navbar-hover.cpp" ]]; then
-            g++ -O3 -o "$BIN_DIR/navbar-hover" "$TEMP_DIR/bin/source/navbar-hover.cpp" $LIBS
+
+        if [[ -f "$TEMP_DIR/src/navbar-hover.cpp" ]]; then
+            g++ -O3 -o "$BIN_DIR/navbar-hover" "$TEMP_DIR/src/navbar-hover.cpp" $LIBS
             echo -e "  [${GREEN}OK${NC}] Compiled navbar-hover"
         fi
         
-        if [[ -f "$TEMP_DIR/bin/source/navbar-watcher.cpp" ]]; then
-            g++ -O3 -o "$BIN_DIR/navbar-watcher" "$TEMP_DIR/bin/source/navbar-watcher.cpp" $LIBS
+        if [[ -f "$TEMP_DIR/src/navbar-watcher.cpp" ]]; then
+            g++ -O3 -o "$BIN_DIR/navbar-watcher" "$TEMP_DIR/src/navbar-watcher.cpp" $LIBS
             echo -e "  [${GREEN}OK${NC}] Compiled navbar-watcher"
+        fi
+        
+        if [[ -f "$TEMP_DIR/src/hypr-nice.cpp" ]]; then
+            g++ -O3 -o "$BIN_DIR/hypr-nice" "$TEMP_DIR/src/hypr-nice.cpp"
+            echo -e "  [${GREEN}OK${NC}] Compiled hypr-nice"
+        fi
+
+        if [[ -f "$TEMP_DIR/src/eject-forbidden.cpp" ]]; then
+            g++ -O3 -o "$BIN_DIR/eject-forbidden" "$TEMP_DIR/src/eject-forbidden.cpp"
+            echo -e "  [${GREEN}OK${NC}] Compiled eject-forbidden"
         fi
     fi
 fi
