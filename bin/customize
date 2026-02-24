@@ -141,10 +141,10 @@ case $FEATURE in
             	    echo "@import \"$PATH_SKIN/style.css\";" > "$STYLE"
                     echo "{ \"include\": [ \"$PATH_SKIN/layout.jsonc\" ] }" > "$CONFIG"
 		    cp "$PATH_SKIN/navbar-hover.conf" "$HOME/.cache/navbar-hover.conf"
-		    killall waybar && sleep 0.05
 
-		    killall -q waybar navbar-hover navbar-watcher 2>/dev/null || true
-		    sleep 0.1
+		    killall -q navbar-hover navbar-watcher 2>/dev/null || true
+		    killall -q waybar 2>/dev/null || true
+		    sleep 0.2
 
 		    if [ "$MANAGEMENT_MODE" = "static" ]; then
 			waybar &
