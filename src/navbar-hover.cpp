@@ -87,28 +87,16 @@ public:
 };
 
 class SwayBackend : public CompositorBackend {
-    int parse_int(const std::string& json, size_t pos) {
-        while (pos < json.length() && !isdigit(json[pos]) && json[pos] != '-') pos++;
-        if (pos >= json.length()) return -999;
-        return std::stoi(json.substr(pos));
-    }
-
 public:
     std::vector<Monitor> get_monitors() override {
         std::vector<Monitor> monitors;
-        std::string mon_out = exec("swaymsg -t get_outputs");
-        size_t pos = 0;
+        std::string cmd = "swaymsg -t get_outputs -r | jq -r '.[] | \"\\(.rect.x) \\(.rect.y) \\(.rect.width) \\(.rect.height)\"'";
+        std::string out = exec(cmd.c_str());
         
-        while ((pos = mon_out.find("\"rect\":", pos)) != std::string::npos) {
-            int x = parse_int(mon_out, mon_out.find("\"x\":", pos) + 4);
-            int y = parse_int(mon_out, mon_out.find("\"y\":", pos) + 4);
-            int w = parse_int(mon_out, mon_out.find("\"width\":", pos) + 8);
-            int h = parse_int(mon_out, mon_out.find("\"height\":", pos) + 9);
-            
-            if (x != -999 && y != -999 && w != -999 && h != -999) {
-                monitors.push_back({x, y, w, h});
-            }
-            pos += 7;
+        std::stringstream ss(out);
+        int x, y, w, h;
+        while (ss >> x >> y >> w >> h) {
+            monitors.push_back({x, y, w, h});
         }
         return monitors;
     }
@@ -120,8 +108,14 @@ public:
     }
 
     bool is_layer_active(const std::string& layer_name) override {
-        std::string layers = exec("lswt 2>/dev/null");
-        return (layers.find(layer_name) != std::string::npos);
+        if (layer_name == "swaync-control-center") {
+            std::string state = exec("timeout 0.5 swaync-client -s 2>/dev/null");
+            return state.find("\"visible\": true") != std::string::npos || 
+                   state.find("\"visible\":true") != std::string::npos;
+        }
+        
+        std::string cmd = "lswt -j 2>/dev/null | jq -e '.[] | select(.namespace == \"" + layer_name + "\")' >/dev/null 2>&1";
+        return system(cmd.c_str()) == 0;
     }
 };
 
