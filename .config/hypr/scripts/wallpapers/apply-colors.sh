@@ -24,7 +24,8 @@ PARAMS="$TARGET_IMG -q -C"
 
 if command -v wallust >/dev/null 2>&1; then
     echo "Updating system theme using: $(basename "$TARGET_IMG")"
-	killall -q waybar navbar-hover navbar-watcher 2>/dev/null || true
+	killall -q navbar-hover navbar-watcher 2>/dev/null || true
+	killall -q waybar 2>/dev/null || true
 
 	if [ "$current_theme" = "Dark" ]; then
 		wallust run "$TARGET_IMG" -q -C ~/.config/wallust/wallust-dark.toml || wallust run $TARGET_IMG -q -C ~/.config/wallust/wallust-dark.toml -b full -t 5
