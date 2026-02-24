@@ -166,15 +166,7 @@
     "custom/ctlcenter": {
         "tooltip": false,
         "format" : "⏻",
-        "menu": "on-click",
-        "menu-file": "~/.config/waybar/power_menu.xml",
-        "menu-actions": {
-	    "lock": "loginctl lock-session",
-	    "sleep": "loginctl lock-session && sleep 0.2 && systemctl suspend",
-            "shutdown": "systemctl poweroff",
-            "reboot": "systemctl reboot",
-	    "signout": "command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"
-        }
+	"on-click": "wlogout"
     },
 
     "custom/notification": {
