@@ -156,7 +156,7 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
   - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
 - Install [Hypremoji](https://github.com/Musagy/hypremoji)
 - Fix waybar tray disappearing after a certain amount of time by installing `sni-qt`.
-  Make sure you're not killing waybar using -SIGUSER2 when refreshing the config. NeKoRoSHELL's waybar is a systemd service and not just an executable, reloads are handled via `systemctl`.
+  Make sure you're not killing waybar using -SIGUSER2 when refreshing the config.
 <br>
 
 ## Optional
