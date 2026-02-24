@@ -11,7 +11,7 @@
 # NeKoRoSHELL 
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/NeKoRoSYS/NeKoRoSHELL?style=for-the-badge&color=%23FFD700)
- ![GitHub Release](https://img.shields.io/github/v/release/NeKoRoSYS/NeKoRoSHELL?display_name=tag&style=for-the-badge) ![Size](https://img.shields.io/github/repo-size/NeKoRoSYS/NeKoRoSHELL?style=for-the-badge) ![GitHub last commit](https://img.shields.io/github/last-commit/NeKoRoSYS/NeKoRoSHELL?style=for-the-badge) ![GitHub contributors](https://img.shields.io/github/contributors/NeKoRoSYS/NeKoRoSHELL?style=for-the-badge) ![Discord](https://img.shields.io/discord/774473787394752532?style=for-the-badge&label=Discord&color=%235865F2)
+ ![GitHub Release](https://img.shields.io/github/v/release/NeKoRoSYS/NeKoRoSHELL?display_name=tag&style=for-the-badge) ![Build Status](https://github.com/nekorosys/nekoroshell/actions/workflows/build-and-lint.yml/badge.svg) ![Size](https://img.shields.io/github/repo-size/NeKoRoSYS/NeKoRoSHELL?style=for-the-badge) ![GitHub last commit](https://img.shields.io/github/last-commit/NeKoRoSYS/NeKoRoSHELL?style=for-the-badge) ![GitHub contributors](https://img.shields.io/github/contributors/NeKoRoSYS/NeKoRoSHELL?style=for-the-badge) ![Discord](https://img.shields.io/discord/774473787394752532?style=for-the-badge&label=Discord&color=%235865F2)
  <br>
  <br>
 
