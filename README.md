@@ -29,7 +29,7 @@ The best way to say "I use Linux btw 🤓" is if your desktop profile looks slee
 | :---: |
 | 🚀 [Features](#features) |
 | 🔗 [Dependencies](#dependencies) |
-| 🤔 [Optional](#optional) |
+| ♥ [Acknowledgements](#acknowledgements) |
 
 </div>
 <br>
@@ -157,84 +157,6 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 - Install [Hypremoji](https://github.com/Musagy/hypremoji)
 - Fix waybar tray disappearing after a certain amount of time by installing `sni-qt`.
   Make sure you're not killing waybar using -SIGUSER2 when refreshing the config.
-<br>
-
-## Optional
-
-Mostly personal notes just in case I switch over to another PC. Do NOT copy my Grub Linux CMDLINE and mkinitcpio modules unless you also have a laptop with old hybrid GPUs (Intel Graphics 620 and Nvidia GeForce 940mx).
-
-### System Booting (Dualboot)
-- Use [MineGrub](https://github.com/Lxtharia/minegrub-world-sel-theme) theme for Grub.
-- Identify GPU names.
-- `/etc/modprobe.d/nvidia.conf`
-  
-  ```
-  options nvidia NVreg_PreserveVideoMemoryAllocations=1
-  options nvidia NVreg_EnableS0ixPowerManagement=1
-  install nvidia_uvm /usr/bin/false
-  ```
-  
-- Modify `/etc/default/grub`
-  - Install `os-prober`.
- 
-    ```
-    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet rd.udev.log_level=3 systemd.show_status=auto vt.global_cursor_default=0 nvidia_drm.modeset=1 nvidia_drm.fbdev=1 pci=noaer pcie_aspm=off nvme_core.default_ps_max_latency_us=0 nvidia.NVreg_EnableS0ixPowerManagement=1 intel_pstate=active i915.modeset=1 i915.enable_fbc=1 mitigations=off"
-    ```
-
-  - `GRUB_THEME="/boot/grub/themes/minegrub-world-selection/theme.txt"`
-  - `GRUB_DISABLE_OS_PROBER=false`
-  - `sudo grub-mkconfig -o /boot/grub/grub.cfg`
-- Modify `/etc/mkinitcpio.conf` (`MODULES` for GPU and `HOOKS` for `plymouth` after `base udev`)
-  - `sudo mkinitcpio -P`
- 
-### Boot Animations and Login
-- Use `plymouth` and `greetd` (`nwg-hello`)
-
-### Fix Boosted/Noisy Mic on OBS and Discord (pipewire)
-- Install `alsa-utils` and `noise-suppression-for-voice`
-  - `wpctl status`
-  - `alsamixer`
-  - `sudo alsactl store`
-  - `nano ~/.config/pipewire/pipewire.conf.d/99-input-denoising.conf`
-
-    ```spa json
-    context.modules = [
-    {  name = libpipewire-module-filter-chain
-       args = {
-          node.description = "Noise Canceling Source"
-          media.name       = "Noise Canceling Source"
-          filter.graph = {
-              nodes = [
-                {
-                    type   = ladspa
-                    name   = rnnoise
-                    plugin = /usr/lib/ladspa/librnnoise_ladspa.so
-                    label  = noise_suppressor_mono
-                    control = {
-                        "VAD Threshold (%)" = 50.0
-                    }
-                }
-            ]
-          }
-          capture.props = {
-              node.name   = "capture.rnnoise_source"
-              node.passive = true
-              audio.rate   = 48000
-          }
-          playback.props = {
-              node.name   = "rnnoise_source"
-              media.class = Audio/Source
-              audio.rate   = 48000
-          }
-        }
-      }
-    ]
-    ```
-
-  - `wpctl set-default yourNoiceCancelledID` (find in `wpctl status`)
-
-### Quality-of-Life
-- Install `blueman` and `r-quick-share` for seamless bluetooth support. (Works with Apple Airpods and android phone)
 <br>
 
 ## Acknowledgements
