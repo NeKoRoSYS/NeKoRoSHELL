@@ -53,6 +53,10 @@ The following are what NeKoRoSHELL currently offers:
     - **The installer is safe.** It backs up your pre-existing .config folders. (If you have any)
     - The installer automatically handles assigning your monitors at `~/.config/hypr/configs/monitors.conf/` and replaces every occurence of `/home/nekorosys/` with your username for your own convenience.
     - SOME distros don't have hyprland or other dependencies on their package manager's repository and you may have to manually build them from source via script or something else.
+
+- **NeKoRoSHELL as a Service**
+  - Update your copy of NeKoRoSHELL simply by running the `nekoroshell update` command on your terminal.
+  - Uses Vim to assist in reviewing file updates and gives the ability to overwrite, keep, and merge.
    
 - **Window Controls**
   - Maximize
