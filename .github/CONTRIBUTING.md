@@ -5,6 +5,8 @@ Contributions are welcome!
 Something's wrong with the repo or you know better workarounds and alternatives? You can fork the repo and make a pull request. It will be very much appreciated!
 
 You are welcome to introduce any changes to the repo. However, I do have to focus on the following:
+- Verifying for multiple distros. (`packages/pkglist-DISTRO.txt`, `install.sh`, etc.) (Please include steps to follow to ensure a working NeKoRoSHELL desktop experience on other distros)
+- Verifying init-agnosticism.
 - The caveats at [Dependencies](https://github.com/NeKoRoSYS/NeKoRoSHELL#dependencies)
 - The [Issue Tracker](https://github.com/NeKoRoSYS/NeKoRoSHELL/issues)
 
