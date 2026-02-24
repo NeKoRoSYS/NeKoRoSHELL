@@ -187,7 +187,7 @@ menu > *:hover {
 #power-profiles-daemon.balanced { color: cornflowerblue; }
 
 #idle_inhibitor.activated {
-    color: @accent;
+    color: @accent; 
 }
 
 #idle_inhibitor.deactivated {
