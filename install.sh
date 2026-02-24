@@ -73,6 +73,30 @@ echo -e "${BLUE}Starting $INSTALL_TYPE installation...${NC}"
 # DEPENDENCY INSTALLATION (Compilation Mode Only)
 # ==============================================================================
 
+detect_and_bootstrap() {
+    source /etc/os-release
+    echo "Detected OS: $ID"
+    
+    if [ "$ID" = "arch" ] || [ "$ID_LIKE" = "arch" ]; then
+        echo "Bootstrapping Arch dependencies..."
+        sudo pacman -Syu --needed base-devel git cargo go flatpak
+        if ! command -v yay &> /dev/null; then
+            git clone https://aur.archlinux.org/yay.git /tmp/yay && cd /tmp/yay && makepkg -si
+        fi
+    elif [ "$ID" = "fedora" ]; then
+        echo "Bootstrapping Fedora dependencies..."
+        sudo dnf install @development-tools git cargo golang flatpak
+    elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ]; then
+        echo "Bootstrapping Debian dependencies..."
+        sudo apt update && sudo apt install build-essential git cargo golang flatpak
+    else
+        echo "Unsupported OS. Please install prerequisites manually."
+        exit 1
+    fi
+}
+
+detect_and_bootstrap
+
 if [[ "$INSTALL_TYPE" == "compilation" ]]; then
 
     echo -e "${BLUE}Detecting operating system...${NC}"
