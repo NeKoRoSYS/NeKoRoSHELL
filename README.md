@@ -40,16 +40,19 @@ NeKoRoSHELL focuses on simplicity and modularity.
 <br>
 
 The following are what NeKoRoSHELL currently offers:
-- **Distro-agnostic Installer Script**
+- **Distro-agnostic**
   - Use NeKoRoSHELL in any **supported** distro!
-  - Use `git clone https://github.com/NeKoRoSYS/NeKoRoSHELL`
-  - Then `cd NeKoRoSHELL`
-  - and finally, `bash install.sh` to install the dotfiles.
+  - Init-agnostic.
+  - Features an advanced installer script.
+    - Use `git clone https://github.com/NeKoRoSYS/NeKoRoSHELL`
+    - Then `cd NeKoRoSHELL`
+    - and finally, `bash install.sh` to install the dotfiles.
     - `install.sh` assumes you already have `git` and a distro-specific `g++` compiler.
     - `install.sh` requires you to have `cargo`, `paru`/`yay`, `go`, and `flatpak`.
     - You can freely customize `flatpak.txt` and `pkglist-DISTRO.txt` before running `install.sh`.
     - **The installer is safe.** It backs up your pre-existing .config folders. (If you have any)
     - The installer automatically handles assigning your monitors at `~/.config/hypr/configs/monitors.conf/` and replaces every occurence of `/home/nekorosys/` with your username for your own convenience.
+    - SOME distros don't have hyprland or other dependencies on their package manager's repository and you may have to manually build them from source via script or something else.
    
 - **Window Controls**
   - Maximize
