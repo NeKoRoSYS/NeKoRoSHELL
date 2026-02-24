@@ -143,14 +143,15 @@ case $FEATURE in
 		    cp "$PATH_SKIN/navbar-hover.conf" "$HOME/.cache/navbar-hover.conf"
 		    killall waybar && sleep 0.05
 
-		    systemctl --user stop navbar.service navbar-hover.service navbar-watcher.service
+		    killall -q waybar navbar-hover navbar-watcher 2>/dev/null || true
+		    sleep 0.1
 
 		    if [ "$MANAGEMENT_MODE" = "static" ]; then
-			systemctl --user restart navbar.service &
+			waybar &
 		    elif [ "$MANAGEMENT_MODE" = "hover" ]; then
-			systemctl --user restart navbar-hover.service
+			navbar-hover &
 		    else
-			systemctl --user restart navbar-watcher.service
+			navbar-watcher &
 		    fi
                     ;;
             esac
