@@ -11,12 +11,13 @@ navbar="Select Navbar Skin"
 launcher="Select Launcher Skin"
 lockscreen="Select Lockscreen Layout"
 panel="Select Control Centre Layout"
-OPTIONS="$theme\n$wallpaper\n$navbar\n$launcher\n$lockscreen\n$panel"
+power="Select Power Options Layout"
+OPTIONS="$theme\n$wallpaper\n$navbar\n$launcher\n$lockscreen\n$panel\n$power"
 
 if [ -n "$CMD_FEATURE" ]; then
     FEATURE="$CMD_FEATURE"
 else
-    CHOICE=$(echo -e "$OPTIONS" | rofi -dmenu -theme-str 'listview { lines: 6; scrollbar: false; }' -no-cache -p "Select Action")
+    CHOICE=$(echo -e "$OPTIONS" | rofi -dmenu -theme-str 'listview { lines: 7; scrollbar: false; }' -no-cache -p "Select Action")
     case "$CHOICE" in
 	"$theme")	FEATURE=theme ;;
         "$wallpaper")   FEATURE=wallpaper ;;
@@ -24,6 +25,7 @@ else
         "$launcher")    FEATURE=launcher ;;
         "$lockscreen")  FEATURE=lockscreen ;;
         "$panel")       FEATURE=panel ;;
+        "$power")       FEATURE=power ;;
         *)              exit 1 ;;
     esac
 fi
@@ -37,7 +39,7 @@ case $FEATURE in
 	THEME_DIR="$HOME/.config/themes"
 	
 	if [ ! -n "$2" ]; then        
-	    makenotif customize preferences-desktop-theme Themes "Select a theme." true
+	    makenotif customize preferences-desktop-theme Themes "Select a Theme." true
         fi
 
 	CHOICE=${CMD_CHOICE:-$(find "$THEME_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort | rofi -dmenu -p "Select Theme")}
@@ -59,7 +61,7 @@ case $FEATURE in
         MAIN="$HOME/.config/hypr/hyprlock.conf"
 
 	if [ ! -n "$2" ]; then        
-	    makenotif customize preferences-desktop-theme Lockscreen "Select a lockscreen layout." true
+	    makenotif customize preferences-desktop-theme Lockscreen "Select a Lockscreen layout." true
         fi
 
 	CHOICE=${CMD_CHOICE:-$(find "$SKIN_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort | rofi -dmenu -p "Select Lockscreen Layout")}
@@ -92,10 +94,10 @@ case $FEATURE in
         fi
         ;;
 
-    launcher|panel|navbar)
+    launcher|panel|navbar|power)
         case $FEATURE in
             launcher)
-                NAME="Launcher"; ICON="preferences-desktop-theme"; MSG="Select a launcher skin."
+                NAME="Launcher"; ICON="preferences-desktop-theme"; MSG="Select a Launcher skin."
                 DIR="$HOME/.config/rofi/skins"; CONFIG="$HOME/.config/rofi/config.rasi"
                 ;;
             panel)
@@ -103,8 +105,12 @@ case $FEATURE in
                 DIR="$HOME/.config/swaync/skins"; CONFIG="$HOME/.config/swaync/config.json"; STYLE="$HOME/.config/swaync/style.css"
                 ;;
             navbar)
-                NAME="Navbar"; ICON="preferences-desktop-theme"; MSG="Select a navbar skin."
+                NAME="Navbar"; ICON="preferences-desktop-theme"; MSG="Select a Navbar skin."
                 DIR="$HOME/.config/waybar/skins"; CONFIG="$HOME/.config/waybar/config.jsonc"; STYLE="$HOME/.config/waybar/style.css"
+                ;;
+            power)
+                NAME="Power Options"; ICON="preferences-desktop-theme"; MSG="Select a Power Options layout."
+                DIR="$HOME/.config/wlogout/skins"; CONFIG="$HOME/.config/wlogout/layout"; STYLE="$HOME/.config/wlogout/style.css"
                 ;;
         esac
 
@@ -124,7 +130,9 @@ case $FEATURE in
             fi
 
             sed -i "\|^source = $DIR/|d" "$HYPR"
-            echo "source = $PATH_SKIN/layerrule.conf" >> "$HYPR"
+	    if [[ -f "$PATH_SKIN/layerrule.conf" ]]; then
+                echo "source = $PATH_SKIN/layerrule.conf" >> "$HYPR"
+	    fi
 
             case $FEATURE in
                 launcher)
@@ -137,6 +145,10 @@ case $FEATURE in
                     swaync-client -R
                     swaync-client -rs
                     ;;
+		power)
+            	    echo "@import \"$PATH_SKIN/style.css\";" > "$STYLE"
+                    cp "$PATH_SKIN/layout" "$CONFIG"
+		    ;;
                 navbar)
             	    echo "@import \"$PATH_SKIN/style.css\";" > "$STYLE"
                     echo "{ \"include\": [ \"$PATH_SKIN/layout.jsonc\" ] }" > "$CONFIG"
