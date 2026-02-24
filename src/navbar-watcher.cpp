@@ -157,25 +157,33 @@ public:
 class SwayBackend : public CompositorBackend {
 public:
     bool is_waybar_active() override {
-        std::string layers = exec("lswt"); 
-        return (layers.find("waybar") != std::string::npos);
+        return system("pgrep -x waybar > /dev/null 2>&1") == 0;
     }
 
     bool has_active_windows() override {
-        std::string ws_out = exec("swaymsg -t get_workspaces");
+        std::string cmd = "swaymsg -t get_tree | jq -r '.. | objects | select(.type==\"workspace\" and .focused==true) | (.nodes | length) + (.floating_nodes | length)'";
+        std::string out = exec(cmd.c_str());
         
-        return (ws_out.find("\"focused\": true") != std::string::npos && 
-                ws_out.find("\"nodes\": []") == std::string::npos); 
+        try {
+            int window_count = std::stoi(out);
+            return window_count > 0;
+        } catch (...) {
+            return false;
+        }
     }
 
     void listen_for_events(std::function<void()> on_event) override {
         FILE* stream = popen("swaymsg -m -t subscribe '[\"window\", \"workspace\"]'", "r");
-        if (!stream) return;
+        if (!stream) {
+            std::cerr << "[ERROR] Failed to subscribe to Sway IPC." << std::endl;
+            return;
+        }
 
         char buffer[2048];
         while (fgets(buffer, sizeof(buffer), stream) != nullptr) {
             on_event(); 
         }
+        
         pclose(stream);
     }
 };
