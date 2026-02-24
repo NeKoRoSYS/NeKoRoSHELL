@@ -74,7 +74,6 @@ The following are what NeKoRoSHELL currently offers:
 
 - **Advanced Customization - Make NeKoRoSHELL YOURS!**
   - NeKoRoSHELL is not just an identity, it is a framework. This repo gives you at most 2 pre-installed out-of-the-box layouts/styling for waybar, hyprlock, and SwayNC. The best part? You can make your own!
-  - Credits to [iyiolacak](https://github.com/iyiolacak/iyiolacak-swaync-config?tab=readme-ov-file), [justinmdickey](https://github.com/justinmdickey/publicdots/blob/main/.config/hypr/hyprlock.conf), and [mkhmtolzhas](https://github.com/mkhmtolzhas/mkhmtdots) for their amazing designs.
   - Switch to Dark and Light contrast modes
   - [Dedicated Theming System](THEMING.md):
     - Select individual skins for Waybar, Rofi, Hyprlock, and SwayNC
@@ -117,18 +116,13 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Optimizations | ✅ |
 | Color Handling - Replace pywal6 with wallust | ✅ |
 | Dmenu Overhaul - Replace wofi with rofi | ✅ |
-| Support for other distros; BETA<br>Verified to be working on: Arch and Debian | 🔍 |
 | Theme System - Set all skins in one go | ✅ |
 | wlogout integration | ⏳ |
-| Example Minecraft Theme| 🤔 |
+| Make NeKoRoSHELL init-agnostic | ⏳ |
+| Support for other distros; BETA<br>Verified to be working on: Arch | 🔍 |
 | Qt and Kvantum integration | 🤔 |
-| Quickshell integration | 🤔 |
 
 </div>
-<br>
-
-NOTE: It is **unclear** what I'll have to do to properly execute a Quickshell integration for this repo. Maybe I'll only add widgets; or maybe I'll make an entirely new desktop environment on top of Hyprland, replacing waybar and swaync. Who knows? It doesn't matter for now so please take it with a grain of salt.
-
 <br>
 
 ## Dependencies
@@ -150,17 +144,12 @@ NOTE: It is **unclear** what I'll have to do to properly execute a Quickshell in
 >
 > The installation system for that I implemented can be improved. If you're willing to help, please make a pull request. Your contributions are welcome and will be appreciated! :D
 
+- `update-nekoroshell` uses Vim to compare, overwrite, or merge files when updating.
 - Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
   - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
- 
-- This rice uses `rofi` to run actions and apps.
-  - Some apps like `mpvpaper` needs to be ran using `prime-run` and `gamemoderun`
-
-- `hyprland` uses `hypridle` and `hyprlock`.
-
-- Waybar was set up to use `kitty`, `Mozilla Firefox`, and `dolphin`. You can change this if you want at `~/.config/waybar/config.jsonc`.
-
-- The screenshot and clipboard features need `grim`, `slurp`, `hyprshot`, `wl-clipboard`, and `cliphist` to run.
+- Install [Hypremoji](https://github.com/Musagy/hypremoji)
+- Fix waybar tray disappearing after a certain amount of time by installing `sni-qt`.
+  Make sure you're not killing waybar using -SIGUSER2 when refreshing the config. NeKoRoSHELL's waybar is a systemd service and not just an executable, reloads are handled via `systemctl`.
 <br>
 
 ## Optional
@@ -238,17 +227,21 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
   - `wpctl set-default yourNoiceCancelledID` (find in `wpctl status`)
 
 ### Quality-of-Life
-- Install [Hypremoji](https://github.com/Musagy/hypremoji)
 - Install `blueman` and `r-quick-share` for seamless bluetooth support. (Works with Apple Airpods and android phone)
-- Fix waybar tray disappearing after a certain amount of time by installing `sni-qt`.
-  Make sure you're not killing waybar using -SIGUSER2 when refreshing the config. NeKoRoSHELL's waybar is a systemd service and not just an executable, reloads are handled via `systemctl`.
+<br>
+
+## Acknowledgements
+- Amelie for helping me transition the project from using pywal16 to wallust.
+- April for helping me figure out the cause of the now-fixed "keybinds not working" issue.
+- Credits to [iyiolacak](https://github.com/iyiolacak/iyiolacak-swaync-config?tab=readme-ov-file), [justinmdickey](https://github.com/justinmdickey/publicdots/blob/main/.config/hypr/hyprlock.conf), and [mkhmtolzhas](https://github.com/mkhmtolzhas/mkhmtdots) for their amazing designs.
+  - The `legacy` theme was based on mkhmtolzha's waybar stylesheet and layout, just heavily modified and made to be thematically-consistent across packages like SwayNC.
 <br>
 
 ## Star History
 <br>
 
 <div align="center">
-<a href="https://www.star-history.com/#caelestia-dots/shell&Date">
+<a href="https://www.star-history.com/#nekorosys/nekoroshell&Date">
  <picture>
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=bottom-right"/>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=bottom-right&theme=dark"/>
