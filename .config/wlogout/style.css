@@ -1,50 +1,71 @@
-* {
-	background-image: none;
-	box-shadow: none;
-}
+@import "/home/nekorosys/.cache/wallust/colors-waybar.css";
 
-window {
-	background-color: rgba(12, 12, 12, 0.9);
-}
+* { background-image: none; box-shadow: none; }
+window { background-color: rgba(12, 12, 12, 0.9); }
 
 button {
-    border-radius: 0;
-    border-color: black;
-	text-decoration-color: #FFFFFF;
-    color: #FFFFFF;
-	background-color: #1E1E1E;
-	border-style: solid;
-	border-width: 1px;
-	background-repeat: no-repeat;
-	background-position: center;
-	background-size: 25%;
+    margin: 10px;
+    border-radius: 10px;
+    border: none;
+    border-bottom: 5px solid @color13;
+    color: white;
+    background-repeat: no-repeat, repeat;
+    background-position: center;
+    background-size: 25%, 100%;
 }
 
-button:focus, button:active, button:hover {
-	background-color: #3700B3;
-	outline-style: none;
+button:hover {
+    color: black;
+    outline-style: none;
+    background-color: white;
 }
 
-#lock {
-    background-image: image(url("/usr/share/wlogout/icons/lock.png"), url("/usr/local/share/wlogout/icons/lock.png"));
+#lock { 
+    background-image: image(url("./assets/lock.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#logout { 
+    background-image: image(url("./assets/logout.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#suspend { 
+    background-image: image(url("./assets/suspend.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#hibernate { 
+    background-image: image(url("./assets/hibernate.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#shutdown { 
+    background-image: image(url("./assets/shutdown.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#reboot { 
+    background-image: image(url("./assets/reboot.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
 }
 
-#logout {
-    background-image: image(url("/usr/share/wlogout/icons/logout.png"), url("/usr/local/share/wlogout/icons/logout.png"));
+#lock:hover { 
+    background-image: image(url("./assets/lock-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
 }
-
-#suspend {
-    background-image: image(url("/usr/share/wlogout/icons/suspend.png"), url("/usr/local/share/wlogout/icons/suspend.png"));
+#logout:hover { 
+    background-image: image(url("./assets/logout-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
 }
-
-#hibernate {
-    background-image: image(url("/usr/share/wlogout/icons/hibernate.png"), url("/usr/local/share/wlogout/icons/hibernate.png"));
+#suspend:hover { 
+    background-image: image(url("./assets/suspend-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
 }
-
-#shutdown {
-    background-image: image(url("/usr/share/wlogout/icons/shutdown.png"), url("/usr/local/share/wlogout/icons/shutdown.png"));
+#hibernate:hover { 
+    background-image: image(url("./assets/hibernate-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
 }
-
-#reboot {
-    background-image: image(url("/usr/share/wlogout/icons/reboot.png"), url("/usr/local/share/wlogout/icons/reboot.png"));
+#shutdown:hover { 
+    background-image: image(url("./assets/shutdown-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#reboot:hover { 
+    background-image: image(url("./assets/reboot-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
 }
