@@ -2,8 +2,10 @@ app-arch/unzip
 app-editors/vim
 app-misc/fastfetch
 app-misc/jq
+app-misc/tty-clock
 app-shells/zsh
 dev-lang/go
+dev-libs/wayland
 dev-util/cmake
 dev-vcs/git
 games-util/gamemode
@@ -21,9 +23,11 @@ media-fonts/jetbrains-mono
 media-fonts/noto
 media-fonts/noto-cjk
 media-fonts/noto-emoji
+media-gfx/imagemagick
 media-plugins/gst-plugins-pipewire
 media-sound/alsa-utils
 media-sound/cava
+media-video/ffmpeg
 media-video/pipewire
 media-video/wireplumber
 net-misc/socat
