@@ -24,7 +24,7 @@ PARAMS="$TARGET_IMG -q -C"
 
 if command -v wallust >/dev/null 2>&1; then
     echo "Updating system theme using: $(basename "$TARGET_IMG")"
-	systemctl --user stop navbar.service navbar-watcher.service navbar-hover.service
+	killall -q waybar navbar-hover navbar-watcher 2>/dev/null || true
 
 	if [ "$current_theme" = "Dark" ]; then
 		wallust run "$TARGET_IMG" -q -C ~/.config/wallust/wallust-dark.toml || wallust run $TARGET_IMG -q -C ~/.config/wallust/wallust-dark.toml -b full -t 5
@@ -42,13 +42,13 @@ if command -v wallust >/dev/null 2>&1; then
 
 	case "$MANAGEMENT_MODE" in
 	"static")
-		systemctl --user restart navbar.service &
+		waybar &
 		;;
 	"hover")
-		systemctl --user restart navbar-hover.service &
+		navbar-hover &
 		;;
 	*)
-		systemctl --user restart navbar-watcher.service &
+		navbar-watcher &
 		;;
 	esac
 fi
