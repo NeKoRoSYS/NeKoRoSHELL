@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <atomic>
+#include <sstream>
 
 struct Monitor { int x, y, w, h; };
 struct Config {
