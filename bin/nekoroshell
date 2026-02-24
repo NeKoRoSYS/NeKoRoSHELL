@@ -36,7 +36,7 @@ prompt_merge() {
 
     while true; do
         echo -e "\n${YELLOW}Conflict detected in: ${NC}$relative_path"
-        echo -ne "Action: [${GREEN}o${NC}]verwrite, [${RED}k${NC}]eep current, [${BLUE}v${NC}]iew diff, [${YELLOW}m${NC}]erge (vimdiff)? "
+        echo -ne "Action: [${GREEN}o${NC}]verwrite, [${RED}k${NC}]eep current, [${BLUE}v${NC}]iew diff, [${YELLOW}m${NC}]erge? "
         
         read -r -n 1 choice 
         echo ""
@@ -53,13 +53,18 @@ prompt_merge() {
                 diff --color=always -u "$target_file" "$new_file" | less -R
                 ;;
             m)
-                if command -v vimdiff >/dev/null; then
-                    vimdiff "$target_file" "$new_file"
-                    break
+                USER_EDITOR=${VISUAL:-${EDITOR:-nano}}
+
+                echo -e "${BLUE}Opening merge review in $USER_EDITOR...${NC}"
+
+                if [ "$USER_EDITOR" = "code" ]; then
+                    # We add --wait so the script pauses until you close the tab
+                    code --wait --diff "$target_file" "$new_file"
                 else
-                    echo -e "${RED}vimdiff is not installed. Please view diff or overwrite/keep.${NC}"
+                    # Fallback to standard editor (vim, nano, etc.)
+                    $USER_EDITOR "$new_file"
                 fi
-                ;;
+                break ;;
             *)
                 echo -e "${RED}Invalid choice. Please press o, k, v, or m.${NC}" ;;
         esac
