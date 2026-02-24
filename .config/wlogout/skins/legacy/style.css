@@ -1,0 +1,71 @@
+@import "/home/nekorosys/.cache/wallust/colors-waybar.css";
+
+* { background-image: none; box-shadow: none; }
+window { background-color: rgba(12, 12, 12, 0.9); }
+
+button {
+    margin: 10px;
+    border-radius: 10px;
+    border: none;
+    border-bottom: 5px solid @color13;
+    color: white;
+    background-repeat: no-repeat, repeat;
+    background-position: center;
+    background-size: 25%, 100%;
+}
+
+button:hover {
+    color: black;
+    outline-style: none;
+    background-color: white;
+}
+
+#lock { 
+    background-image: image(url("./assets/lock.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#logout { 
+    background-image: image(url("./assets/logout.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#suspend { 
+    background-image: image(url("./assets/suspend.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#hibernate { 
+    background-image: image(url("./assets/hibernate.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#shutdown { 
+    background-image: image(url("./assets/shutdown.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#reboot { 
+    background-image: image(url("./assets/reboot.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+
+#lock:hover { 
+    background-image: image(url("./assets/lock-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#logout:hover { 
+    background-image: image(url("./assets/logout-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#suspend:hover { 
+    background-image: image(url("./assets/suspend-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#hibernate:hover { 
+    background-image: image(url("./assets/hibernate-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#shutdown:hover { 
+    background-image: image(url("./assets/shutdown-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
+#reboot:hover { 
+    background-image: image(url("./assets/reboot-hover.png")), 
+                      linear-gradient(to bottom, alpha(black, 0), alpha(@color5, 0.5)); 
+}
