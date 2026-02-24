@@ -9,9 +9,11 @@ cliphist
 cmake
 dolphin
 fastfetch
+ffmpeg
 firefox
 flatpak
 gamemode
+gcc
 git
 grim
 gst-plugin-pipewire
@@ -24,6 +26,7 @@ hyprpicker
 hyprpolkitagent
 hyprshot
 hyprsunset
+imagemagick
 jq
 kio-admin
 kitty
@@ -40,8 +43,10 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
+pkgconf
 power-profiles-daemon
 rofi-wayland
+slurp
 smartmontools
 sni-qt
 socat
@@ -55,6 +60,7 @@ unzip
 vim
 wallust
 waybar
+wayland
 wayland-utils
 wireplumber
 wl-clipboard
