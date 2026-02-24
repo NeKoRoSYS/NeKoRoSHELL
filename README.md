@@ -40,7 +40,7 @@ NeKoRoSHELL focuses on simplicity and modularity.
 <br>
 
 The following are what NeKoRoSHELL currently offers:
-- **Distro-agnostic**
+- **BETA: Distro-agnostic**
   - Use NeKoRoSHELL in any **supported** distro!
   - Init-agnostic.
   - Features an advanced installer script.
