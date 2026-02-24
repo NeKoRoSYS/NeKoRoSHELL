@@ -120,8 +120,8 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Color Handling - Replace pywal6 with wallust | ✅ |
 | Dmenu Overhaul - Replace wofi with rofi | ✅ |
 | Theme System - Set all skins in one go | ✅ |
-| wlogout integration | ⏳ |
-| Make NeKoRoSHELL init-agnostic | ⏳ |
+| wlogout integration | ✅ |
+| Make NeKoRoSHELL init-agnostic; BETA<br>Verified to be working on: Arch | 🔍 |
 | Support for other distros; BETA<br>Verified to be working on: Arch | 🔍 |
 | Qt and Kvantum integration | 🤔 |
 
