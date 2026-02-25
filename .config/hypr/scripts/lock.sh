@@ -1,1 +1,1 @@
-hyprlock
+sys-power lock
