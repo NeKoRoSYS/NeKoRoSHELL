@@ -16,74 +16,147 @@
 #include <algorithm>
 #include <set>
 #include <functional>
+#include <unordered_map>
+#include <unordered_set>
+#include <sstream>
+#include <dirent.h>
+#include <fcntl.h>
+#include <nlohmann/json.hpp>
 
-struct PipeDeleter {
-    void operator()(FILE* stream) const { if (stream) pclose(stream); }
-};
+using json = nlohmann::json;
 
-std::string exec(const char* cmd) {
-    char buffer[4096];
-    std::string result = "";
-    std::unique_ptr<FILE, PipeDeleter> pipe(popen(cmd, "r"));
-    if (!pipe) return "";
-    while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) {
-        result += buffer;
+std::string exec(const char* cmd, int timeout_ms = 1000) {
+    int pipefd[2];
+    if (pipe(pipefd) == -1) return "";
+
+    pid_t pid = fork();
+    if (pid == -1) return "";
+
+    if (pid == 0) {
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+        execl("/bin/sh", "sh", "-c", cmd, nullptr);
+        exit(1);
     }
+
+    close(pipefd[1]);
+
+    int flags = fcntl(pipefd[0], F_GETFL, 0);
+    fcntl(pipefd[0], F_SETFL, flags | O_NONBLOCK);
+
+    std::string result = "";
+    char buffer[4096];
+    auto start_time = std::chrono::steady_clock::now();
+
+    while (true) {
+        ssize_t count = read(pipefd[0], buffer, sizeof(buffer) - 1);
+        if (count > 0) {
+            buffer[count] = '\0';
+            result += buffer;
+        } else if (count == 0) {
+            break; 
+        } else {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                auto now = std::chrono::steady_clock::now();
+                auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time).count();
+                if (elapsed > timeout_ms) {
+                    kill(pid, SIGKILL); 
+                    std::cerr << "[WARNING] Command timed out: " << cmd << "\n";
+                    break;
+                }
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            } else {
+                break;
+            }
+        }
+    }
+
+    close(pipefd[0]);
+    waitpid(pid, nullptr, 0); 
     return result;
+}
+
+pid_t get_waybar_pid() {
+    DIR* dir = opendir("/proc");
+    if (!dir) return -1;
+
+    struct dirent* ent;
+    while ((ent = readdir(dir)) != nullptr) {
+        if (!isdigit(ent->d_name[0])) continue;
+
+        std::string pid_str = ent->d_name;
+        std::ifstream comm_file("/proc/" + pid_str + "/comm");
+        if (comm_file.is_open()) {
+            std::string comm_name;
+            std::getline(comm_file, comm_name);
+            if (comm_name == "waybar") {
+                closedir(dir);
+                return std::stoi(pid_str);
+            }
+        }
+    }
+    closedir(dir);
+    return -1;
 }
 
 class CompositorBackend {
 public:
     virtual ~CompositorBackend() = default;
-    
     virtual bool is_waybar_active() = 0;
-    
     virtual bool has_active_windows() = 0;
-    
     virtual void listen_for_events(std::function<void()> on_event) = 0;
 };
 
 class HyprlandBackend : public CompositorBackend {
 private:
-    int parse_int_value(const std::string& json, size_t pos) {
-        while (pos < json.length() && !isdigit(json[pos]) && json[pos] != '-') pos++;
-        if (pos >= json.length()) return -999;
-        return std::stoi(json.substr(pos));
+    std::unordered_map<std::string, std::string> window_to_workspace;
+    std::unordered_map<std::string, int> workspace_window_count;
+    std::unordered_set<std::string> active_workspaces;
+
+    std::vector<std::string> split(const std::string& s, char delimiter) {
+        std::vector<std::string> tokens;
+        std::string token;
+        std::istringstream tokenStream(s);
+        while (std::getline(tokenStream, token, delimiter)) tokens.push_back(token);
+        return tokens;
+    }
+
+    void sync_state_from_json() {
+        try {
+            window_to_workspace.clear();
+            workspace_window_count.clear();
+            active_workspaces.clear();
+
+            auto monitors = json::parse(exec("hyprctl -j monitors"));
+            for (const auto& mon : monitors) {
+                active_workspaces.insert(mon["activeWorkspace"]["name"].get<std::string>());
+            }
+
+            auto clients = json::parse(exec("hyprctl -j clients"));
+            for (const auto& client : clients) {
+                std::string addr = client["address"].get<std::string>();
+                std::string ws = client["workspace"]["name"].get<std::string>();
+                window_to_workspace[addr] = ws;
+                workspace_window_count[ws]++;
+            }
+        } catch (const json::exception& e) {
+            std::cerr << "[ERROR] JSON parse failed: " << e.what() << "\n";
+        }
     }
 
 public:
+    HyprlandBackend() {
+        sync_state_from_json();
+    }
+
     bool is_waybar_active() override {
-        std::string layers = exec("hyprctl layers");
-        return (layers.find("waybar") != std::string::npos);
+        return get_waybar_pid() != -1;
     }
 
     bool has_active_windows() override {
-        std::string mon_out = exec("hyprctl -j monitors");
-        std::set<int> active_workspace_ids;
-
-        size_t pos = 0;
-        while ((pos = mon_out.find("\"activeWorkspace\":", pos)) != std::string::npos) {
-            size_t id_key = mon_out.find("\"id\":", pos);
-            if (id_key != std::string::npos) {
-                int id = parse_int_value(mon_out, id_key + 5);
-                if (id != -999) active_workspace_ids.insert(id);
-            }
-            pos++;
-        }
-
-        if (active_workspace_ids.empty()) return false;
-
-        std::string clients_out = exec("hyprctl -j clients");
-        pos = 0;
-        while ((pos = clients_out.find("\"workspace\":", pos)) != std::string::npos) {
-            size_t id_key = clients_out.find("\"id\":", pos);
-            if (id_key != std::string::npos) {
-                int id = parse_int_value(clients_out, id_key + 5);
-                if (active_workspace_ids.count(id)) {
-                    return true; 
-                }
-            }
-            pos++;
+        for (const auto& ws : active_workspaces) {
+            if (workspace_window_count[ws] > 0) return true;
         }
         return false;
     }
@@ -121,22 +194,48 @@ public:
                 pending_data += buffer;
                 
                 size_t pos = 0;
-                bool dirty = false;
+                bool state_changed = false;
                 
                 while ((pos = pending_data.find('\n')) != std::string::npos) {
                     std::string line = pending_data.substr(0, pos);
                     pending_data.erase(0, pos + 1);
                     
-                    if (line.find("openwindow") == 0 ||
-                        line.find("closewindow") == 0 ||
-                        line.find("movewindow") == 0 ||
-                        line.find("workspace") == 0 ||
-                        line.find("focusedmon") == 0) {
-                        dirty = true;
+                    if (line.rfind("openwindow>>", 0) == 0) {
+                        auto parts = split(line.substr(12), ',');
+                        if (parts.size() >= 2) {
+                            window_to_workspace[parts[0]] = parts[1];
+                            workspace_window_count[parts[1]]++;
+                            state_changed = true;
+                        }
+                    } 
+                    else if (line.rfind("closewindow>>", 0) == 0) {
+                        std::string addr = line.substr(13);
+                        if (window_to_workspace.count(addr)) {
+                            workspace_window_count[window_to_workspace[addr]]--;
+                            window_to_workspace.erase(addr);
+                            state_changed = true;
+                        }
+                    } 
+                    else if (line.rfind("movewindow>>", 0) == 0) {
+                        auto parts = split(line.substr(12), ',');
+                        if (parts.size() >= 2) {
+                            std::string addr = parts[0];
+                            std::string new_ws = parts[1];
+                            if (window_to_workspace.count(addr)) {
+                                workspace_window_count[window_to_workspace[addr]]--;
+                            }
+                            window_to_workspace[addr] = new_ws;
+                            workspace_window_count[new_ws]++;
+                            state_changed = true;
+                        }
+                    }
+                    else if (line.rfind("workspace>>", 0) == 0 || line.rfind("focusedmon>>", 0) == 0) {
+                        sync_state_from_json();
+                        state_changed = true;
                     }
                 }
                 
-                if (dirty) {
+                if (state_changed) {
                     on_event(); 
                 }
             } else if (num_read == -1) {
@@ -157,7 +256,7 @@ public:
 class SwayBackend : public CompositorBackend {
 public:
     bool is_waybar_active() override {
-        return system("pgrep -x waybar > /dev/null 2>&1") == 0;
+        return get_waybar_pid() != -1;
     }
 
     bool has_active_windows() override {
@@ -189,9 +288,17 @@ public:
 };
 
 bool is_waybar_visible = false;
+pid_t waybar_pid = -1;
 
 void set_waybar(bool visible) {
-    bool process_running = (system("pgrep -x waybar > /dev/null") == 0);
+    if (waybar_pid <= 0 || kill(waybar_pid, 0) != 0) {
+        waybar_pid = get_waybar_pid();
+    }
+
+    bool process_running = (waybar_pid > 0);
+    if (!process_running) {
+        is_waybar_visible = false;
+    }
 
     if (visible) {
         if (!process_running) {
@@ -201,14 +308,15 @@ void set_waybar(bool visible) {
                 execvp(args[0], args);
                 exit(1); 
             }
+            waybar_pid = pid; 
             is_waybar_visible = true;
         } else if (!is_waybar_visible) {
-            system("killall -q -SIGUSR1 waybar");
+            kill(waybar_pid, SIGUSR1);
             is_waybar_visible = true;
         }
     } else {
         if (process_running && is_waybar_visible) {
-            system("killall -q -SIGUSR1 waybar");
+            kill(waybar_pid, SIGUSR1);
             is_waybar_visible = false;
         }
     }
@@ -226,7 +334,8 @@ int main() {
         return 1;
     }
 
-    is_waybar_visible = backend->is_waybar_active();
+    waybar_pid = get_waybar_pid();
+    is_waybar_visible = (waybar_pid != -1);
 
     set_waybar(backend->has_active_windows());
 
