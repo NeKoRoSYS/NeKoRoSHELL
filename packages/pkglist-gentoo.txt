@@ -1,4 +1,5 @@
 app-arch/unzip
+dev-cpp/nlohmann_json
 app-editors/vim
 app-misc/fastfetch
 app-misc/jq
