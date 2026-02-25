@@ -33,6 +33,7 @@ kitty
 less
 mpvpaper
 network-manager-applet
+nlohmann-json
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
