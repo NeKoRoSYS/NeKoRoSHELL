@@ -1,36 +1,36 @@
 {
     "label" : "lock",
-    "action" : "hyprlock",
+    "action" : "sys-power lock",
     "text" : "Lock",
     "keybind" : "l"
 }
 {
     "label" : "hibernate",
-    "action" : "hibernate",
+    "action" : "sys-power hibernate",
     "text" : "Hibernate",
     "keybind" : "h"
 }
 {
     "label" : "logout",
-    "action" : "loginctl terminate-user $USER",
+    "action" : "sys-power logout",
     "text" : "Logout",
     "keybind" : "e"
 }
 {
     "label" : "shutdown",
-    "action" : "poweroff",
+    "action" : "syspower shutdown",
     "text" : "Shutdown",
     "keybind" : "s"
 }
 {
     "label" : "suspend",
-    "action" : "systemctl suspend || loginctl suspend || zzz",
+    "action" : "sys-power suspend",
     "text" : "Suspend",
     "keybind" : "u"
 }
 {
     "label" : "reboot",
-    "action" : "reboot",
+    "action" : "sys-power reboot",
     "text" : "Reboot",
     "keybind" : "r"
 }
