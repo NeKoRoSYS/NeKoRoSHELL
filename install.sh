@@ -452,15 +452,6 @@ for bin_dir in "$HOME/.local/bin/nekoroshell" "$HOME/bin/nekoroshell"; do
     fi
 done
 
-if command -v systemctl >/dev/null 2>&1; then
-    echo -e "${BLUE}Enabling Wayland services...${NC}"
-    systemctl --user daemon-reload || true
-    systemctl --user enable waybar.service 2>/dev/null || true
-    systemctl --user enable swaync.service 2>/dev/null || true
-else
-    echo -e "${RED}Cannot run systemctl. Please enable waybar and SwayNC manually.${NC}"
-fi
-
 # ==============================================================================
 # FINAL VERIFICATION
 # ==============================================================================
