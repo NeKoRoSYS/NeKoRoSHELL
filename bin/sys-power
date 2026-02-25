@@ -10,7 +10,17 @@ have() { command -v "$1" >/dev/null 2>&1; }
 
 case "$COMMAND" in
   lock)
-    swaylock
+    case "$XDG_CURRENT_DESKTOP" in
+      sway|Sway)
+        swaylock
+        ;;
+      Hyprland)
+        hyprlock
+        ;;
+      *)
+        loginctl lock-session
+        ;;
+    esac
     ;;
 
   logout)
