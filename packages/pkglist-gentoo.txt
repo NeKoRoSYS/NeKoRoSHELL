@@ -17,6 +17,7 @@ gui-apps/swaync
 gui-apps/waybar
 gui-apps/wayland-utils
 gui-apps/wl-clipboard
+gui-apps/wlogout
 gui-wm/hyprland
 kde-apps/dolphin
 media-fonts/jetbrains-mono
