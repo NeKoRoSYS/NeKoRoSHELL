@@ -17,7 +17,7 @@
 
 </div>
 
-The best way to say "I use Linux btw 🤓" is if your desktop profile looks sleek and suave.
+The best way to say "I use Linux btw 🤓" is if your desktop environment looks sleek and suave.
 
 **NeKoRoSHELL** aims to provide an out-of-the-box, clean and reliable, generic, and modular framework that lets you easily customize your desktop experience with simple UI design philosophy in mind.
 <br>
