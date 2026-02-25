@@ -108,23 +108,25 @@ do_uninstall() {
 
     echo -e "\n${BLUE}Removing NeKoRoSHELL configs and restoring backups...${NC}"
 
-    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync themes wallpapers wallust waybar)
+    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync themes wallpapers wallust waybar wlogout)
 
     for conf in "${CONFIGS[@]}"; do
         target_dir="$HOME/.config/$conf"
-        
         if [[ -d "$target_dir" ]]; then
             rm -rf "$target_dir"
             echo -e "  Removed ${YELLOW}$conf${NC} configuration."
         fi
-
-        latest_backup=$(ls -1d "${target_dir}_backup_"* 2>/dev/null | tail -n 1)
-        
-        if [[ -n "$latest_backup" ]]; then
-            mv "$latest_backup" "$target_dir"
-            echo -e "  [${GREEN}Restored${NC}] $(basename "$latest_backup") -> $conf"
-        fi
     done
+
+    latest_backup=$(ls -1 "$HOME/nekoroshell_backup_"*.tar.gz 2>/dev/null | sort -V | tail -n 1)
+    
+    if [[ -n "$latest_backup" ]]; then
+        echo -e "\n${BLUE}Restoring from backup archive: $(basename "$latest_backup")...${NC}"
+        tar -xzf "$latest_backup" -C "$HOME/.config"
+        echo -e "  [${GREEN}Restored${NC}] Configurations recovered from tarball."
+    else
+        echo -e "  ${YELLOW}No tarball backup found to restore.${NC}"
+    fi
 
     echo -e "\n${BLUE}Cleaning up NeKoRoSHELL scripts and binaries...${NC}"
 
@@ -172,6 +174,26 @@ do_update() {
     if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
         echo -e "${RED}Upgrade aborted by user.${NC}"
         exit 0
+    fi
+
+    echo -e "\n${BLUE}Creating backup before update...${NC}"
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    BACKUP_ARCHIVE="$HOME/nekoroshell_backup_$TIMESTAMP.tar.gz"
+    BACKUP_ITEMS=()
+    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync systemd wallpapers wallust waybar wlogout themes)
+
+    mkdir -p "$HOME/.config"
+    for conf in "${CONFIGS[@]}"; do
+        if [[ -e "$HOME/.config/$conf" ]]; then
+            BACKUP_ITEMS+=("$conf")
+        fi
+    done
+
+    if [[ ${#BACKUP_ITEMS[@]} -gt 0 ]]; then
+        tar -czf "$BACKUP_ARCHIVE" -C "$HOME/.config" "${BACKUP_ITEMS[@]}"
+        echo -e "${GREEN}Created pre-update backup archive at: $BACKUP_ARCHIVE${NC}"
+    else
+        echo -e "${YELLOW}No existing configs found to backup. Proceeding...${NC}"
     fi
 
     echo -e "\n${BLUE}Downloading and extracting...${NC}"
