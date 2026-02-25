@@ -46,5 +46,6 @@ waybar
 wayland-utils
 wireplumber
 wl-clipboard
+wlogout
 xdg-desktop-portal-gtk
 zsh
