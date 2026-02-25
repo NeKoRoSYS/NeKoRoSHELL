@@ -28,6 +28,7 @@ kitty
 less
 libwayland-dev
 network-manager
+nlohmann-json3-dev
 pavucontrol
 piper
 pipewire
