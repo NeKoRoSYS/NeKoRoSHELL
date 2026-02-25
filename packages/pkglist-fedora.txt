@@ -34,6 +34,7 @@ less
 make
 mpvpaper
 network-manager-applet
+nlohmann-json-devel
 pavucontrol
 piper
 pipewire
