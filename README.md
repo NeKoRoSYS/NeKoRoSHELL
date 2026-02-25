@@ -159,6 +159,9 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 - Amelie ([@S-e-r-a-p-h-i-n-e](https://github.com/S-e-r-a-p-h-i-n-e)) for helping me transition the project from using pywal16 to wallust and letting me borrow a few scripts. Go check out [SeraDOTS](https://github.com/S-e-r-a-p-h-i-n-e/SeraDOTS)!
 
 - April for helping me figure out the cause of the now-fixed "keybinds not working" issue.
+
+- [@MiroBG](https://github.com/MiroBG) for helping me track issues within the repo.
+
 - Credits to [iyiolacak](https://github.com/iyiolacak/iyiolacak-swaync-config?tab=readme-ov-file), [justinmdickey](https://github.com/justinmdickey/publicdots/blob/main/.config/hypr/hyprlock.conf), and [mkhmtolzhas](https://github.com/mkhmtolzhas/mkhmtdots) for their amazing designs.
   - The `legacy` theme was based on mkhmtolzha's waybar stylesheet and layout, just heavily modified and made to be thematically-consistent across packages like SwayNC.
 <br>
