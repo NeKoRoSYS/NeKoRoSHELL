@@ -89,17 +89,17 @@
         },
         {
           "label": "",
-          "command": "hyprlock",
+          "command": "sys-power lock",
           "tooltip": "Lock"
         },
         {
           "label": "󰜉",
-          "command": "reboot",
+          "command": "sys-power reboot",
           "tooltip": "Reboot"
         },
         {
           "label": "⏻",
-          "command": "shutdown now",
+          "command": "sys-power shutdown",
           "tooltip": "Power Off"
         }
       ]
