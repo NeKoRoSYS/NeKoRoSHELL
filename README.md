@@ -125,7 +125,7 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Dmenu Overhaul - Replace wofi with rofi | ✅ |
 | Theme System - Set all skins in one go | ✅ |
 | wlogout integration | ✅ |
-| BETA<br>Support for other distros; BETA<br>Verified to be working on: Arch | 🔍 |
+| BETA<br>Support for other distros; Verified to be working on: Arch | 🔍 |
 | BETA<br>Make NeKoRoSHELL init-agnostic; Verified to be working on: Arch | 🔍 |
 | BETA<br>Make NeKoRoSHELL WM-agnostic; Verified to be working on: Hyprland | 🔍 |
 | Qt and Kvantum integration | 🤔 |
