@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <nlohmann/json.hpp>
 
+
 using json = nlohmann::json;
 
 struct Monitor { int x, y, w, h; };
