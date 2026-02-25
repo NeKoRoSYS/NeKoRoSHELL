@@ -74,7 +74,7 @@ The following are what NeKoRoSHELL currently offers:
   - Uses `SwayNC` for a dedicated notification center with customizable buttons and options.
  
 - **Smart Navbar**
-  - Uses WM-agnostic C++ wrappers for `waybar` to toggle visibility modes: Static, Dynamic, and Hover.
+  - Uses portable WM-agnostic C++ wrappers for `waybar` to toggle visibility modes: Static, Dynamic, and Hover.
 <p align="center">
   <img src="https://github.com/NeKoRoSYS/NeKoRoSHELL/blob/main/showcase/navbar-modes.gif" alt="Navbar Demo" />
 </p>
@@ -83,7 +83,7 @@ The following are what NeKoRoSHELL currently offers:
   - NeKoRoSHELL is not just an identity, it is a framework. This repo gives you at most 2 pre-installed out-of-the-box layouts/styling for waybar, hyprlock, and SwayNC. The best part? You can make your own!
   - Switch to Dark and Light contrast modes
   - [Dedicated Theming System](THEMING.md):
-    - Select individual skins for Waybar, Rofi, Hyprlock, and SwayNC
+    - Select individual skins for waybar, rofi, hyprlock, SwayNC, and wlogout.
     - **Wallpaper Handling**
       - Supports both online and offline image (via `swww`) and video (via `mpvpaper`) formats.
         - `mpvpaper` automatically stops if an app is on fullscreen mode to save CPU/RAM and GPU space.
