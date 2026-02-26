@@ -1,4 +1,4 @@
-@import "/home/nekorosys/.cache/wallust/colors-rofi.rasi"
+@import "~/.cache/wallust/colors-rofi.rasi"
 
 * {
     font: "JetBrains Mono 12";
