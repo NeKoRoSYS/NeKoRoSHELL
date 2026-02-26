@@ -30,14 +30,14 @@ else
     esac
 fi
 
-NAVBAR_MODE_FILE="$XDG_CACHE_HOME/nekoroshell/navbar_mode"
-NAVBAR_HOVER_CONF="$XDG_CACHE_HOME/nekoroshell/navbar-hover.conf"
-HYPR="$XDG_CONFIG_HOME/hypr/user/configs/windowrules.conf"
+NAVBAR_MODE_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/nekoroshell/navbar_mode"
+NAVBAR_HOVER_CONF="${XDG_CACHE_HOME:-$HOME/.cache}/nekoroshell/navbar-hover.conf"
+HYPR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/user/configs/windowrules.conf"
 MANAGEMENT_MODE=$(cat "$NAVBAR_MODE_FILE" 2>/dev/null || echo "static")
 
 case $FEATURE in
     theme)
-	THEME_DIR="/themes"
+	THEME_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/themes"
 	
 	if [ ! -n "$2" ]; then        
 	    makenotif customize preferences-desktop-theme Themes "Select a Theme." true
@@ -58,8 +58,8 @@ case $FEATURE in
 	;;
 
     lockscreen)
-        SKIN_DIR="$XDG_CONFIG_HOME/hypr/hyprlock/skins"
-        MAIN="$XDG_CONFIG_HOME/hypr/hyprlock.conf"
+        SKIN_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock/skins"
+        MAIN="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock.conf"
 
 	if [ ! -n "$2" ]; then        
 	    makenotif customize preferences-desktop-theme Lockscreen "Select a Lockscreen layout." true
@@ -80,7 +80,7 @@ case $FEATURE in
         ;;
         
     wallpaper)
-        SCRIPT_DIR="$XDG_CONFIG_HOME/hypr/scripts/wallpapers"
+        SCRIPT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/scripts/wallpapers"
 
 	if [ ! -n "$2" ]; then        
 	    makenotif customize folder-pictures Wallpaper "Select a new background." true
@@ -99,19 +99,19 @@ case $FEATURE in
         case $FEATURE in
             launcher)
                 NAME="Launcher"; ICON="preferences-desktop-theme"; MSG="Select a Launcher skin."
-                DIR="$XDG_CONFIG_HOME/rofi/skins"; CONFIG="$XDG_CONFIG_HOME/rofi/config.rasi"
+                DIR="${XDG_CONFIG_HOME:-$HOME/.config}/rofi/skins"; CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/rofi/config.rasi"
                 ;;
             panel)
                 NAME="Control Centre"; ICON="preferences-desktop-theme"; MSG="Select Control Centre style."
-                DIR="$XDG_CONFIG_HOME/swaync/skins"; CONFIG="$XDG_CONFIG_HOME/swaync/config.json"; STYLE="$XDG_CONFIG_HOME/swaync/style.css"
+                DIR="${XDG_CONFIG_HOME:-$HOME/.config}/swaync/skins"; CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/swaync/config.json"; STYLE="${XDG_CONFIG_HOME:-$HOME/.config}/swaync/style.css"
                 ;;
             navbar)
                 NAME="Navbar"; ICON="preferences-desktop-theme"; MSG="Select a Navbar skin."
-                DIR="$XDG_CONFIG_HOME/waybar/skins"; CONFIG="$XDG_CONFIG_HOME/waybar/config.jsonc"; STYLE="$XDG_CONFIG_HOME/waybar/style.css"
+                DIR="${XDG_CONFIG_HOME:-$HOME/.config}/waybar/skins"; CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waybar/config.jsonc"; STYLE="${XDG_CONFIG_HOME:-$HOME/.config}/waybar/style.css"
                 ;;
             power)
                 NAME="Power Options"; ICON="preferences-desktop-theme"; MSG="Select a Power Options layout."
-                DIR="$XDG_CONFIG_HOME/wlogout/skins"; CONFIG="$XDG_CONFIG_HOME/wlogout/layout"; STYLE="$XDG_CONFIG_HOME/wlogout/style.css"
+                DIR="${XDG_CONFIG_HOME:-$HOME/.config}/wlogout/skins"; CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/wlogout/layout"; STYLE="${XDG_CONFIG_HOME:-$HOME/.config}/wlogout/style.css"
                 ;;
         esac
 
