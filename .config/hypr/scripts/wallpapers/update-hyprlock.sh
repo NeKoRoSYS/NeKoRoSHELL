@@ -1,7 +1,7 @@
 #!/bin/bash
 
 WALLPAPER=$(swww query | grep -oP '/.*\.(jpg|png|jpeg|webp)' | head -n 1)
-CONF="$XDG_CONFIG_HOME/hypr/hyprlock.conf"
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock.conf"
 
 if [ -n "$WALLPAPER" ]; then
     TARGET_SKIN=$(grep "^source =" "$CONF" | cut -d '=' -f2 | tr -d ' ')
