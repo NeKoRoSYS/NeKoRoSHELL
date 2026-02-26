@@ -3,8 +3,8 @@ set -eu
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 WALL_DIR="$HOME/.config/wallpapers"
-THUMB_CACHE="$HOME/.cache/nekoroshell/wallpaper-thumbs"
-VIDEO_CACHE="$HOME/.cache/nekoroshell/video_wallpaper"
+THUMB_CACHE="$XDG_CACHE_HOME/nekoroshell/wallpaper-thumbs"
+VIDEO_CACHE="$XDG_CACHE_HOME/nekoroshell/video_wallpaper"
 SOCKET="/tmp/mpvsocket"
 
 mkdir -p "$THUMB_CACHE"
