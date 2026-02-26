@@ -1,5 +1,5 @@
 #!/bin/bash
-VIDEO_CACHE="$HOME/.cache/last_video"
+VIDEO_CACHE="$XDG_CACHE_HOME/last_video"
 
 if [[ -f "$VIDEO_CACHE" ]]; then
     WALL=$(cat "$VIDEO_CACHE")
