@@ -56,7 +56,7 @@ The following are what NeKoRoSHELL currently offers:
 
 - **NeKoRoSHELL as a Service**
   - Update your copy of NeKoRoSHELL simply by running the `nekoroshell update` command on your terminal.
-  - Uses Vim to assist in reviewing file updates and gives the ability to overwrite, keep, and merge.
+  - Uses Vim or your preferred text editor to assist in reviewing file updates and gives the ability to overwrite, keep, and merge.
    
 - **Window Controls**
   - Maximize
