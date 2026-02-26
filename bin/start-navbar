@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODE_FILE="$HOME/.cache/nekoroshell/navbar_mode"
+MODE_FILE="$XDG_CONFIG_HOME/.cache/nekoroshell/navbar_mode"
 CURRENT_MODE=$(cat "$MODE_FILE" 2>/dev/null || echo "static")
 
 killall -q waybar navbar-watcher navbar-hover 2>/dev/null
