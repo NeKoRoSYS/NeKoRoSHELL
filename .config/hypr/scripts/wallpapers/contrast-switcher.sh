@@ -1,6 +1,6 @@
 #!/bin/bash
 
-STATE_FILE="$HOME/.cache/theme_mode"
+STATE_FILE="$HOME/.cache/nekoroshell/theme_mode"
 
 if [ ! -f "$STATE_FILE" ]; then
     echo "Dark" > "$STATE_FILE"
