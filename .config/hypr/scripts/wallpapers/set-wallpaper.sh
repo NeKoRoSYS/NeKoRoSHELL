@@ -2,9 +2,9 @@
 set -eu
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-WALL_DIR="$XDG_CONFIG_HOME/wallpapers"
-THUMB_CACHE="$XDG_CACHE_HOME/nekoroshell/wallpaper-thumbs"
-VIDEO_CACHE="$XDG_CACHE_HOME/nekoroshell/video_wallpaper"
+WALL_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/wallpapers"
+THUMB_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/nekoroshell/wallpaper-thumbs"
+VIDEO_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/nekoroshell/video_wallpaper"
 SOCKET="/tmp/mpvsocket"
 
 mkdir -p "$THUMB_CACHE"
