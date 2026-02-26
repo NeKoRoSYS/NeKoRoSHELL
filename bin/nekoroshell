@@ -8,7 +8,7 @@ NC='\033[0m'
 
 REPO="nekorosys/nekoroshell"
 TEMP_DIR="/tmp/nekoroshell_upgrade"
-CONF_DIR=$XDG_CONFIG_HOME
+CONF_DIR=${XDG_CONFIG_HOME:-$HOME/.config}
 
 usage() {
     echo -e "${BLUE}NeKoRoSHELL Management Utility${NC}\n"
