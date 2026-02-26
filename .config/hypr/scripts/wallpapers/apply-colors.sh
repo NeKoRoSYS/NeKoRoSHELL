@@ -1,8 +1,8 @@
 #!/bin/bash
 
-THUMB_CACHE="$HOME/.cache/wallpaper-thumbs"
-STATE_FILE="$HOME/.cache/theme_mode"
-WAYBAR_MODE_FILE="$HOME/.cache/.waybar_mode"
+THUMB_CACHE="$HOME/.cache/nekoroshell/wallpaper-thumbs"
+STATE_FILE="$HOME/.cache/nekoroshell/theme_mode"
+WAYBAR_MODE_FILE="$HOME/.cache/nekoroshell/navbar_mode"
 waybar_colors="$HOME/.cache/wallust/colors-waybar.css"
 rofi_colors="$HOME/.cache/wallust/colors-rofi.rasi"
 
