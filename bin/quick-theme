@@ -5,9 +5,11 @@ NAVBAR=${2:-"legacy"}
 LAUNCHER=${3:-"legacy"}
 LOCKSCREEN=${4:-"legacy"}
 PANEL=${5:-"legacy"}
+POWER=${5:-"legacy"}
 
 customize wallpaper $WALLPAPER
 customize navbar $NAVBAR
 customize launcher $LAUNCHER
 customize lockscreen $LOCKSCREEN
 customize panel $PANEL
+customize power $POWER

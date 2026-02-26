@@ -4,4 +4,5 @@
 
 .config/hypr/user/configs/*
 .config/hypr/user/scripts/*
+.config/hypremoji/recents.json
 !.config/hypr/user/templates/

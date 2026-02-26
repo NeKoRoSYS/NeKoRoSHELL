@@ -108,7 +108,7 @@
 	  "type": "toggle",  
 	  "active": false,
 	  "command": "bash ~/.config/hypr/scripts/wallpapers/contrast-switcher.sh",
-	  "update-command": "sh -c '[[ $(cat ~/.cache/theme_mode) == \"Dark\" ]] && echo true || echo false'"
+	  "update-command": "sh -c '[[ $(cat ~/.cache/nekoroshell/theme_mode) == \"Dark\" ]] && echo true || echo false'"
 	},
 	{
 	  "label": "󰈈",

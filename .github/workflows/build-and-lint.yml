@@ -1,0 +1,50 @@
+name: NeKoRoSHELL CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './bin'
+
+  build-cpp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libgtk-layer-shell-dev \
+            nlohmann-json3-dev \
+            jq \
+            pkg-config \
+            build-essential
+
+      - name: Build C++ Daemons
+        run: |
+          mkdir -p build
+          # Build Navbar Hover (GTK + Layer Shell)
+          g++ -O2 src/navbar-hover.cpp -o build/navbar-hover \
+            $(pkg-config --cflags --libs gtk+-3.0 gtk-layer-shell-0)
+          
+          # Build Navbar Watcher (Core C++)
+          g++ -O2 src/navbar-watcher.cpp -o build/navbar-watcher
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nekoroshell-binaries-${{ github.sha }}
+          path: build/
+          retention-days: 7

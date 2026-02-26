@@ -17,7 +17,7 @@
 
 </div>
 
-The best way to say "I use Linux btw 🤓" is if your desktop profile looks sleek and suave.
+The best way to say "I use Linux btw 🤓" is if your desktop environment looks sleek and suave.
 
 **NeKoRoSHELL** aims to provide an out-of-the-box, clean and reliable, generic, and modular framework that lets you easily customize your desktop experience with simple UI design philosophy in mind.
 <br>
@@ -29,7 +29,7 @@ The best way to say "I use Linux btw 🤓" is if your desktop profile looks slee
 | :---: |
 | 🚀 [Features](#features) |
 | 🔗 [Dependencies](#dependencies) |
-| 🤔 [Optional](#optional) |
+| ♥ [Acknowledgements](#acknowledgements) |
 
 </div>
 <br>
@@ -40,16 +40,23 @@ NeKoRoSHELL focuses on simplicity and modularity.
 <br>
 
 The following are what NeKoRoSHELL currently offers:
-- **Distro-agnostic Installer Script**
+- **BETA: Distro-agnostic**
   - Use NeKoRoSHELL in any **supported** distro!
-  - Use `git clone https://github.com/NeKoRoSYS/NeKoRoSHELL`
-  - Then `cd NeKoRoSHELL`
-  - and finally, `bash install.sh` to install the dotfiles.
+  - Init-agnostic.
+  - Features an advanced installer script.
+    - Use `git clone https://github.com/NeKoRoSYS/NeKoRoSHELL`
+    - Then `cd NeKoRoSHELL`
+    - and finally, `bash install.sh` to install the dotfiles.
     - `install.sh` assumes you already have `git` and a distro-specific `g++` compiler.
     - `install.sh` requires you to have `cargo`, `paru`/`yay`, `go`, and `flatpak`.
     - You can freely customize `flatpak.txt` and `pkglist-DISTRO.txt` before running `install.sh`.
     - **The installer is safe.** It backs up your pre-existing .config folders. (If you have any)
     - The installer automatically handles assigning your monitors at `~/.config/hypr/configs/monitors.conf/` and replaces every occurence of `/home/nekorosys/` with your username for your own convenience.
+    - SOME distros don't have hyprland or other dependencies on their package manager's repository and you may have to manually build them from source via script or something else.
+
+- **NeKoRoSHELL as a Service**
+  - Update your copy of NeKoRoSHELL simply by running the `nekoroshell update` command on your terminal.
+  - Uses Vim or your preferred text editor to assist in reviewing file updates and gives the ability to overwrite, keep, and merge.
    
 - **Window Controls**
   - Maximize
@@ -67,7 +74,7 @@ The following are what NeKoRoSHELL currently offers:
   - Uses `SwayNC` for a dedicated notification center with customizable buttons and options.
  
 - **Smart Navbar**
-  - Uses C++ wrappers for `waybar` to toggle visibility modes: Static, Dynamic, and Hover.
+  - Uses portable WM-agnostic C++ wrappers for `waybar` to toggle visibility modes: Static, Dynamic, and Hover.
 <p align="center">
   <img src="https://github.com/NeKoRoSYS/NeKoRoSHELL/blob/main/showcase/navbar-modes.gif" alt="Navbar Demo" />
 </p>
@@ -76,7 +83,7 @@ The following are what NeKoRoSHELL currently offers:
   - NeKoRoSHELL is not just an identity, it is a framework. This repo gives you at most 2 pre-installed out-of-the-box layouts/styling for waybar, hyprlock, and SwayNC. The best part? You can make your own!
   - Switch to Dark and Light contrast modes
   - [Dedicated Theming System](THEMING.md):
-    - Select individual skins for Waybar, Rofi, Hyprlock, and SwayNC
+    - Select individual skins for waybar, rofi, hyprlock, SwayNC, and wlogout.
     - **Wallpaper Handling**
       - Supports both online and offline image (via `swww`) and video (via `mpvpaper`) formats.
         - `mpvpaper` automatically stops if an app is on fullscreen mode to save CPU/RAM and GPU space.
@@ -117,9 +124,10 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Color Handling - Replace pywal6 with wallust | ✅ |
 | Dmenu Overhaul - Replace wofi with rofi | ✅ |
 | Theme System - Set all skins in one go | ✅ |
-| wlogout integration | ⏳ |
-| Make NeKoRoSHELL init-agnostic | ⏳ |
-| Support for other distros; BETA<br>Verified to be working on: Arch | 🔍 |
+| wlogout integration | ✅ |
+| BETA<br>Support for other distros; Verified to be working on: Arch | 🔍 |
+| BETA<br>Make NeKoRoSHELL init-agnostic; Verified to be working on: Arch | 🔍 |
+| BETA<br>Make NeKoRoSHELL WM-agnostic; Verified to be working on: Hyprland | 🔍 |
 | Qt and Kvantum integration | 🤔 |
 
 </div>
@@ -131,108 +139,29 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 > **HARDWARE SPECIFIC CONFIGURATION**<br>
 >
 > Some environment variables and params at `~/.config/hypr/configs/environment.conf/` and `~/.config/hypr/scripts/set-wallpaper.sh/` (also check the `check-video.sh` script, `mpvpaper` uses a "hwdec=nvdec" param) **require an NVIDIA graphics card**. Although it may be generally safe to leave it as is upon installing to a machine without such GPU, I recommend commenting it out or replacing it with a variable that goes according to your GPU.
-> 
-> The [System Booting](#system-booting) section contains settings specifically optimized for a dual-GPU laptop (Intel 620/Nvidia 940MX). 
-> **Do not** copy the `GRUB_CMDLINE_LINUX_DEFAULT` or `mkinitcpio` modules unless you have identical hardware, as this may **prevent your system from booting**.
 
 > [!WARNING]
 > **SOFTWARE SPECIFIC CONFIGURATION**<br>
 >
-> This project of mine was originally built only for Arch Linux but is now capable of claiming itself to be Distro-agnostic. However, **installation of this repo in other Linux Distros aside from Arch is more or less UNTESTED.** Please verify using `nano` or your preferred text-editor if your distro supports the packages listed at `pkglist-DISTRO.txt` or if the packages are named correctly.
+> This project of mine was originally built only for Arch Linux but is now capable of claiming itself to be Distro-agnostic. However, **installation of this repo in other Linux Distros aside from Arch is more or less UNTESTED.** Please verify using `nano` or your preferred text editor if your distro supports the packages listed at `pkglist-DISTRO.txt` or if the packages are named correctly.
 >
-> Normal incompatibilities include distros like Artix not being able to run `systemctl` because they use a different init system/manager. For those who experience something similar, manually enable SwayNC and waybar services yourself. Furthermore, some distros have outdated packages and may require building from git, cargo, or go.
->
-> The installation system for that I implemented can be improved. If you're willing to help, please make a pull request. Your contributions are welcome and will be appreciated! :D
+> The installation system that I implemented can be improved. If you're willing to help, please make a pull request. Your contributions are welcome and will be appreciated! :D
 
 - `update-nekoroshell` uses Vim to compare, overwrite, or merge files when updating.
 - Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
   - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
 - Install [Hypremoji](https://github.com/Musagy/hypremoji)
 - Fix waybar tray disappearing after a certain amount of time by installing `sni-qt`.
-  Make sure you're not killing waybar using -SIGUSER2 when refreshing the config. NeKoRoSHELL's waybar is a systemd service and not just an executable, reloads are handled via `systemctl`.
-<br>
-
-## Optional
-
-Mostly personal notes just in case I switch over to another PC. Do NOT copy my Grub Linux CMDLINE and mkinitcpio modules unless you also have a laptop with old hybrid GPUs (Intel Graphics 620 and Nvidia GeForce 940mx).
-
-### System Booting (Dualboot)
-- Use [MineGrub](https://github.com/Lxtharia/minegrub-world-sel-theme) theme for Grub.
-- Identify GPU names.
-- `/etc/modprobe.d/nvidia.conf`
-  
-  ```
-  options nvidia NVreg_PreserveVideoMemoryAllocations=1
-  options nvidia NVreg_EnableS0ixPowerManagement=1
-  install nvidia_uvm /usr/bin/false
-  ```
-  
-- Modify `/etc/default/grub`
-  - Install `os-prober`.
- 
-    ```
-    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet rd.udev.log_level=3 systemd.show_status=auto vt.global_cursor_default=0 nvidia_drm.modeset=1 nvidia_drm.fbdev=1 pci=noaer pcie_aspm=off nvme_core.default_ps_max_latency_us=0 nvidia.NVreg_EnableS0ixPowerManagement=1 intel_pstate=active i915.modeset=1 i915.enable_fbc=1 mitigations=off"
-    ```
-
-  - `GRUB_THEME="/boot/grub/themes/minegrub-world-selection/theme.txt"`
-  - `GRUB_DISABLE_OS_PROBER=false`
-  - `sudo grub-mkconfig -o /boot/grub/grub.cfg`
-- Modify `/etc/mkinitcpio.conf` (`MODULES` for GPU and `HOOKS` for `plymouth` after `base udev`)
-  - `sudo mkinitcpio -P`
- 
-### Boot Animations and Login
-- Use `plymouth` and `greetd` (`nwg-hello`)
-
-### Fix Boosted/Noisy Mic on OBS and Discord (pipewire)
-- Install `alsa-utils` and `noise-suppression-for-voice`
-  - `wpctl status`
-  - `alsamixer`
-  - `sudo alsactl store`
-  - `nano ~/.config/pipewire/pipewire.conf.d/99-input-denoising.conf`
-
-    ```spa json
-    context.modules = [
-    {  name = libpipewire-module-filter-chain
-       args = {
-          node.description = "Noise Canceling Source"
-          media.name       = "Noise Canceling Source"
-          filter.graph = {
-              nodes = [
-                {
-                    type   = ladspa
-                    name   = rnnoise
-                    plugin = /usr/lib/ladspa/librnnoise_ladspa.so
-                    label  = noise_suppressor_mono
-                    control = {
-                        "VAD Threshold (%)" = 50.0
-                    }
-                }
-            ]
-          }
-          capture.props = {
-              node.name   = "capture.rnnoise_source"
-              node.passive = true
-              audio.rate   = 48000
-          }
-          playback.props = {
-              node.name   = "rnnoise_source"
-              media.class = Audio/Source
-              audio.rate   = 48000
-          }
-        }
-      }
-    ]
-    ```
-
-  - `wpctl set-default yourNoiceCancelledID` (find in `wpctl status`)
-
-### Quality-of-Life
-- Install `blueman` and `r-quick-share` for seamless bluetooth support. (Works with Apple Airpods and android phone)
+  Make sure you're not killing waybar using -SIGUSER2 when refreshing the config.
 <br>
 
 ## Acknowledgements
-- Amelie for helping me transition the project from using pywal16 to wallust.
+- Amelie ([@S-e-r-a-p-h-i-n-e](https://github.com/S-e-r-a-p-h-i-n-e)) for helping me transition the project from using pywal16 to wallust and letting me borrow a few scripts. Go check out [SeraDOTS](https://github.com/S-e-r-a-p-h-i-n-e/SeraDOTS)!
+
 - April for helping me figure out the cause of the now-fixed "keybinds not working" issue.
+
+- [@MiroBG](https://github.com/MiroBG) for helping me track issues within the repo.
+
 - Credits to [iyiolacak](https://github.com/iyiolacak/iyiolacak-swaync-config?tab=readme-ov-file), [justinmdickey](https://github.com/justinmdickey/publicdots/blob/main/.config/hypr/hyprlock.conf), and [mkhmtolzhas](https://github.com/mkhmtolzhas/mkhmtdots) for their amazing designs.
   - The `legacy` theme was based on mkhmtolzha's waybar stylesheet and layout, just heavily modified and made to be thematically-consistent across packages like SwayNC.
 <br>
@@ -241,11 +170,11 @@ Mostly personal notes just in case I switch over to another PC. Do NOT copy my G
 <br>
 
 <div align="center">
-<a href="https://www.star-history.com/#nekorosys/nekoroshell&Date">
+<a href="https://www.star-history.com/#nekorosys/nekoroshell&type=date&legend=bottom-right">
  <picture>
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=bottom-right"/>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&logscale&legend=bottom-right&theme=dark"/>
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&ttype=date&logscale&legend=bottom-right"/>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=nekorosys/nekoroshell&type=date&legend=bottom-right" />
  </picture>
 </a>
 </div>

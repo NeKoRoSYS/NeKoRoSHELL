@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cerrno>
 #include <csignal>
 #include <sys/wait.h>
@@ -15,6 +16,14 @@
 #include <cstdio>
 #include <algorithm>
 #include <set>
+#include <functional>
+#include <unordered_map>
+#include <unordered_set>
+#include <sstream>
+#include <dirent.h>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 struct PipeDeleter {
     void operator()(FILE* stream) const { if (stream) pclose(stream); }
@@ -31,18 +40,212 @@ std::string exec(const char* cmd) {
     return result;
 }
 
-int parse_int_value(const std::string& json, size_t pos) {
-    while (pos < json.length() && !isdigit(json[pos]) && json[pos] != '-') {
-        pos++;
+pid_t get_waybar_pid() {
+    DIR* dir = opendir("/proc");
+    if (!dir) return -1;
+    struct dirent* ent;
+    while ((ent = readdir(dir)) != nullptr) {
+        if (!isdigit(ent->d_name[0])) continue;
+        std::string pid_str = ent->d_name;
+        std::ifstream comm_file("/proc/" + pid_str + "/comm");
+        if (comm_file.is_open()) {
+            std::string comm_name;
+            std::getline(comm_file, comm_name);
+            if (comm_name == "waybar") {
+                closedir(dir);
+                return std::stoi(pid_str);
+            }
+        }
     }
-    if (pos >= json.length()) return -999;
-    return std::stoi(json.substr(pos));
+    closedir(dir);
+    return -1;
 }
 
+class CompositorBackend {
+public:
+    virtual ~CompositorBackend() = default;
+    virtual bool is_layer_active(const std::string& layer_name) = 0;
+    virtual bool has_active_windows() = 0;
+    virtual void listen_for_events(std::function<void()> on_event) = 0;
+};
+
+class HyprlandBackend : public CompositorBackend {
+private:
+    std::unordered_map<std::string, std::string> window_to_workspace;
+    std::unordered_map<std::string, int> workspace_window_count;
+    std::unordered_set<std::string> active_workspaces;
+
+    std::vector<std::string> split(const std::string& s, char delimiter) {
+        std::vector<std::string> tokens;
+        std::string token;
+        std::istringstream tokenStream(s);
+        while (std::getline(tokenStream, token, delimiter)) tokens.push_back(token);
+        return tokens;
+    }
+
+    void sync_state_from_json() {
+        try {
+            window_to_workspace.clear();
+            workspace_window_count.clear();
+            active_workspaces.clear();
+
+            std::string mon_out = exec("hyprctl -j monitors");
+            if (!mon_out.empty() && mon_out.front() == '[') {
+                auto monitors = json::parse(mon_out);
+                for (const auto& mon : monitors) {
+                    active_workspaces.insert(mon["activeWorkspace"]["name"].get<std::string>());
+                }
+            }
+
+            std::string cli_out = exec("hyprctl -j clients");
+            if (!cli_out.empty() && cli_out.front() == '[') {
+                auto clients = json::parse(cli_out);
+                for (const auto& client : clients) {
+                    std::string addr = client["address"].get<std::string>();
+                    std::string ws = client["workspace"]["name"].get<std::string>();
+                    window_to_workspace[addr] = ws;
+                    workspace_window_count[ws]++;
+                }
+            }
+        } catch (...) {}
+    }
+
+public:
+    HyprlandBackend() {
+        sync_state_from_json();
+    }
+
+    bool is_layer_active(const std::string& layer_name) override {
+        std::string layers = exec("hyprctl layers");
+        return (layers.find(layer_name) != std::string::npos);
+    }
+
+    bool has_active_windows() override {
+        for (const auto& ws : active_workspaces) {
+            if (workspace_window_count[ws] > 0) return true;
+        }
+        return false;
+    }
+
+    void listen_for_events(std::function<void()> on_event) override {
+        const char* runtime_dir = getenv("XDG_RUNTIME_DIR");
+        const char* signature = getenv("HYPRLAND_INSTANCE_SIGNATURE");
+        if (!runtime_dir || !signature) return;
+
+        std::string socket_path = std::string(runtime_dir) + "/hypr/" + std::string(signature) + "/.socket2.sock";
+        
+        struct sockaddr_un addr;
+        int sfd = socket(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, 0);
+        if (sfd == -1) return;
+
+        memset(&addr, 0, sizeof(struct sockaddr_un));
+        addr.sun_family = AF_UNIX;
+        strncpy(addr.sun_path, socket_path.c_str(), sizeof(addr.sun_path) - 1);
+
+        if (connect(sfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1) {
+            close(sfd);
+            return;
+        }
+
+        char buffer[4096];
+        std::string pending_data = "";
+        
+        while (true) {
+            ssize_t num_read = read(sfd, buffer, sizeof(buffer) - 1);
+            if (num_read > 0) {
+                buffer[num_read] = '\0';
+                pending_data += buffer;
+                
+                size_t pos = 0;
+                bool state_changed = false;
+                
+                while ((pos = pending_data.find('\n')) != std::string::npos) {
+                    std::string line = pending_data.substr(0, pos);
+                    pending_data.erase(0, pos + 1);
+                    
+                    if (line.rfind("openwindow>>", 0) == 0) {
+                        auto parts = split(line.substr(12), ',');
+                        if (parts.size() >= 2) {
+                            window_to_workspace[parts[0]] = parts[1];
+                            workspace_window_count[parts[1]]++;
+                            state_changed = true;
+                        }
+                    } 
+                    else if (line.rfind("closewindow>>", 0) == 0) {
+                        std::string addr = line.substr(13);
+                        if (window_to_workspace.count(addr)) {
+                            workspace_window_count[window_to_workspace[addr]]--;
+                            window_to_workspace.erase(addr);
+                            state_changed = true;
+                        }
+                    } 
+                    else if (line.rfind("movewindow>>", 0) == 0) {
+                        auto parts = split(line.substr(12), ',');
+                        if (parts.size() >= 2) {
+                            std::string addr = parts[0];
+                            std::string new_ws = parts[1];
+                            if (window_to_workspace.count(addr)) workspace_window_count[window_to_workspace[addr]]--;
+                            window_to_workspace[addr] = new_ws;
+                            workspace_window_count[new_ws]++;
+                            state_changed = true;
+                        }
+                    }
+                    else if (line.rfind("workspace>>", 0) == 0 || line.rfind("focusedmon>>", 0) == 0) {
+                        sync_state_from_json();
+                        state_changed = true;
+                    }
+                }
+                
+                if (state_changed) on_event(); 
+            } else if (num_read == -1) {
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                } else break;
+            } else break;
+        }
+        close(sfd);
+    }
+};
+
+class SwayBackend : public CompositorBackend {
+public:
+    bool is_layer_active(const std::string& layer_name) override {
+        std::string cmd = "lswt -j 2>/dev/null | jq -e '.[] | select(.namespace == \"" + layer_name + "\")' >/dev/null 2>&1";
+        return system(cmd.c_str()) == 0;
+    }
+
+    bool has_active_windows() override {
+        std::string cmd = "swaymsg -t get_tree 2>/dev/null | jq -r '.. | objects | select(.type==\"workspace\" and .focused==true) | (.nodes | length) + (.floating_nodes | length)'";
+        std::string out = exec(cmd.c_str());
+        try {
+            int window_count = std::stoi(out);
+            return window_count > 0;
+        } catch (...) {
+            return false;
+        }
+    }
+
+    void listen_for_events(std::function<void()> on_event) override {
+        FILE* stream = popen("swaymsg -m -t subscribe '[\"window\", \"workspace\"]'", "r");
+        if (!stream) return;
+        char buffer[2048];
+        while (fgets(buffer, sizeof(buffer), stream) != nullptr) {
+            on_event(); 
+        }
+        pclose(stream);
+    }
+};
+
 bool is_waybar_visible = false;
+pid_t current_waybar_pid = -1;
 
 void set_waybar(bool visible) {
-    bool process_running = (system("pgrep -x waybar > /dev/null") == 0);
+    if (current_waybar_pid <= 0 || kill(current_waybar_pid, 0) != 0) {
+        current_waybar_pid = get_waybar_pid();
+    }
+
+    bool process_running = (current_waybar_pid > 0);
+    if (!process_running) is_waybar_visible = false;
 
     if (visible) {
         if (!process_running) {
@@ -50,122 +253,46 @@ void set_waybar(bool visible) {
             if (pid == 0) {
                 char* args[] = {(char*)"waybar", nullptr};
                 execvp(args[0], args);
-                exit(1); // Exit if execvp fails
+                exit(1); 
             }
+            current_waybar_pid = pid;
             is_waybar_visible = true;
         } else if (!is_waybar_visible) {
-            system("killall -q -SIGUSR1 waybar");
+            kill(current_waybar_pid, SIGUSR1);
             is_waybar_visible = true;
         }
     } else {
         if (process_running && is_waybar_visible) {
-            system("killall -q -SIGUSR1 waybar");
+            kill(current_waybar_pid, SIGUSR1);
             is_waybar_visible = false;
         }
     }
 }
 
-void check_and_update() {
-    std::string mon_out = exec("hyprctl -j monitors");
-    std::set<int> active_workspace_ids;
-
-    size_t pos = 0;
-    while ((pos = mon_out.find("\"activeWorkspace\":", pos)) != std::string::npos) {
-        size_t id_key = mon_out.find("\"id\":", pos);
-        if (id_key != std::string::npos) {
-            int id = parse_int_value(mon_out, id_key + 5);
-            if (id != -999) active_workspace_ids.insert(id);
-        }
-        pos++;
-    }
-
-    if (active_workspace_ids.empty()) return;
-
-    std::string clients_out = exec("hyprctl -j clients");
-    bool has_windows = false;
-
-    pos = 0;
-    while ((pos = clients_out.find("\"workspace\":", pos)) != std::string::npos) {
-        size_t id_key = clients_out.find("\"id\":", pos);
-        if (id_key != std::string::npos) {
-            int id = parse_int_value(clients_out, id_key + 5);
-            if (active_workspace_ids.count(id)) {
-                has_windows = true;
-                break;
-            }
-        }
-        pos++;
-    }
-
-    set_waybar(has_windows);
-}
-
 int main() {
-    std::string layers = exec("hyprctl layers");
-    is_waybar_visible = (layers.find("waybar") != std::string::npos);
+    std::unique_ptr<CompositorBackend> backend;
 
-    const char* runtime_dir = getenv("XDG_RUNTIME_DIR");
-    const char* signature = getenv("HYPRLAND_INSTANCE_SIGNATURE");
-    
-    if (!runtime_dir || !signature) return 1;
-
-    check_and_update();
-
-    std::string socket_path = std::string(runtime_dir) + "/hypr/" + std::string(signature) + "/.socket2.sock";
-
-    struct sockaddr_un addr;
-    int sfd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (sfd == -1) return 1;
-
-    memset(&addr, 0, sizeof(struct sockaddr_un));
-    addr.sun_family = AF_UNIX;
-    strncpy(addr.sun_path, socket_path.c_str(), sizeof(addr.sun_path) - 1);
-
-    if (connect(sfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1) {
-        close(sfd);
+    if (getenv("HYPRLAND_INSTANCE_SIGNATURE")) {
+        backend = std::make_unique<HyprlandBackend>();
+    } else if (getenv("SWAYSOCK")) {
+        backend = std::make_unique<SwayBackend>();
+    } else {
         return 1;
     }
 
-    char buffer[4096];
-    std::string pending_data = "";
-    
-    while (true) {
-        ssize_t num_read = read(sfd, buffer, sizeof(buffer) - 1);
-        if (num_read > 0) {
-            buffer[num_read] = '\0';
-            pending_data += buffer;
-            
-            size_t pos = 0;
-            bool dirty = false;
-            
-            while ((pos = pending_data.find('\n')) != std::string::npos) {
-                std::string line = pending_data.substr(0, pos);
-                pending_data.erase(0, pos + 1);
-                
-                if (line.find("openwindow") == 0 ||
-                    line.find("closewindow") == 0 ||
-                    line.find("movewindow") == 0 ||
-                    line.find("workspace") == 0 ||
-                    line.find("focusedmon") == 0) {
-                    dirty = true;
-                }
-            }
-            
-            if (dirty) {
-                check_and_update();
-            }
-        } else if (num_read == -1) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            } else {
-                std::cerr << "Socket disconnected. Exiting to allow systemd to restart." << std::endl;
-                break;
-            }
-        } else {
-            break;
-        }
+    current_waybar_pid = get_waybar_pid();
+    if (current_waybar_pid > 0) {
+        is_waybar_visible = backend->is_layer_active("waybar");
+    } else {
+        is_waybar_visible = true; 
     }
 
-    close(sfd);
+    set_waybar(backend->has_active_windows());
+
+    backend->listen_for_events([&backend]() {
+        bool has_windows = backend->has_active_windows();
+        set_waybar(has_windows);
+    });
+
     return 0;
 }

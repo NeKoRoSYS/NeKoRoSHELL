@@ -1,5 +1,5 @@
 #!/bin/bash
-VIDEO_CACHE="$HOME/.cache/last_video"
+VIDEO_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/nekoroshell/video_wallpaper"
 
 if [[ -f "$VIDEO_CACHE" ]]; then
     WALL=$(cat "$VIDEO_CACHE")

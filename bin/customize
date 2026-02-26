@@ -11,12 +11,13 @@ navbar="Select Navbar Skin"
 launcher="Select Launcher Skin"
 lockscreen="Select Lockscreen Layout"
 panel="Select Control Centre Layout"
-OPTIONS="$theme\n$wallpaper\n$navbar\n$launcher\n$lockscreen\n$panel"
+power="Select Power Options Layout"
+OPTIONS="$theme\n$wallpaper\n$navbar\n$launcher\n$lockscreen\n$panel\n$power"
 
 if [ -n "$CMD_FEATURE" ]; then
     FEATURE="$CMD_FEATURE"
 else
-    CHOICE=$(echo -e "$OPTIONS" | rofi -dmenu -theme-str 'listview { lines: 6; scrollbar: false; }' -no-cache -p "Select Action")
+    CHOICE=$(echo -e "$OPTIONS" | rofi -dmenu -theme-str 'listview { lines: 7; scrollbar: false; }' -no-cache -p "Select Action")
     case "$CHOICE" in
 	"$theme")	FEATURE=theme ;;
         "$wallpaper")   FEATURE=wallpaper ;;
@@ -24,20 +25,22 @@ else
         "$launcher")    FEATURE=launcher ;;
         "$lockscreen")  FEATURE=lockscreen ;;
         "$panel")       FEATURE=panel ;;
+        "$power")       FEATURE=power ;;
         *)              exit 1 ;;
     esac
 fi
 
-WAYBAR_MODE_FILE="$HOME/.cache/.waybar_mode"
-HYPR="$HOME/.config/hypr/user/configs/windowrules.conf"
-MANAGEMENT_MODE=$(cat "$WAYBAR_MODE_FILE" 2>/dev/null || echo "static")
+NAVBAR_MODE_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/nekoroshell/navbar_mode"
+NAVBAR_HOVER_CONF="${XDG_CACHE_HOME:-$HOME/.cache}/nekoroshell/navbar-hover.conf"
+HYPR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/user/configs/windowrules.conf"
+MANAGEMENT_MODE=$(cat "$NAVBAR_MODE_FILE" 2>/dev/null || echo "static")
 
 case $FEATURE in
     theme)
-	THEME_DIR="$HOME/.config/themes"
+	THEME_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/themes"
 	
 	if [ ! -n "$2" ]; then        
-	    makenotif customize preferences-desktop-theme Themes "Select a theme." true
+	    makenotif customize preferences-desktop-theme Themes "Select a Theme." true
         fi
 
 	CHOICE=${CMD_CHOICE:-$(find "$THEME_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort | rofi -dmenu -p "Select Theme")}
@@ -55,11 +58,11 @@ case $FEATURE in
 	;;
 
     lockscreen)
-        SKIN_DIR="$HOME/.config/hypr/hyprlock/skins"
-        MAIN="$HOME/.config/hypr/hyprlock.conf"
+        SKIN_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock/skins"
+        MAIN="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock.conf"
 
 	if [ ! -n "$2" ]; then        
-	    makenotif customize preferences-desktop-theme Lockscreen "Select a lockscreen layout." true
+	    makenotif customize preferences-desktop-theme Lockscreen "Select a Lockscreen layout." true
         fi
 
 	CHOICE=${CMD_CHOICE:-$(find "$SKIN_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort | rofi -dmenu -p "Select Lockscreen Layout")}
@@ -77,7 +80,7 @@ case $FEATURE in
         ;;
         
     wallpaper)
-        SCRIPT_DIR="$HOME/.config/hypr/scripts/wallpapers"
+        SCRIPT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/scripts/wallpapers"
 
 	if [ ! -n "$2" ]; then        
 	    makenotif customize folder-pictures Wallpaper "Select a new background." true
@@ -92,19 +95,23 @@ case $FEATURE in
         fi
         ;;
 
-    launcher|panel|navbar)
+    launcher|panel|navbar|power)
         case $FEATURE in
             launcher)
-                NAME="Launcher"; ICON="preferences-desktop-theme"; MSG="Select a launcher skin."
-                DIR="$HOME/.config/rofi/skins"; CONFIG="$HOME/.config/rofi/config.rasi"
+                NAME="Launcher"; ICON="preferences-desktop-theme"; MSG="Select a Launcher skin."
+                DIR="${XDG_CONFIG_HOME:-$HOME/.config}/rofi/skins"; CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/rofi/config.rasi"
                 ;;
             panel)
                 NAME="Control Centre"; ICON="preferences-desktop-theme"; MSG="Select Control Centre style."
-                DIR="$HOME/.config/swaync/skins"; CONFIG="$HOME/.config/swaync/config.json"; STYLE="$HOME/.config/swaync/style.css"
+                DIR="${XDG_CONFIG_HOME:-$HOME/.config}/swaync/skins"; CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/swaync/config.json"; STYLE="${XDG_CONFIG_HOME:-$HOME/.config}/swaync/style.css"
                 ;;
             navbar)
-                NAME="Navbar"; ICON="preferences-desktop-theme"; MSG="Select a navbar skin."
-                DIR="$HOME/.config/waybar/skins"; CONFIG="$HOME/.config/waybar/config.jsonc"; STYLE="$HOME/.config/waybar/style.css"
+                NAME="Navbar"; ICON="preferences-desktop-theme"; MSG="Select a Navbar skin."
+                DIR="${XDG_CONFIG_HOME:-$HOME/.config}/waybar/skins"; CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waybar/config.jsonc"; STYLE="${XDG_CONFIG_HOME:-$HOME/.config}/waybar/style.css"
+                ;;
+            power)
+                NAME="Power Options"; ICON="preferences-desktop-theme"; MSG="Select a Power Options layout."
+                DIR="${XDG_CONFIG_HOME:-$HOME/.config}/wlogout/skins"; CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/wlogout/layout"; STYLE="${XDG_CONFIG_HOME:-$HOME/.config}/wlogout/style.css"
                 ;;
         esac
 
@@ -124,7 +131,9 @@ case $FEATURE in
             fi
 
             sed -i "\|^source = $DIR/|d" "$HYPR"
-            echo "source = $PATH_SKIN/layerrule.conf" >> "$HYPR"
+	    if [[ -f "$PATH_SKIN/layerrule.conf" ]]; then
+                echo "source = $PATH_SKIN/layerrule.conf" >> "$HYPR"
+	    fi
 
             case $FEATURE in
                 launcher)
@@ -137,21 +146,25 @@ case $FEATURE in
                     swaync-client -R
                     swaync-client -rs
                     ;;
+		power)
+            	    echo "@import \"$PATH_SKIN/style.css\";" > "$STYLE"
+                    cp "$PATH_SKIN/layout" "$CONFIG"
+		    ;;
                 navbar)
             	    echo "@import \"$PATH_SKIN/style.css\";" > "$STYLE"
                     echo "{ \"include\": [ \"$PATH_SKIN/layout.jsonc\" ] }" > "$CONFIG"
-		    cp "$PATH_SKIN/navbar-hover.conf" "$HOME/.cache/navbar-hover.conf"
-		    killall waybar && sleep 0.05
+		    cp "$PATH_SKIN/navbar-hover.conf" $NAVBAR_HOVER_CONF
 
-		    killall -q waybar navbar-hover navbar-watcher 2>/dev/null || true
-		    sleep 0.1
+		    killall -q navbar-hover navbar-watcher 2>/dev/null || true
+		    killall -q waybar 2>/dev/null || true
+		    sleep 0.2
 
 		    if [ "$MANAGEMENT_MODE" = "static" ]; then
-			waybar &
+				waybar &
 		    elif [ "$MANAGEMENT_MODE" = "hover" ]; then
-			navbar-hover &
+				navbar-hover &
 		    else
-			navbar-watcher &
+				navbar-watcher &
 		    fi
                     ;;
             esac
