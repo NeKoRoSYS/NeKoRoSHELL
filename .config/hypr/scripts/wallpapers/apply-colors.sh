@@ -1,14 +1,14 @@
 #!/bin/bash
 
-THUMB_CACHE="$HOME/.cache/nekoroshell/wallpaper-thumbs"
-STATE_FILE="$HOME/.cache/nekoroshell/theme_mode"
-WAYBAR_MODE_FILE="$HOME/.cache/nekoroshell/navbar_mode"
-waybar_colors="$HOME/.cache/wallust/colors-waybar.css"
-rofi_colors="$HOME/.cache/wallust/colors-rofi.rasi"
+THUMB_CACHE="$XDG_CACHE_HOME/nekoroshell/wallpaper-thumbs"
+STATE_FILE="$XDG_CACHE_HOME/nekoroshell/theme_mode"
+WAYBAR_MODE_FILE="$XDG_CACHE_HOME/nekoroshell/navbar_mode"
+waybar_colors="$XDG_CACHE_HOME/wallust/colors-waybar.css"
+rofi_colors="$XDG_CACHE_HOME/wallust/colors-rofi.rasi"
 
 MANAGEMENT_MODE=$(cat "$WAYBAR_MODE_FILE" 2>/dev/null || echo "static")
 
-img_path="${1:-$(cat "$HOME/.cache/wallust/wal")}"
+img_path="${1:-$(cat "$XDG_CACHE_HOME/wallust/wal")}"
 current_theme="${2:-$(cat "$STATE_FILE")}"
 
 FILENAME=$(basename "$img_path")
