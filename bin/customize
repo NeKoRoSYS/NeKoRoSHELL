@@ -30,9 +30,10 @@ else
     esac
 fi
 
-WAYBAR_MODE_FILE="$HOME/.cache/nekoroshell/navbar_mode"
+NAVBAR_MODE_FILE="$HOME/.cache/nekoroshell/navbar_mode"
+NAVBAR_HOVER_CONF="$HOME/.cache/nekoroshell/navbar-hover.conf"
 HYPR="$HOME/.config/hypr/user/configs/windowrules.conf"
-MANAGEMENT_MODE=$(cat "$WAYBAR_MODE_FILE" 2>/dev/null || echo "static")
+MANAGEMENT_MODE=$(cat "$NAVBAR_MODE_FILE" 2>/dev/null || echo "static")
 
 case $FEATURE in
     theme)
@@ -152,18 +153,18 @@ case $FEATURE in
                 navbar)
             	    echo "@import \"$PATH_SKIN/style.css\";" > "$STYLE"
                     echo "{ \"include\": [ \"$PATH_SKIN/layout.jsonc\" ] }" > "$CONFIG"
-		    cp "$PATH_SKIN/navbar-hover.conf" $WAYBAR_MODE_FILE
+		    cp "$PATH_SKIN/navbar-hover.conf" $NAVBAR_HOVER_CONF
 
 		    killall -q navbar-hover navbar-watcher 2>/dev/null || true
 		    killall -q waybar 2>/dev/null || true
 		    sleep 0.2
 
 		    if [ "$MANAGEMENT_MODE" = "static" ]; then
-			waybar &
+				waybar &
 		    elif [ "$MANAGEMENT_MODE" = "hover" ]; then
-			navbar-hover &
+				navbar-hover &
 		    else
-			navbar-watcher &
+				navbar-watcher &
 		    fi
                     ;;
             esac
