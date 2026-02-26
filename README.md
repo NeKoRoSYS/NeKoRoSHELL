@@ -40,9 +40,10 @@ NeKoRoSHELL focuses on simplicity and modularity.
 <br>
 
 The following are what NeKoRoSHELL currently offers:
-- **BETA: Distro-agnostic**
+- **Portable and Distro-agnostic**
   - Use NeKoRoSHELL in any **supported** distro!
   - Init-agnostic.
+  - XDG-compliant.
   - Features an advanced installer script.
     - Use `git clone https://github.com/NeKoRoSYS/NeKoRoSHELL`
     - Then `cd NeKoRoSHELL`
