@@ -8,6 +8,7 @@ NC='\033[0m'
 
 REPO="nekorosys/nekoroshell"
 TEMP_DIR="/tmp/nekoroshell_upgrade"
+CONF_DIR=$XDG_CONFIG_HOME
 
 usage() {
     echo -e "${BLUE}NeKoRoSHELL Management Utility${NC}\n"
@@ -101,7 +102,7 @@ do_uninstall() {
             fi
         done
         
-        rm -f "$HOME/.config/systemd/user/navbar"*
+        rm -f "$CONF_DIR/systemd/user/navbar"*
         systemctl --user daemon-reload
         echo -e "${GREEN}Services stopped and removed.${NC}"
     fi
@@ -111,7 +112,7 @@ do_uninstall() {
     CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync themes wallpapers wallust waybar wlogout)
 
     for conf in "${CONFIGS[@]}"; do
-        target_dir="$HOME/.config/$conf"
+        target_dir="$CONF_DIR/$conf"
         if [[ -d "$target_dir" ]]; then
             rm -rf "$target_dir"
             echo -e "  Removed ${YELLOW}$conf${NC} configuration."
@@ -122,7 +123,7 @@ do_uninstall() {
     
     if [[ -n "$latest_backup" ]]; then
         echo -e "\n${BLUE}Restoring from backup archive: $(basename "$latest_backup")...${NC}"
-        tar -xzf "$latest_backup" -C "$HOME/.config"
+        tar -xzf "$latest_backup" -C "$CONF_DIR"
         echo -e "  [${GREEN}Restored${NC}] Configurations recovered from tarball."
     else
         echo -e "  ${YELLOW}No tarball backup found to restore.${NC}"
@@ -182,15 +183,15 @@ do_update() {
     BACKUP_ITEMS=()
     CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync systemd wallpapers wallust waybar wlogout themes)
 
-    mkdir -p "$HOME/.config"
+    mkdir -p "$CONF_DIR"
     for conf in "${CONFIGS[@]}"; do
-        if [[ -e "$HOME/.config/$conf" ]]; then
+        if [[ -e "$CONF_DIR/$conf" ]]; then
             BACKUP_ITEMS+=("$conf")
         fi
     done
 
     if [[ ${#BACKUP_ITEMS[@]} -gt 0 ]]; then
-        tar -czf "$BACKUP_ARCHIVE" -C "$HOME/.config" "${BACKUP_ITEMS[@]}"
+        tar -czf "$BACKUP_ARCHIVE" -C "$CONF_DIR" "${BACKUP_ITEMS[@]}"
         echo -e "${GREEN}Created pre-update backup archive at: $BACKUP_ARCHIVE${NC}"
     else
         echo -e "${YELLOW}No existing configs found to backup. Proceeding...${NC}"
@@ -244,9 +245,9 @@ do_update() {
 
     echo -e "\n${BLUE}Verifying user configuration sandbox...${NC}"
 
-    USER_CONF_DIR="$HOME/.config/hypr/user/configs"
-    USER_SCRIPT_DIR="$HOME/.config/hypr/user/scripts"
-    TEMPLATE_DIR="$HOME/.config/hypr/user/templates"
+    USER_CONF_DIR="$CONF_DIR/hypr/user/configs"
+    USER_SCRIPT_DIR="$CONF_DIR/hypr/user/scripts"
+    TEMPLATE_DIR="$CONF_DIR/hypr/user/templates"
 
     mkdir -p "$USER_CONF_DIR"
     mkdir -p "$USER_SCRIPT_DIR"
