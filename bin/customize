@@ -30,7 +30,7 @@ else
     esac
 fi
 
-WAYBAR_MODE_FILE="$HOME/.cache/.waybar_mode"
+WAYBAR_MODE_FILE="$HOME/.cache/nekoroshell/navbar_mode"
 HYPR="$HOME/.config/hypr/user/configs/windowrules.conf"
 MANAGEMENT_MODE=$(cat "$WAYBAR_MODE_FILE" 2>/dev/null || echo "static")
 
@@ -152,7 +152,7 @@ case $FEATURE in
                 navbar)
             	    echo "@import \"$PATH_SKIN/style.css\";" > "$STYLE"
                     echo "{ \"include\": [ \"$PATH_SKIN/layout.jsonc\" ] }" > "$CONFIG"
-		    cp "$PATH_SKIN/navbar-hover.conf" "$HOME/.cache/navbar-hover.conf"
+		    cp "$PATH_SKIN/navbar-hover.conf" $WAYBAR_MODE_FILE
 
 		    killall -q navbar-hover navbar-watcher 2>/dev/null || true
 		    killall -q waybar 2>/dev/null || true
