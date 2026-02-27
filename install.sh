@@ -377,9 +377,9 @@ inject_shell_config() {
 inject_shell_config "$HOME/.bashrc" "home/.bashrc"
 inject_shell_config "$HOME/.zshrc" "home/.zshrc"
 
-[[ -f home/.p10k.zsh ]] && cp .p10k.zsh "$HOME/"
-[[ -f home/.face.icon ]] && cp .face.icon "$HOME/"
-[[ -f home/change-avatar.sh ]] && cp change-avatar.sh "$HOME/"
+[[ -f home/.p10k.zsh ]] && cp home/.p10k.zsh "$HOME/"
+[[ -f home/.face.icon ]] && cp home/.face.icon "$HOME/"
+[[ -f home/change-avatar.sh ]] && cp home/change-avatar.sh "$HOME/"
 
 if [[ -d bin ]]; then
     echo -e "${BLUE}Copying scripts to $USER_BIN_DIR...${NC}"
