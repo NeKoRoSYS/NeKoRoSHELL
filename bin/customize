@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-CMD_FEATURE="$1"
-CMD_CHOICE="$2"
+CMD_FEATURE="${1:-}"
+CMD_CHOICE="${2:-}"
 
 pkill -x rofi
 
@@ -41,7 +41,7 @@ case "$FEATURE" in
     theme)
 	THEME_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/themes"
 	
-	if [ ! -n "$2" ]; then        
+	if [ ! -n "${2:-}" ]; then        
 	    makenotif customize preferences-desktop-theme Themes "Select a Theme." true
         fi
 
@@ -63,7 +63,7 @@ case "$FEATURE" in
         SKIN_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock/skins"
         MAIN="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock.conf"
 
-	if [ ! -n "$2" ]; then        
+	if [ ! -n "" ]; then        
 	    makenotif customize preferences-desktop-theme Lockscreen "Select a Lockscreen layout." true
         fi
 
@@ -84,7 +84,7 @@ case "$FEATURE" in
     wallpaper)
         SCRIPT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/scripts/wallpapers"
 
-	if [ ! -n "$2" ]; then        
+	if [ ! -n "${2:-}" ]; then        
 	    makenotif customize folder-pictures Wallpaper "Select a new background." true
         fi
 
@@ -117,8 +117,8 @@ case "$FEATURE" in
                 ;;
         esac
 
-        if [ -n "$2" ]; then
-            CHOICE="$2"
+        if [ -n "${2:-}" ]; then
+            CHOICE="${2:-}"
         else
             makenotif customize "$ICON" "$NAME" "$MSG" true
             CHOICE=$(ls "$DIR" | rofi -dmenu -p "Select $NAME Skin")
