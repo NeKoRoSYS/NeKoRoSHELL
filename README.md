@@ -134,6 +134,15 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 </div>
 <br>
 
+### Beyond "NeKoRoSHELL"
+
+In the near future, I plan to expand upon what makes NeKoRoSHELL, well, "NeKoRoSHELL." The following plans MAY or MAY NOT happen, so do take it with a grain of salt:
+- **NeKoRoSHELL Headless**: A plug-and-play fork of NeKoRoSHELL that lets you integrate the config files and scripts to any wayland-based window manager/compositor.
+  - Barebones/DIY branch
+  - `Sway` branch
+  - `MangoWC` branch
+- **NeKoRoSHELL DLux**: A reimagining of NeKoRoSHELL that uses Quickshell instead of waybar, SwayNC, rofi, and other packages; in an effort to unify everything. This will effectively rebrand this project as "NeKoRoSHELL Legacy."
+
 ## Dependencies
 
 > [!CAUTION]
