@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pkill -x rofi
+pkill -x rofi || true
 
 MODE=$1
 
