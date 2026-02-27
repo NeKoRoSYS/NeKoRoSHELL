@@ -25,7 +25,7 @@ void replace_all(std::string& str, const std::string& from, const std::string& t
 
 std::string parse_binds(const std::string& filepath, const std::string& category) {
     std::ifstream file(filepath);
-    if (!file.is_open()) return ""; // Silently ignore if file doesn't exist
+    if (!file.is_open()) return "";
 
     std::ostringstream output;
     output << " ────────────────── " << category << " ────────────────── \n";
