@@ -386,13 +386,18 @@ void set_waybar(bool visible) {
 }
 
 int main() {
-    std::unique_ptr<CompositorBackend> backend;
-
-    if (getenv("HYPRLAND_INSTANCE_SIGNATURE")) {
-        backend = std::make_unique<HyprlandBackend>();
-    } else if (getenv("SWAYSOCK")) {
-        backend = std::make_unique<SwayBackend>();
+    std::string wm = getenv("XDG_CURRENT_DESKTOP") ? getenv("XDG_CURRENT_DESKTOP") : "";
+    
+    CompositorBackend* backend = nullptr;
+    
+    if (wm.find("Hyprland") != std::string::npos) {
+        backend = new HyprlandBackend();
+    } else if (wm.find("Sway") != std::string::npos) {
+        backend = new SwayBackend();
+    } else if (wm.find("Mango") != std::string::npos || wm.find("dwl") != std::string::npos) {
+        backend = new MangoBackend();
     } else {
+        std::cerr << "Unsupported Window Manager." << std::endl;
         return 1;
     }
 
