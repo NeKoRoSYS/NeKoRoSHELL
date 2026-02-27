@@ -208,6 +208,58 @@ public:
 };
 
 class SwayBackend : public CompositorBackend {
+private:
+    int get_socket() {
+        const char* sock_path = getenv("SWAYSOCK");
+        if (!sock_path) return -1;
+        int sfd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (sfd == -1) return -1;
+        struct sockaddr_un addr;
+        memset(&addr, 0, sizeof(struct sockaddr_un));
+        addr.sun_family = AF_UNIX;
+        strncpy(addr.sun_path, sock_path, sizeof(addr.sun_path) - 1);
+        if (connect(sfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1) {
+            close(sfd);
+            return -1;
+        }
+        return sfd;
+    }
+
+    std::string sway_ipc_request(int fd, uint32_t type, const std::string& payload = "") {
+        struct { char magic[6]; uint32_t len; uint32_t type; } __attribute__((packed)) header;
+        memcpy(header.magic, "i3-ipc", 6);
+        header.len = payload.length();
+        header.type = type;
+        
+        if (write(fd, &header, sizeof(header)) == -1) return "";
+        if (!payload.empty() && write(fd, payload.c_str(), payload.length()) == -1) return "";
+        
+        if (read(fd, &header, sizeof(header)) != sizeof(header)) return "";
+        std::string response(header.len, '\0');
+        size_t total_read = 0;
+        while (total_read < header.len) {
+            ssize_t bytes = read(fd, &response[total_read], header.len - total_read);
+            if (bytes <= 0) break;
+            total_read += bytes;
+        }
+        return response;
+    }
+
+    bool has_windows_recursive(const json& j) {
+        if (j.contains("type") && j["type"] == "workspace" && j.value("focused", false)) {
+            size_t count = 0;
+            if (j.contains("nodes")) count += j["nodes"].size();
+            if (j.contains("floating_nodes")) count += j["floating_nodes"].size();
+            return count > 0;
+        }
+        if (j.contains("nodes")) {
+            for (const auto& node : j["nodes"]) {
+                if (has_windows_recursive(node)) return true;
+            }
+        }
+        return false;
+    }
+
 public:
     bool is_layer_active(const std::string& layer_name) override {
         std::string cmd = "lswt -j 2>/dev/null | jq -e '.[] | select(.namespace == \"" + layer_name + "\")' >/dev/null 2>&1";
@@ -215,24 +267,43 @@ public:
     }
 
     bool has_active_windows() override {
-        std::string cmd = "swaymsg -t get_tree 2>/dev/null | jq -r '.. | objects | select(.type==\"workspace\" and .focused==true) | (.nodes | length) + (.floating_nodes | length)'";
-        std::string out = exec(cmd.c_str());
+        int fd = get_socket();
+        if (fd == -1) return false;
+        
+        std::string tree_json = sway_ipc_request(fd, 4); 
+        close(fd);
+        
+        if (tree_json.empty()) return false;
         try {
-            int window_count = std::stoi(out);
-            return window_count > 0;
-        } catch (...) {
-            return false;
-        }
+            auto j = json::parse(tree_json);
+            return has_windows_recursive(j);
+        } catch (...) { return false; }
     }
 
     void listen_for_events(std::function<void()> on_event) override {
-        FILE* stream = popen("swaymsg -m -t subscribe '[\"window\", \"workspace\"]'", "r");
-        if (!stream) return;
-        char buffer[2048];
-        while (fgets(buffer, sizeof(buffer), stream) != nullptr) {
-            on_event(); 
+        int fd = get_socket();
+        if (fd == -1) return;
+        
+        sway_ipc_request(fd, 2, "[\"window\", \"workspace\"]");
+        
+        struct { char magic[6]; uint32_t len; uint32_t type; } __attribute__((packed)) header;
+        std::vector<char> buffer(65536);
+        
+        while (true) {
+            if (read(fd, &header, sizeof(header)) != sizeof(header)) break;
+            
+            size_t total_read = 0;
+            while (total_read < header.len) {
+                ssize_t bytes = read(fd, buffer.data(), std::min(buffer.size(), (size_t)(header.len - total_read)));
+                if (bytes <= 0) break;
+                total_read += bytes;
+            }
+            
+            if ((header.type & 0x80000000) != 0) {
+                on_event();
+            }
         }
-        pclose(stream);
+        close(fd);
     }
 };
 
