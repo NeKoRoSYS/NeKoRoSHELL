@@ -54,15 +54,23 @@ prompt_merge() {
                 diff --color=always -u "$target_file" "$new_file" | less -R
                 ;;
             m)
-                USER_EDITOR=${VISUAL:-${EDITOR:-nano}}
+                if [ -z "${VISUAL}" ] && [ -z "${EDITOR}" ]; then
+                    if command -v vim >/dev/null 2>&1; then
+                        USER_EDITOR="vim"
+                    elif command -v nano >/dev/null 2>&1; then
+                        USER_EDITOR="nano"
+                    else
+                        USER_EDITOR="vi" 
+                    fi
+                else
+                    USER_EDITOR=${VISUAL:-${EDITOR}}
+                fi
 
                 echo -e "${BLUE}Opening merge review in $USER_EDITOR...${NC}"
 
                 if [ "$USER_EDITOR" = "code" ]; then
-                    # We add --wait so the script pauses until you close the tab
                     code --wait --diff "$target_file" "$new_file"
                 else
-                    # Fallback to standard editor (vim, nano, etc.)
                     $USER_EDITOR "$new_file"
                 fi
                 break ;;
