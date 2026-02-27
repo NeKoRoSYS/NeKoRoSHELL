@@ -5,7 +5,7 @@ set -euo pipefail
 CMD_FEATURE="${1:-}"
 CMD_CHOICE="${2:-}"
 
-pkill -x rofi
+pkill -x rofi || true
 
 theme="Select Theme"
 wallpaper="Select Wallpaper"
