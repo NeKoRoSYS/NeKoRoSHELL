@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 CMD_FEATURE=$1
 CMD_CHOICE=$2
 
