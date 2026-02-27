@@ -323,7 +323,18 @@ do_update() {
     fi
 
     if [[ -d "$TEMP_DIR/bin" ]]; then
-        cp -r "$TEMP_DIR/bin/"* "$BIN_DIR/" 2>/dev/null
+        for new_script in "$TEMP_DIR/bin/"*; do
+            script_name=$(basename "$new_script")
+            if [[ "$script_name" != "nekoroshell" ]]; then
+                cp -r "$new_script" "$BIN_DIR/" 2>/dev/null
+            fi
+        done
+
+        if [[ -f "$TEMP_DIR/bin/nekoroshell" ]]; then
+            cp "$TEMP_DIR/bin/nekoroshell" "$BIN_DIR/nekoroshell.new"
+            mv "$BIN_DIR/nekoroshell.new" "$BIN_DIR/nekoroshell"
+        fi
+
         chmod +x "$BIN_DIR"/* 2>/dev/null
         echo -e "${GREEN}Successfully updated bash scripts in $BIN_DIR${NC}"
     fi
