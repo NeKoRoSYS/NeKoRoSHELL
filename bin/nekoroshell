@@ -126,7 +126,7 @@ do_uninstall() {
 
     echo -e "\n${BLUE}Removing NeKoRoSHELL configs and restoring backups...${NC}"
 
-    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync systemd themes wallpapers wallust waybar wlogout)
+    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync themes wallpapers wallust waybar wlogout)
 
     for conf in "${CONFIGS[@]}"; do
         target_dir="$CONF_DIR/$conf"
@@ -198,7 +198,7 @@ do_update() {
     TIMESTAMP=$(date +%Y%m%d_%H%M%S)
     BACKUP_ARCHIVE="$HOME/nekoroshell_backup_$TIMESTAMP.tar.gz"
     BACKUP_ITEMS=()
-    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync systemd wallpapers wallust waybar wlogout themes)
+    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync wallpapers wallust waybar wlogout themes)
 
     mkdir -p "$CONF_DIR"
     for conf in "${CONFIGS[@]}"; do
