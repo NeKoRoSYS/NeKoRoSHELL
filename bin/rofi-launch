@@ -4,7 +4,6 @@ pkill -x rofi
 
 MODE=$1
 
-# Map modes to commands and text
 case $MODE in
     run)
         TITLE="Run Command"
