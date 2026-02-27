@@ -458,25 +458,14 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             echo -e "${RED}Missing required C++ development headers: $REQUIRED_LIBS${NC}"
             echo -e "${RED}Please install the corresponding -dev / -devel packages. Compilation aborted.${NC}"
         else
-            echo -e "${BLUE}Compiling C++ Daemons...${NC}"
+            echo -e "${BLUE}Compiling C++ Daemons via Make...${NC}"
             execute mkdir -p "$USER_BIN_DIR"
             
-            LIBS=$(pkg-config --cflags --libs $REQUIRED_LIBS)
-            
-            if [[ -f "src/navbar-hover.cpp" ]]; then
-                execute g++ -O3 -o "$USER_BIN_DIR/navbar-hover" src/navbar-hover.cpp $LIBS && echo -e "${GREEN}Successfully compiled navbar-hover.${NC}" || echo -e "${RED}Failed to compile navbar-hover.${NC}"
-            fi
-            
-            if [[ -f "src/navbar-watcher.cpp" ]]; then
-                execute g++ -O3 -o "$USER_BIN_DIR/navbar-watcher" src/navbar-watcher.cpp $LIBS && echo -e "${GREEN}Successfully compiled navbar-watcher.${NC}" || echo -e "${RED}Failed to compile navbar-watcher.${NC}"
-            fi
-            
-            if [[ -f "src/hypr-nice.cpp" ]]; then
-                execute g++ -O3 -o "$USER_BIN_DIR/hypr-nice" src/hypr-nice.cpp && echo -e "${GREEN}Successfully compiled hypr-nice.${NC}" || echo -e "${RED}Failed to compile hypr-nice.${NC}"
-            fi
-
-            if [[ -f "src/eject-forbidden.cpp" ]]; then
-                execute g++ -O3 -o "$USER_BIN_DIR/eject-forbidden" src/eject-forbidden.cpp && echo -e "${GREEN}Successfully compiled eject-forbidden.${NC}" || echo -e "${RED}Failed to compile eject-forbidden.${NC}"
+            if execute make clean all; then
+                echo -e "${GREEN}Successfully compiled all C++ daemons.${NC}"
+                execute cp build/* "$USER_BIN_DIR/" || echo -e "${RED}Warning: Failed to copy binaries to $USER_BIN_DIR${NC}"
+            else
+                echo -e "${RED}Compilation failed. Check the output above.${NC}"
             fi
         fi
     fi
