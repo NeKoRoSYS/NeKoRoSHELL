@@ -16,8 +16,10 @@ usage() {
     echo -e "${BLUE}NeKoRoSHELL Management Utility${NC}\n"
     echo -e "Usage: nekoroshell [COMMAND]\n"
     echo -e "Commands:"
-    echo -e "  ${GREEN}update${NC}      Fetch and apply the latest NeKoRoSHELL release."
-    echo -e "  ${RED}uninstall${NC}   Remove all NeKoRoSHELL configurations and scripts from the system."
+    echo -e "  ${GREEN}update${NC}        Fetch and apply the latest NeKoRoSHELL release."
+    echo -e "  ${GREEN}create-skin${NC}   Create a new empty skin template for a specific feature."
+    echo -e "  ${GREEN}create-theme${NC}  Create a new theme script bundle from existing skins."
+    echo -e "  ${RED}uninstall${NC}     Remove all NeKoRoSHELL configurations and scripts."
     echo ""
     exit 1
 }
@@ -383,6 +385,162 @@ do_update() {
     fi
 
     echo -e "${GREEN}Upgrade to $LATEST_TAG complete!${NC}"
+}
+
+do_create_skin() {
+    echo -e "${BLUE}NeKoRoSHELL Skin Template Generator${NC}\n"
+    echo -e "Which feature do you want to create a skin for?"
+    echo "1) Navbar (waybar)"
+    echo "2) Launcher (rofi)"
+    echo "3) Lockscreen (hyprlock)"
+    echo "4) Panel (swaync)"
+    echo "5) Power (wlogout)"
+    read -r -p "Select option (1-5): " feature_opt
+
+    local target_dir=""
+    local required_files=()
+    local feature_name=""
+
+    case "$feature_opt" in
+        1) feature_name="navbar"; target_dir="$CONF_DIR/waybar/skins"; required_files=("style.css" "layout.jsonc" "navbar-hover.conf") ;;
+        2) feature_name="launcher"; target_dir="$CONF_DIR/rofi/skins"; required_files=("config.rasi" "style.rasi") ;;
+        3) feature_name="lockscreen"; target_dir="$CONF_DIR/hypr/hyprlock/skins"; ;;
+        4) feature_name="panel"; target_dir="$CONF_DIR/swaync/skins"; required_files=("style.css" "config.json") ;;
+        5) feature_name="power"; target_dir="$CONF_DIR/wlogout/skins"; required_files=("style.css" "layout") ;;
+        *) echo -e "${RED}Invalid option.${NC}"; exit 1 ;;
+    esac
+
+    read -r -p "Enter the name for your new $feature_name skin: " skin_name
+    if [[ -z "$skin_name" ]]; then echo -e "${RED}Skin name cannot be empty.${NC}"; exit 1; fi
+
+    skin_name="${skin_name// /_}"
+
+    local skin_path="$target_dir/$skin_name"
+    if [[ -d "$skin_path" ]]; then
+        echo -e "${RED}Error: Skin '$skin_name' already exists at $skin_path${NC}"
+        exit 1
+    fi
+
+    mkdir -p "$skin_path"
+    
+    if [[ "$feature_name" == "lockscreen" ]]; then
+        touch "$skin_path/$skin_name.conf"
+        echo "# Hyprlock config for $skin_name" > "$skin_path/$skin_name.conf"
+    else
+        for req_file in "${required_files[@]}"; do
+            touch "$skin_path/$req_file"
+            
+            if [[ "$req_file" == *.css || "$req_file" == *.rasi ]]; then
+                echo "/* $req_file for $skin_name */" > "$skin_path/$req_file"
+            elif [[ "$req_file" == *.json || "$req_file" == *.jsonc ]]; then
+                echo "{}" > "$skin_path/$req_file"
+            fi
+        done
+
+        touch "$skin_path/layerrule.conf"
+    fi
+
+    echo -e "\n${GREEN}Success!${NC} Created empty template for '$skin_name' in:"
+    echo -e "${YELLOW}$skin_path${NC}"
+    echo "You can now edit these files to build your skin."
+}
+
+do_create_theme() {
+    echo -e "${BLUE}NeKoRoSHELL Theme Generator${NC}\n"
+    read -r -p "Enter the name for your new theme: " theme_name
+    if [[ -z "$theme_name" ]]; then echo -e "${RED}Theme name cannot be empty.${NC}"; exit 1; fi
+    theme_name="${theme_name// /_}"
+
+    local theme_dir="$CONF_DIR/themes/$theme_name"
+    if [[ -d "$theme_dir" ]]; then
+        echo -e "${RED}Error: Theme '$theme_name' already exists.${NC}"
+        exit 1
+    fi
+
+    echo -e "\n${YELLOW}Specify the skins for this theme (leave blank to default to 'legacy').${NC}"
+    
+    read -r -p "Wallpaper file (e.g. 'image.png', or 'random'): " t_wall
+    t_wall=${t_wall:-random}
+
+    read -r -p "Navbar skin: " t_nav
+    t_nav=${t_nav:-legacy}
+
+    read -r -p "Launcher skin: " t_launch
+    t_launch=${t_launch:-legacy}
+
+    read -r -p "Lockscreen layout: " t_lock
+    t_lock=${t_lock:-legacy}
+
+    read -r -p "Panel skin: " t_panel
+    t_panel=${t_panel:-legacy}
+
+    read -r -p "Power options skin: " t_power
+    t_power=${t_power:-legacy}
+
+    mkdir -p "$theme_dir"
+    local script_path="$theme_dir/$theme_name.sh"
+
+    cat << 'EOF' > "$script_path"
+#!/bin/bash
+# Auto-generated theme script by NeKoRoSHELL
+
+CONF_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+
+WALLPAPER="VAR_WALL"
+NAVBAR="VAR_NAV"
+LAUNCHER="VAR_LAUNCH"
+LOCKSCREEN="VAR_LOCK"
+PANEL="VAR_PANEL"
+POWER="VAR_POWER"
+
+missing=0
+
+if [[ "$WALLPAPER" != "random" && ! -f "$CONF_DIR/wallpapers/$WALLPAPER" ]]; then
+    echo "Error: Wallpaper '$WALLPAPER' not found in ~/.config/wallpapers/"
+    missing=1
+fi
+if [[ ! -d "$CONF_DIR/waybar/skins/$NAVBAR" ]]; then
+    echo "Error: Navbar skin '$NAVBAR' not found."
+    missing=1
+fi
+if [[ ! -d "$CONF_DIR/rofi/skins/$LAUNCHER" ]]; then
+    echo "Error: Launcher skin '$LAUNCHER' not found."
+    missing=1
+fi
+if [[ ! -d "$CONF_DIR/hypr/hyprlock/skins/$LOCKSCREEN" ]]; then
+    echo "Error: Lockscreen layout '$LOCKSCREEN' not found."
+    missing=1
+fi
+if [[ ! -d "$CONF_DIR/swaync/skins/$PANEL" ]]; then
+    echo "Error: Panel skin '$PANEL' not found."
+    missing=1
+fi
+if [[ ! -d "$CONF_DIR/wlogout/skins/$POWER" ]]; then
+    echo "Error: Power options skin '$POWER' not found."
+    missing=1
+fi
+
+if [ $missing -eq 1 ]; then
+    echo "Theme validation failed. Please create the missing skins or edit this theme script."
+    command -v makenotif >/dev/null && makenotif customize dialog-error "Theme Error" "Missing skins for theme." true
+    exit 1
+fi
+
+quick-theme "$WALLPAPER" "$NAVBAR" "$LAUNCHER" "$LOCKSCREEN" "$PANEL" "$POWER"
+EOF
+
+    sed -i "s/VAR_WALL/$t_wall/" "$script_path"
+    sed -i "s/VAR_NAV/$t_nav/" "$script_path"
+    sed -i "s/VAR_LAUNCH/$t_launch/" "$script_path"
+    sed -i "s/VAR_LOCK/$t_lock/" "$script_path"
+    sed -i "s/VAR_PANEL/$t_panel/" "$script_path"
+    sed -i "s/VAR_POWER/$t_power/" "$script_path"
+
+    chmod +x "$script_path"
+
+    echo -e "\n${GREEN}Success!${NC} Theme '$theme_name' script created at:"
+    echo -e "${YELLOW}$script_path${NC}"
+    echo "You can apply it via the customizer GUI tool or by running the script directly."
 }
 
 if [ $# -eq 0 ]; then
