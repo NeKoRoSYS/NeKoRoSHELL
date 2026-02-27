@@ -3,7 +3,7 @@
 MODE_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/nekoroshell/navbar_mode"
 CURRENT_MODE=$(cat "$MODE_FILE" 2>/dev/null || echo "static")
 
-killall -q waybar navbar-watcher navbar-hover 2>/dev/null
+killall -q waybar navbar-watcher navbar-hover 2>/dev/null || true
 
 if [ "$CURRENT_MODE" = "dynamic" ]; then
     navbar-watcher &

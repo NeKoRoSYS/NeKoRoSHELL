@@ -19,7 +19,7 @@
 
 The best way to say "I use Linux btw 🤓" is if your desktop environment looks sleek and suave.
 
-**NeKoRoSHELL** aims to provide an out-of-the-box, clean and reliable, generic, and modular framework that lets you easily customize your desktop experience with simple UI design philosophy in mind.
+Powered by Hyprland, this project does not define itself as "just a rice." **NeKoRoSHELL** aims to provide an out-of-the-box, clean and reliable, generic, and modular framework that lets you easily customize your desktop experience with simple UI design philosophy in mind.
 <br>
 <br>
 
@@ -40,9 +40,10 @@ NeKoRoSHELL focuses on simplicity and modularity.
 <br>
 
 The following are what NeKoRoSHELL currently offers:
-- **BETA: Distro-agnostic**
+- **Portable and Distro-agnostic**
   - Use NeKoRoSHELL in any **supported** distro!
   - Init-agnostic.
+  - XDG-compliant.
   - Features an advanced installer script.
     - Use `git clone https://github.com/NeKoRoSYS/NeKoRoSHELL`
     - Then `cd NeKoRoSHELL`
@@ -127,10 +128,19 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | wlogout integration | ✅ |
 | BETA<br>Support for other distros; Verified to be working on: Arch | 🔍 |
 | BETA<br>Make NeKoRoSHELL init-agnostic; Verified to be working on: Arch | 🔍 |
-| BETA<br>Make NeKoRoSHELL WM-agnostic; Verified to be working on: Hyprland | 🔍 |
+| BETA<br>Make NeKoRoSHELL WM-agnostic; Verified to be working on: Hyprland | 🛠 |
 | Qt and Kvantum integration | 🤔 |
 
 </div>
+<br>
+
+### Beyond "NeKoRoSHELL"
+
+In the near future, I plan to expand upon what makes NeKoRoSHELL, well, "NeKoRoSHELL." The following plans MAY or MAY NOT happen, so do take it with a grain of salt:
+- **NeKoRoSHELL Headless**: A plug-and-play fork of NeKoRoSHELL that lets you integrate the config files and scripts to any wayland-based window manager/compositor.
+  - Barebones/DIY branch
+
+- **NeKoRoSHELL DLux (2.0)**: A reimagining of NeKoRoSHELL that uses Quickshell instead of waybar, SwayNC, rofi, and other packages; in an effort to unify everything. This will effectively rebrand this project as "NeKoRoSHELL Legacy."
 <br>
 
 ## Dependencies
@@ -147,7 +157,7 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 >
 > The installation system that I implemented can be improved. If you're willing to help, please make a pull request. Your contributions are welcome and will be appreciated! :D
 
-- `update-nekoroshell` uses Vim to compare, overwrite, or merge files when updating.
+- `nekoroshell update` may use Vim to compare, overwrite, or merge files when updating.
 - Auto-pause animated wallpapers via [mpvpaper-stop](https://github.com/pvtoari/mpvpaper-stop) (dependencies: cmake, cjson)
   - Used at `set-wallpaper.sh` and `check-video.sh` in `~/.config/hypr/scripts/wallpapers/` to save CPU/RAM usage.
 - Install [Hypremoji](https://github.com/Musagy/hypremoji)

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
@@ -54,15 +56,23 @@ prompt_merge() {
                 diff --color=always -u "$target_file" "$new_file" | less -R
                 ;;
             m)
-                USER_EDITOR=${VISUAL:-${EDITOR:-nano}}
+                if [ -z "${VISUAL:-}" ] && [ -z "${EDITOR:-}" ]; then
+                    if command -v vim >/dev/null 2>&1; then
+                        USER_EDITOR="vim"
+                    elif command -v nano >/dev/null 2>&1; then
+                        USER_EDITOR="nano"
+                    else
+                        USER_EDITOR="vi" 
+                    fi
+                else
+                    USER_EDITOR=${VISUAL:-${EDITOR:-vi}}
+                fi
 
                 echo -e "${BLUE}Opening merge review in $USER_EDITOR...${NC}"
 
                 if [ "$USER_EDITOR" = "code" ]; then
-                    # We add --wait so the script pauses until you close the tab
                     code --wait --diff "$target_file" "$new_file"
                 else
-                    # Fallback to standard editor (vim, nano, etc.)
                     $USER_EDITOR "$new_file"
                 fi
                 break ;;
@@ -213,7 +223,7 @@ do_update() {
     find "$TEMP_DIR/.config" -type f \( -name "*.conf" -o -name "*.json" -o -name "*.jsonc" -o -name "*.css" -o -name "*.rasi" -o -name "*.sh" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|/home/nekorosys|$HOME|g"
 
     declare -a MONITOR_LIST
-    if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]] && command -v hyprctl &> /dev/null; then
+    if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE:-" ]] && command -v hyprctl &> /dev/null; then
         mapfile -t MONITOR_LIST < <(hyprctl monitors | awk '/Monitor/ {print $2}')
     else
         for f in /sys/class/drm/*/status; do
@@ -313,7 +323,18 @@ do_update() {
     fi
 
     if [[ -d "$TEMP_DIR/bin" ]]; then
-        cp -r "$TEMP_DIR/bin/"* "$BIN_DIR/" 2>/dev/null
+        for new_script in "$TEMP_DIR/bin/"*; do
+            script_name=$(basename "$new_script")
+            if [[ "$script_name" != "nekoroshell" ]]; then
+                cp -r "$new_script" "$BIN_DIR/" 2>/dev/null
+            fi
+        done
+
+        if [[ -f "$TEMP_DIR/bin/nekoroshell" ]]; then
+            cp "$TEMP_DIR/bin/nekoroshell" "$BIN_DIR/nekoroshell.new"
+            mv "$BIN_DIR/nekoroshell.new" "$BIN_DIR/nekoroshell"
+        fi
+
         chmod +x "$BIN_DIR"/* 2>/dev/null
         echo -e "${GREEN}Successfully updated bash scripts in $BIN_DIR${NC}"
     fi

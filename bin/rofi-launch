@@ -1,10 +1,9 @@
 #!/bin/bash
 
-pkill -x rofi
+pkill -x rofi || true
 
 MODE=$1
 
-# Map modes to commands and text
 case $MODE in
     run)
         TITLE="Run Command"

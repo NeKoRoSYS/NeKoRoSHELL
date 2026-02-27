@@ -1,20 +1,24 @@
 #!/bin/bash
 
 if pgrep -x hyprshot > /dev/null || pgrep -x slurp > /dev/null; then
-    killall -9 hyprshot slurp hyprpicker grim
+    killall -9 hyprshot slurp hyprpicker grim || true
     exit 0
 fi
 
-MODE=$1
+MODE="${1:-}"
+FILENAME="screenshot_$(date +%s).png"
+IMG_PATH="/tmp/$FILENAME"
 
+rm -f /tmp/screenshot_*.png
 
 if [ "$MODE" == "region" ]; then
-    hyprshot -m region --clipboard-only --freeze -s
+    hyprshot -m region --freeze -s -o /tmp -f "$FILENAME"
 else
-    hyprshot -m $MODE --clipboard-only -s
+    hyprshot -m $MODE -s -o /tmp -f "$FILENAME"
 fi
 
-pkill rofi
+pkill rofi || true
 
-wl-paste > /tmp/screenshot.png && sleep 1
-makenotif hyprshot "/tmp/screenshot.png" Hyprshot "Captured $MODE to clipboard!" true camera-shutter.oga
+if [ -f "$IMG_PATH" ]; then
+    makenotif hyprshot "$IMG_PATH" Hyprshot "Captured $MODE to clipboard!" true camera-shutter.oga
+fi

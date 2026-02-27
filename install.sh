@@ -40,13 +40,6 @@ echo -e "${BLUE}Please choose your installation type:${NC}"
 echo -e "  ${GREEN}Minimal${NC}     - Backup existing config files as a tarball, deploy new dotfiles, and replace hardcoded directories. No dependencies."
 echo -e "  ${GREEN}Compilation${NC} - Backup existing config files, deploy dotfiles, replace hardcoded directories, and install every dependency.\n"
 
-cleanup() {
-    if [[ -n "${SUDO_PID:-}" ]]; then
-        kill "$SUDO_PID" 2>/dev/null || true
-    fi
-}
-trap cleanup EXIT
-
 INSTALL_TYPE=""
 while true; do
     echo -ne "${BLUE}Type 'Minimal' or 'Compilation' to proceed (or 'exit' to abort): ${NC}"
@@ -63,8 +56,17 @@ while true; do
         
         echo -e "${BLUE}Caching sudo credentials for dependency installation...${NC}"
         sudo -v
-        ( while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done ) 2>/dev/null &
-        SUDO_PID=$!
+        exec 9> >(
+            while true; do
+                read -r -t 60
+                status=$?
+                if [[ $status -gt 128 ]]; then
+                    sudo -n true 2>/dev/null
+                else
+                    break
+                fi
+            done
+        )
         break
     elif [[ "$choice" == "exit" ]]; then
         echo -e "${RED}Installation aborted.${NC}"

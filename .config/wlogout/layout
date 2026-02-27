@@ -18,7 +18,7 @@
 }
 {
     "label" : "shutdown",
-    "action" : "syspower shutdown",
+    "action" : "sys-power shutdown",
     "text" : "Shutdown",
     "keybind" : "s"
 }
