@@ -14,8 +14,8 @@ if [ -z "$CHOICE" ]; then
 fi
 
 stop_services() {
-    killall -q navbar-hover navbar-watcher 2>/dev/null
-    killall -q waybar 2>/dev/null
+    killall -q navbar-hover navbar-watcher 2>/dev/null || true
+    killall -q waybar 2>/dev/null || true
     sleep 0.2
 }
 
