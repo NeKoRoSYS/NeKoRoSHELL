@@ -14,6 +14,16 @@
 #include <dirent.h>
 #include <nlohmann/json.hpp>
 
+void log_error(const std::string& msg) {
+    std::ofstream log_file("/tmp/nekoroshell-navbar.log", std::ios_base::app);
+    if (log_file.is_open()) {
+        auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        std::string time_str = std::ctime(&now);
+        time_str.pop_back();
+        log_file << "[" << time_str << "] ERROR: " << msg << "\n";
+    }
+}
+
 using json = nlohmann::json;
 
 struct Monitor { int x, y, w, h; }; 
@@ -31,7 +41,10 @@ std::string exec(const char* cmd) {
     char buffer[4096]; 
     std::string result = ""; 
     std::unique_ptr<FILE, PipeDeleter> pipe(popen(cmd, "r")); 
-    if (!pipe) return ""; 
+    if (!pipe) {
+        log_error("popen() failed to execute command: " + std::string(cmd));
+        return "";
+    }
     while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) { 
         result += buffer; 
     } 
@@ -201,7 +214,9 @@ int main() {
     if (pid == 0) { 
         char* args[] = {(char*)"waybar", nullptr}; 
         execvp(args[0], args); 
-        exit(1); 
+        std::ofstream log_file("/tmp/nekoroshell-navbar.log", std::ios_base::app);
+        log_file << "[FATAL] execvp failed to spawn Waybar. Error code: " << errno << "\n";
+        exit(1);
     } 
 
     for (int i = 0; i < 40; ++i) {  
