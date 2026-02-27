@@ -551,6 +551,12 @@ case "$1" in
     update|upgrade)
         do_update
         ;;
+    create-skin)
+        do_create_skin
+        ;;
+    create-theme)
+        do_create_theme
+        ;;
     uninstall|remove)
         do_uninstall
         ;;
