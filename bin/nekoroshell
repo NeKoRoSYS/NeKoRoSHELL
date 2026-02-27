@@ -56,7 +56,7 @@ prompt_merge() {
                 diff --color=always -u "$target_file" "$new_file" | less -R
                 ;;
             m)
-                if [ -z "${VISUAL}" ] && [ -z "${EDITOR}" ]; then
+                if [ -z "${VISUAL:-}" ] && [ -z "${EDITOR:-}" ]; then
                     if command -v vim >/dev/null 2>&1; then
                         USER_EDITOR="vim"
                     elif command -v nano >/dev/null 2>&1; then
@@ -65,7 +65,7 @@ prompt_merge() {
                         USER_EDITOR="vi" 
                     fi
                 else
-                    USER_EDITOR=${VISUAL:-${EDITOR}}
+                    USER_EDITOR=${VISUAL:-${EDITOR:-vi}}
                 fi
 
                 echo -e "${BLUE}Opening merge review in $USER_EDITOR...${NC}"
@@ -223,7 +223,7 @@ do_update() {
     find "$TEMP_DIR/.config" -type f \( -name "*.conf" -o -name "*.json" -o -name "*.jsonc" -o -name "*.css" -o -name "*.rasi" -o -name "*.sh" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|/home/nekorosys|$HOME|g"
 
     declare -a MONITOR_LIST
-    if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]] && command -v hyprctl &> /dev/null; then
+    if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE:-" ]] && command -v hyprctl &> /dev/null; then
         mapfile -t MONITOR_LIST < <(hyprctl monitors | awk '/Monitor/ {print $2}')
     else
         for f in /sys/class/drm/*/status; do
