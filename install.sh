@@ -63,8 +63,17 @@ while true; do
         
         echo -e "${BLUE}Caching sudo credentials for dependency installation...${NC}"
         sudo -v
-        ( while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done ) 2>/dev/null &
-        SUDO_PID=$!
+        exec 9> >(
+            while true; do
+                read -r -t 60
+                status=$?
+                if [[ $status -gt 128 ]]; then
+                    sudo -n true 2>/dev/null
+                else
+                    break
+                fi
+            done
+        )
         break
     elif [[ "$choice" == "exit" ]]; then
         echo -e "${RED}Installation aborted.${NC}"
