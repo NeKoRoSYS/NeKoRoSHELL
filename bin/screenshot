@@ -5,8 +5,7 @@ if pgrep -x hyprshot > /dev/null || pgrep -x slurp > /dev/null; then
     exit 0
 fi
 
-MODE=$1
-
+MODE="${1:-}"
 
 if [ "$MODE" == "region" ]; then
     hyprshot -m region --clipboard-only --freeze -s
@@ -16,5 +15,10 @@ fi
 
 pkill rofi || true
 
-wl-paste > /tmp/screenshot.png && sleep 1
-makenotif hyprshot "/tmp/screenshot.png" Hyprshot "Captured $MODE to clipboard!" true camera-shutter.oga
+rm -f /tmp/screenshot_*.png
+IMG_PATH="/tmp/screenshot_$(date +%s).png"
+
+if wl-paste > "$IMG_PATH"; then
+    sleep 0.5
+    makenotif hyprshot "$IMG_PATH" Hyprshot "Captured $MODE to clipboard!" true camera-shutter.oga
+fi
