@@ -307,6 +307,51 @@ public:
     }
 };
 
+class MangoBackend : public CompositorBackend {
+public:
+    bool is_layer_active(const std::string& layer_name) override {
+        FILE* pipe = popen("mmsg -g -e 2>/dev/null", "r");
+        if (!pipe) return false;
+        char buffer[128];
+        bool active = false;
+        while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+            std::string line(buffer);
+            if (line.find("last_layer " + layer_name) != std::string::npos) {
+                active = true;
+                break;
+            }
+        }
+        pclose(pipe);
+        return active;
+    }
+
+    bool has_active_windows() override {
+        FILE* pipe = popen("mmsg -g -t 2>/dev/null", "r");
+        if (!pipe) return false;
+        char buffer[128];
+        bool has_windows = false;
+        while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+            std::string line(buffer);
+            if (line.find("clients ") != std::string::npos) {
+                int clients = std::stoi(line.substr(line.find("clients ") + 8));
+                if (clients > 0) has_windows = true;
+            }
+        }
+        pclose(pipe);
+        return has_windows;
+    }
+
+    void listen_for_events(std::function<void()> on_event) override {
+        FILE* pipe = popen("mmsg -w -t -c 2>/dev/null", "r");
+        if (!pipe) return;
+        char buffer[128];
+        while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+            on_event();
+        }
+        pclose(pipe);
+    }
+};
+
 bool is_waybar_visible = false;
 pid_t current_waybar_pid = -1;
 
