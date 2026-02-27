@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if pgrep -x hyprshot > /dev/null || pgrep -x slurp > /dev/null; then
-    killall -9 hyprshot slurp hyprpicker grim
+    killall -9 hyprshot slurp hyprpicker grim || true
     exit 0
 fi
 
@@ -14,7 +14,7 @@ else
     hyprshot -m $MODE --clipboard-only -s
 fi
 
-pkill rofi
+pkill rofi || true
 
 wl-paste > /tmp/screenshot.png && sleep 1
 makenotif hyprshot "/tmp/screenshot.png" Hyprshot "Captured $MODE to clipboard!" true camera-shutter.oga
