@@ -90,7 +90,7 @@ prompt_merge() {
 }
 
 do_uninstall() {
-    echo -e " ======================================================= #"
+    echo -e "# ======================================================= #"
     echo -e "#              NeKoRoSHELL Uninstallation Utility         #"
     echo -e "# ======================================================= #\n"
 
@@ -126,7 +126,7 @@ do_uninstall() {
 
     echo -e "\n${BLUE}Removing NeKoRoSHELL configs and restoring backups...${NC}"
 
-    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync themes wallpapers wallust waybar wlogout)
+    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync systemd themes wallpapers wallust waybar wlogout)
 
     for conf in "${CONFIGS[@]}"; do
         target_dir="$CONF_DIR/$conf"
@@ -226,8 +226,12 @@ do_update() {
     fi
 
     echo -e "${BLUE}Pre-processing downloaded files to match your system...${NC}"
-
-    find "$TEMP_DIR/.config" -type f \( -name "*.conf" -o -name "*.json" -o -name "*.jsonc" -o -name "*.css" -o -name "*.rasi" -o -name "*.sh" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|/home/nekorosys|$HOME|g"
+    
+    SEARCH="/home/nekorosys"
+    REPLACE="$HOME"
+    REPLACE_ESCAPED=$(echo "$REPLACE" | sed 's/|/\\|/g; s/\\/\\\\/g')
+    
+    find "$TEMP_DIR/.config" -type f \( -name "*.config" -o -name "*.css" -o -name "*.rasi" -o -name "*.conf" -o -name "*.sh" -o -name "*.json" -o -name "*.jsonc" -o -name "*.lua" -o -name "*.py" -o -name "*.yaml" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|$SEARCH|$REPLACE_ESCAPED|g" || true
 
     declare -a MONITOR_LIST
     if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE:-" ]] && command -v hyprctl &> /dev/null; then
@@ -287,13 +291,14 @@ do_update() {
         echo -e "  [${GREEN}New${NC}] Initialized user autostart script."
     fi
 
-    if [[ ${#MONITOR_LIST[@]} -gt 0 ]]; then
+    MONITOR_COUNT=${#MONITOR_LIST[@]}
+    if [[ "$MONITOR_COUNT" -gt 0 ]]; then
         PRIMARY_MONITOR=${MONITOR_LIST[0]}
         SECONDARY_MONITOR=${MONITOR_LIST[1]:-$PRIMARY_MONITOR}
         
         if [[ -d "$USER_CONF_DIR" ]]; then
             find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
-            if [[ ${#MONITOR_LIST[@]} -ge 2 ]]; then
+            if [[ "$MONITOR_COUNT" -ge 2 ]]; then
                 find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
             else
                 find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
@@ -308,7 +313,6 @@ do_update() {
             for new_script in "$TEMP_DIR/bin/"*; do
                 if [[ -f "$new_script" ]]; then
                     script_name=$(basename "$new_script")
-                    
                     if [[ -f "$legacy_dir/$script_name" ]]; then
                         echo -e "${YELLOW}Removing old script to prevent conflicts:${NC} $legacy_dir/$script_name"
                         rm -f "$legacy_dir/$script_name"
@@ -320,14 +324,15 @@ do_update() {
 
     echo -e "\n${BLUE}Updating core scripts and binaries...${NC}"
 
-    if [[ -d "$HOME/.local/bin/nekoroshell" ]]; then
-        BIN_DIR="$HOME/.local/bin/nekoroshell"
-    elif [[ -d "$HOME/bin/nekoroshell" ]]; then
-        BIN_DIR="$HOME/bin/nekoroshell"
+    if [[ -d "$HOME/.local/bin" ]]; then
+        BASE_BIN_DIR="$HOME/.local/bin"
+    elif [[ -d "$HOME/bin" ]]; then
+        BASE_BIN_DIR="$HOME/bin"
     else
-        BIN_DIR="$HOME/.local/bin/nekoroshell"
-        mkdir -p "$BIN_DIR"
+        BASE_BIN_DIR="$HOME/.local/bin"
     fi
+    BIN_DIR="$BASE_BIN_DIR/nekoroshell"
+    mkdir -p "$BIN_DIR"
 
     if [[ -d "$TEMP_DIR/bin" ]]; then
         for new_script in "$TEMP_DIR/bin/"*; do
@@ -346,35 +351,22 @@ do_update() {
         echo -e "${GREEN}Successfully updated bash scripts in $BIN_DIR${NC}"
     fi
 
-    echo -e "${BLUE}Recompiling C++ Daemons...${NC}"
-    if ! command -v g++ &> /dev/null || ! command -v pkg-config &> /dev/null; then
-        echo -e "${RED}Warning: g++ or pkg-config not found. Skipping C++ recompilation.${NC}"
+    echo -e "\n${BLUE}Recompiling C++ Daemons via Make...${NC}"
+    if ! command -v make &> /dev/null || ! command -v g++ &> /dev/null || ! command -v pkg-config &> /dev/null; then
+        echo -e "${RED}Warning: make, g++, or pkg-config not found. Skipping C++ recompilation.${NC}"
     else
         REQUIRED_LIBS="wayland-client" 
         if ! pkg-config --exists $REQUIRED_LIBS; then
             echo -e "${RED}Warning: Missing development headers for $REQUIRED_LIBS. Skipping compilation.${NC}"
         else
-            LIBS=$(pkg-config --cflags --libs $REQUIRED_LIBS)
-
-            if [[ -f "$TEMP_DIR/src/navbar-hover.cpp" ]]; then
-                g++ -O3 -o "$BIN_DIR/navbar-hover" "$TEMP_DIR/src/navbar-hover.cpp" $LIBS
-                echo -e "  [${GREEN}OK${NC}] Compiled navbar-hover"
+            pushd "$TEMP_DIR" >/dev/null
+            if make clean all; then
+                echo -e "  [${GREEN}OK${NC}] Successfully compiled C++ daemons."
+                cp build/* "$BIN_DIR/" 2>/dev/null || echo -e "${RED}Warning: Failed to copy binaries.${NC}"
+            else
+                echo -e "${RED}Warning: Compilation failed.${NC}"
             fi
-            
-            if [[ -f "$TEMP_DIR/src/navbar-watcher.cpp" ]]; then
-                g++ -O3 -o "$BIN_DIR/navbar-watcher" "$TEMP_DIR/src/navbar-watcher.cpp" $LIBS
-                echo -e "  [${GREEN}OK${NC}] Compiled navbar-watcher"
-            fi
-            
-            if [[ -f "$TEMP_DIR/src/hypr-nice.cpp" ]]; then
-                g++ -O3 -o "$BIN_DIR/hypr-nice" "$TEMP_DIR/src/hypr-nice.cpp"
-                echo -e "  [${GREEN}OK${NC}] Compiled hypr-nice"
-            fi
-
-            if [[ -f "$TEMP_DIR/src/eject-forbidden.cpp" ]]; then
-                g++ -O3 -o "$BIN_DIR/eject-forbidden" "$TEMP_DIR/src/eject-forbidden.cpp"
-                echo -e "  [${GREEN}OK${NC}] Compiled eject-forbidden"
-            fi
+            popd >/dev/null
         fi
     fi
 
@@ -384,7 +376,7 @@ do_update() {
         hyprctl reload >/dev/null 2>&1
     fi
 
-    echo -e "${GREEN}Upgrade to $LATEST_TAG complete!${NC}"
+    echo -e "\n${GREEN}Upgrade to $LATEST_TAG complete!${NC}"
 }
 
 do_create_skin() {
@@ -522,7 +514,8 @@ fi
 
 if [ $missing -eq 1 ]; then
     echo "Theme validation failed. Please create the missing skins or edit this theme script."
-    command -v makenotif >/dev/null && makenotif customize dialog-error "Theme Error" "Missing skins for theme." true
+    command -v makenotif >/dev/null && makenotif customize dialog-error "Theme Error" "Missing skins for theme."
+    true
     exit 1
 fi
 
