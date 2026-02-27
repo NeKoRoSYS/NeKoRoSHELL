@@ -56,24 +56,29 @@ prompt_merge() {
                 diff --color=always -u "$target_file" "$new_file" | less -R
                 ;;
             m)
-                if [ -z "${VISUAL:-}" ] && [ -z "${EDITOR:-}" ]; then
-                    if command -v vim >/dev/null 2>&1; then
-                        USER_EDITOR="vim"
-                    elif command -v nano >/dev/null 2>&1; then
-                        USER_EDITOR="nano"
+                USER_MERGE_TOOL="${MERGE_TOOL:-vimdiff}"
+                
+                if ! command -v "$USER_MERGE_TOOL" &> /dev/null; then
+                    echo -e "${BLUE}$USER_MERGE_TOOL not found. Falling back to diff3...${NC}"
+                    
+                    if diff3 -m "$target_file" "$target_file" "$new_file" > "${target_file}.tmp_merge"; then
+                        mv "${target_file}.tmp_merge" "$target_file"
+                        echo -e "${GREEN}Merged cleanly using diff3.${NC}"
                     else
-                        USER_EDITOR="vi" 
+                        echo -e "${YELLOW}Merge conflicts found! Opening in your standard editor to resolve manually...${NC}"
+                        USER_EDITOR=${VISUAL:-${EDITOR:-nano}}
+                        command -v "$USER_EDITOR" >/dev/null 2>&1 || USER_EDITOR="vi"
+                        
+                        $USER_EDITOR "${target_file}.tmp_merge"
+                        mv "${target_file}.tmp_merge" "$target_file"
                     fi
                 else
-                    USER_EDITOR=${VISUAL:-${EDITOR:-vi}}
-                fi
-
-                echo -e "${BLUE}Opening merge review in $USER_EDITOR...${NC}"
-
-                if [ "$USER_EDITOR" = "code" ]; then
-                    code --wait --diff "$target_file" "$new_file"
-                else
-                    $USER_EDITOR "$new_file"
+                    echo -e "${BLUE}Opening merge review in $USER_MERGE_TOOL...${NC}"
+                    if [ "$USER_MERGE_TOOL" = "code" ]; then
+                        code --wait --diff "$target_file" "$new_file"
+                    else
+                        "$USER_MERGE_TOOL" "$target_file" "$new_file"
+                    fi
                 fi
                 break ;;
             *)
@@ -83,7 +88,7 @@ prompt_merge() {
 }
 
 do_uninstall() {
-    echo -e "# ======================================================= #"
+    echo -e " ======================================================= #"
     echo -e "#              NeKoRoSHELL Uninstallation Utility         #"
     echo -e "# ======================================================= #\n"
 
