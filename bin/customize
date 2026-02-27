@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-CMD_FEATURE=$1
-CMD_CHOICE=$2
+CMD_FEATURE="$1"
+CMD_CHOICE="$2"
 
 pkill -x rofi
 
@@ -37,7 +37,7 @@ NAVBAR_HOVER_CONF="${XDG_CACHE_HOME:-$HOME/.cache}/nekoroshell/navbar-hover.conf
 HYPR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/user/configs/windowrules.conf"
 MANAGEMENT_MODE=$(cat "$NAVBAR_MODE_FILE" 2>/dev/null || echo "static")
 
-case $FEATURE in
+case "$FEATURE" in
     theme)
 	THEME_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/themes"
 	
@@ -67,10 +67,10 @@ case $FEATURE in
 	    makenotif customize preferences-desktop-theme Lockscreen "Select a Lockscreen layout." true
         fi
 
-	CHOICE=${CMD_CHOICE:-$(find "$SKIN_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort | rofi -dmenu -p "Select Lockscreen Layout")}
+	CHOICE="${CMD_CHOICE:-$(find "$SKIN_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort | rofi -dmenu -p "Select Lockscreen Layout")}"
 
         if [ -n "$CHOICE" ]; then
-            TARGET_CONF=$(find "$SKIN_DIR/$CHOICE" -maxdepth 1 -name "*.conf" | head -n 1)
+            TARGET_CONF="$(find "$SKIN_DIR/$CHOICE" -maxdepth 1 -name "*.conf" | head -n 1)"
             
             if [ -n "$TARGET_CONF" ]; then
                 echo "source = $TARGET_CONF" > "$MAIN"
@@ -98,7 +98,7 @@ case $FEATURE in
         ;;
 
     launcher|panel|navbar|power)
-        case $FEATURE in
+        case "$FEATURE" in
             launcher)
                 NAME="Launcher"; ICON="preferences-desktop-theme"; MSG="Select a Launcher skin."
                 DIR="${XDG_CONFIG_HOME:-$HOME/.config}/rofi/skins"; CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/rofi/config.rasi"
@@ -148,26 +148,26 @@ case $FEATURE in
                     swaync-client -R
                     swaync-client -rs
                     ;;
-		power)
+				power)
             	    echo "@import \"$PATH_SKIN/style.css\";" > "$STYLE"
                     cp "$PATH_SKIN/layout" "$CONFIG"
-		    ;;
+		    		;;
                 navbar)
             	    echo "@import \"$PATH_SKIN/style.css\";" > "$STYLE"
                     echo "{ \"include\": [ \"$PATH_SKIN/layout.jsonc\" ] }" > "$CONFIG"
-		    cp "$PATH_SKIN/navbar-hover.conf" $NAVBAR_HOVER_CONF
+		    		cp "$PATH_SKIN/navbar-hover.conf" $NAVBAR_HOVER_CONF
 
-		    killall -q navbar-hover navbar-watcher 2>/dev/null || true
-		    killall -q waybar 2>/dev/null || true
-		    sleep 0.2
+		   		 	killall -q navbar-hover navbar-watcher 2>/dev/null || true
+		    		killall -q waybar 2>/dev/null || true
+		    		sleep 0.2
 
-		    if [ "$MANAGEMENT_MODE" = "static" ]; then
-				waybar &
-		    elif [ "$MANAGEMENT_MODE" = "hover" ]; then
-				navbar-hover &
-		    else
-				navbar-watcher &
-		    fi
+		    		if [ "$MANAGEMENT_MODE" = "static" ]; then
+						waybar &
+		    		elif [ "$MANAGEMENT_MODE" = "hover" ]; then
+						navbar-hover &
+		    		else
+						navbar-watcher &
+		    		fi
                     ;;
             esac
 
