@@ -163,6 +163,8 @@ In the near future, I plan to expand upon what makes NeKoRoSHELL, well, "NeKoRoS
 <br>
 
 ## Acknowledgements
+- NeKoRoSHELL is fundamentally different and built with strict design/philosophy in mind; however, it's worth to mention that it is partially inspired by [JaKooLit's Hyprland Dots](github.com/JaKooLit/Hyprland-Dots/). Frankly, I only found out about the repository while I am deep into polising v1.6 and I realized how similar the two projects are. Given this, it is inevitable that I may use their project as reference for future updates while still keeping the features grounded enough to fit into NeKoRoSHELL.
+
 - Amelie ([@S-e-r-a-p-h-i-n-e](https://github.com/S-e-r-a-p-h-i-n-e)) for helping me transition the project from using pywal16 to wallust and letting me borrow a few scripts. Go check out [SeraDOTS](https://github.com/S-e-r-a-p-h-i-n-e/SeraDOTS)!
 
 - April for helping me figure out the cause of the now-fixed "keybinds not working" issue.
