@@ -232,7 +232,16 @@ update() {
             pushd "$TEMP_DIR" >/dev/null
             if make clean all; then
                 log_success "Successfully compiled C++ daemons."
-                cp build/* "$bin_dir/" 2>/dev/null || log_warn "Failed to copy binaries."
+                
+                local copy_failed=0
+                for compiled_file in build/*; do
+                    if [[ -f "$compiled_file" ]]; then
+                        rm -f "$bin_dir/$(basename "$compiled_file")" 2>/dev/null || true
+                        cp "$compiled_file" "$bin_dir/" || copy_failed=1
+                    fi
+                done
+                
+                [[ $copy_failed -eq 1 ]] && log_warn "Failed to copy some binaries."
             else
                 log_error "Warning: Compilation failed."
             fi
