@@ -8,6 +8,7 @@ LAUNCHER=${3:-"legacy"}
 LOCKSCREEN=${4:-"legacy"}
 PANEL=${5:-"legacy"}
 POWER=${6:-"legacy"}
+WINDOWS=${7:-"legacy"}
 
 echo "Applying theme components..."
 
@@ -38,6 +39,11 @@ fi
 
 if ! customize power "$POWER"; then 
     echo "Error: Failed to apply power options skin '$POWER'."
+    exit 1
+fi
+
+if ! customize windows "$WINDOWS"; then 
+    echo "Error: Failed to apply windows skin '$WINDOWS'."
     exit 1
 fi
 
