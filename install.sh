@@ -306,10 +306,12 @@ echo -e "${BLUE}Initializing user configuration sandbox...${NC}"
 
 USER_CONF_DIR="$XDG_CONFIG_HOME/hypr/user/configs"
 USER_SCRIPT_DIR="$XDG_CONFIG_HOME/hypr/user/scripts"
+USER_HOOKS_DIR="$CONF_DIR/hypr/user/hooks"
 TEMPLATE_DIR="$XDG_CONFIG_HOME/hypr/user/templates"
 
 execute mkdir -p "$USER_CONF_DIR"
 execute mkdir -p "$USER_SCRIPT_DIR"
+execute mkdir -p "$USER_HOOKS_DIR"
 
 if [[ -d "$TEMPLATE_DIR" ]]; then
     for file in "$TEMPLATE_DIR"/*.conf; do
@@ -331,6 +333,21 @@ if [ ! -f "$USER_SCRIPT_DIR/autostart.sh" ]; then
         chmod +x "$USER_SCRIPT_DIR/autostart.sh"
         echo -e "  Initialized user autostart script."
     fi
+fi
+
+if [ ! -f "$USER_HOOKS_DIR/post-install.sh" ]; then
+    echo -e "#!/usr/bin/env bash\n# Runs once after NeKoRoSHELL finishes a fresh install." > "$USER_HOOKS_DIR/post-install.sh"
+    chmod +x "$USER_HOOKS_DIR/post-install.sh"
+fi
+
+if [ ! -f "$USER_HOOKS_DIR/post-update.sh" ]; then
+    echo -e "#!/usr/bin/env bash\n# Runs every time 'nekoroshell update' completes successfully." > "$USER_HOOKS_DIR/post-update.sh"
+    chmod +x "$USER_HOOKS_DIR/post-update.sh"
+fi
+
+if [ ! -f "$USER_HOOKS_DIR/on-theme-change.sh" ]; then
+    echo -e "#!/usr/bin/env bash\n# Runs when a new theme is applied. \$1 is the theme name." > "$USER_HOOKS_DIR/on-theme-change.sh"
+    chmod +x "$USER_HOOKS_DIR/on-theme-change.sh"
 fi
 
 echo -e "${BLUE}Detecting monitors...${NC}"
