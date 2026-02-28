@@ -111,7 +111,7 @@ int main() {
         return 1;
     }
 
-    std::string rofi_cmd = R"(rofi -dmenu -i -p "  Search Keybinds" -theme-str 'window { width: 900px; border-radius: 12px; } listview { lines: 20; fixed-height: true; } element-text { font: "monospace 11"; }')";
+    std::string rofi_cmd = R"(rofi -dmenu -i -p "  Search Keybinds" -theme-str 'window { width: 1000px; border-radius: 12px; } listview { lines: 20; fixed-height: true; } element-text { font: "monospace 11"; }')";
 
     FILE* pipe = popen(rofi_cmd.c_str(), "w");
     if (!pipe) {
