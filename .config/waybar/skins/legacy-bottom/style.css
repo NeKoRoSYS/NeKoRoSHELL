@@ -121,7 +121,7 @@ menu > *:hover {
 #gright2, 
 #power-profiles-daemon {
     padding: 0.125rem 0.5625rem;
-    border-bottom: 0.125rem solid @color5;
+    border-bottom: 0.175rem solid @color5;
     border-radius: 0.9375rem;
     background: alpha(@background, 0.75);
 }
@@ -129,7 +129,7 @@ menu > *:hover {
 #clock {
     padding: 0.125rem 1.125rem;
     border-radius: 0.9375rem;
-    border-bottom: 0.125rem solid @color5;
+    border-bottom: 0.175rem solid @color5;
     background: alpha(@background, 0.75);
 }
 
