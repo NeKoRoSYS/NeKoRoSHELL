@@ -55,6 +55,12 @@ prompt_merge() {
                 local merge_tool="${MERGE_TOOL:-vimdiff}"
                 if command -v "$merge_tool" &> /dev/null; then
                     log_info "Opening merge review in $merge_tool..."
+                    if [[ "$merge_tool" == *"vim"* ]]; then
+                        log_info "Opening merge review in $merge_tool... (Tip: type :xa to save and exit both files)"
+                    else
+                        log_info "Opening merge review in $merge_tool..."
+                    fi
+                    
                     if [ "$merge_tool" = "code" ]; then
                         code --wait --diff "$target_file" "$new_file" || true
                     else
