@@ -13,6 +13,7 @@
 #include <sstream> 
 #include <dirent.h>
 #include <nlohmann/json.hpp>
+#include <optional>
 
 void log_error(const std::string& msg) {
     std::ofstream log_file("/tmp/nekoroshell-navbar.log", std::ios_base::app);
