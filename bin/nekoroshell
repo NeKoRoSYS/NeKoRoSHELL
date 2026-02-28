@@ -55,7 +55,6 @@ prompt_merge() {
                 local merge_tool="${MERGE_TOOL:-vimdiff}"
                 if command -v "$merge_tool" &> /dev/null; then
                     log_info "Opening merge review in $merge_tool..."
-                    # Specific flag handling for VS Code restored
                     if [ "$merge_tool" = "code" ]; then
                         code --wait --diff "$target_file" "$new_file" || true
                     else
