@@ -1,50 +1,28 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-set -e
+declare -A COMPONENTS=(
+    ["wallpaper"]="${1:-random}"
+    ["navbar"]="${2:-legacy}"
+    ["launcher"]="${3:-legacy}"
+    ["lockscreen"]="${4:-legacy}"
+    ["panel"]="${5:-legacy}"
+    ["power"]="${6:-legacy}"
+    ["windows"]="${7:-legacy}"
+)
 
-WALLPAPER=${1:-"random"}
-NAVBAR=${2:-"legacy"}
-LAUNCHER=${3:-"legacy"}
-LOCKSCREEN=${4:-"legacy"}
-PANEL=${5:-"legacy"}
-POWER=${6:-"legacy"}
-WINDOWS=${7:-"legacy"}
+ORDER=("wallpaper" "navbar" "launcher" "lockscreen" "panel" "power" "windows")
 
-echo "Applying theme components..."
+echo -e "\033[0;34mApplying NeKoRoSHELL Theme Components...\033[0m"
 
-if ! customize wallpaper "$WALLPAPER"; then 
-    echo "Error: Failed to apply wallpaper '$WALLPAPER'."
-    exit 1
-fi
+for comp in "${ORDER[@]}"; do
+    val="${COMPONENTS[$comp]}"
+    echo -e "  \033[0;33m-> Applying $comp:\033[0m $val"
+    
+    if ! customize "$comp" "$val" >/dev/null; then 
+        echo -e "\033[0;31mError: Failed to apply $comp skin '$val'.\033[0m"
+        exit 1
+    fi
+done
 
-if ! customize navbar "$NAVBAR"; then 
-    echo "Error: Failed to apply navbar skin '$NAVBAR'."
-    exit 1
-fi
-
-if ! customize launcher "$LAUNCHER"; then 
-    echo "Error: Failed to apply launcher skin '$LAUNCHER'."
-    exit 1
-fi
-
-if ! customize lockscreen "$LOCKSCREEN"; then 
-    echo "Error: Failed to apply lockscreen layout '$LOCKSCREEN'."
-    exit 1
-fi
-
-if ! customize panel "$PANEL"; then 
-    echo "Error: Failed to apply panel skin '$PANEL'."
-    exit 1
-fi
-
-if ! customize power "$POWER"; then 
-    echo "Error: Failed to apply power options skin '$POWER'."
-    exit 1
-fi
-
-if ! customize windows "$WINDOWS"; then 
-    echo "Error: Failed to apply windows skin '$WINDOWS'."
-    exit 1
-fi
-
-echo "Theme successfully applied!"
+echo -e "\n\033[0;32mTheme successfully applied!\033[0m"
