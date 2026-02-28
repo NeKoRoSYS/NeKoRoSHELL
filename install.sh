@@ -15,6 +15,24 @@ XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 
+DRY_RUN=0
+for arg in "$@"; do
+    if [[ "$arg" == "--dry-run" || "$arg" == "-d" ]]; then
+        DRY_RUN=1
+        echo -e "${BLUE}============ DRY-RUN MODE ============${NC}"
+        echo -e "${GREEN}No files will be modified or copied.${NC}"
+        echo -e "${BLUE}======================================${NC}\n"
+    fi
+done
+
+execute() {
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+        echo -e "  ${BLUE}[DRY-RUN]${NC} Would execute: $*"
+    else
+        "$@"
+    fi
+}
+
 echo -e "# ======================================================= #"
 echo -e "#            NeKoRoSHELL Installation Wizard              #"
 echo -e "# ======================================================= #\n "
@@ -88,16 +106,21 @@ detect_and_bootstrap() {
     
     if [ "$ID" = "arch" ] || [ "$ID_LIKE" = "arch" ]; then
         echo "Bootstrapping Arch dependencies..."
-        sudo pacman -Syu --needed --noconfirm base-devel git cargo go flatpak
+        execute sudo pacman -Syu --needed --noconfirm base-devel git cargo go flatpak
         if ! command -v yay &> /dev/null; then
-            git clone https://aur.archlinux.org/yay.git /tmp/yay && cd /tmp/yay && makepkg -si --noconfirm && cd "$SCRIPT_DIR"
+            if [[ "$DRY_RUN" -eq 1 ]]; then
+                echo -e "  ${BLUE}[DRY-RUN]${NC} Would clone and install yay from AUR"
+            else
+                git clone https://aur.archlinux.org/yay.git /tmp/yay && cd /tmp/yay && makepkg -si --noconfirm && cd "$SCRIPT_DIR"
+            fi
         fi
     elif [ "$ID" = "fedora" ]; then
         echo "Bootstrapping Fedora dependencies..."
-        sudo dnf install -y @development-tools git cargo golang flatpak
+        execute sudo dnf install -y @development-tools git cargo golang flatpak
     elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ]; then
         echo "Bootstrapping Debian dependencies..."
-        sudo apt update && sudo apt install -y build-essential git cargo golang flatpak
+        execute sudo apt update
+        execute sudo apt install -y build-essential git cargo golang flatpak
     else
         echo "Unsupported OS for automatic bootstrap. Please install prerequisites manually."
     fi
@@ -138,7 +161,7 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
                 pkg_array=($packages)
                 if [[ ${#pkg_array[@]} -gt 0 ]]; then
                     echo -e "${BLUE}Installing Arch packages in bulk...${NC}"
-                    $AUR_HELPER -S --needed --noconfirm "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check output above.${NC}"
+                    execute $AUR_HELPER -S --needed --noconfirm "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check output above.${NC}"
                 fi
             else
                 echo -e "${RED}Warning: packages/pkglist-arch.txt not found!${NC}"
@@ -150,7 +173,7 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
                 pkg_array=($packages)
                 if [[ ${#pkg_array[@]} -gt 0 ]]; then
                     echo -e "${BLUE}Installing Fedora packages in bulk...${NC}"
-                    sudo dnf install -y "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check output above.${NC}"
+                    execute sudo dnf install -y "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check output above.${NC}"
                 fi
             else
                 echo -e "${RED}Warning: packages/pkglist-fedora.txt not found!${NC}"
@@ -161,12 +184,12 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             echo -e "${RED}Ensure you have installed them via a 3rd party PPA/script first.${NC}"
             sleep 3
             if [[ -f "packages/pkglist-debian.txt" ]]; then
-                sudo apt-get update
+                execute sudo apt-get update
                 packages=$(sed 's/["'\'']//g' packages/pkglist-debian.txt | tr ' ' '\n' | grep -v -E '^\s*$|^#')
                 pkg_array=($packages)
                 if [[ ${#pkg_array[@]} -gt 0 ]]; then
                     echo -e "${BLUE}Installing Debian/Ubuntu packages in bulk...${NC}"
-                    sudo apt-get install -y "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check output above.${NC}"
+                    execute sudo apt-get install -y "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check output above.${NC}"
                 fi
             else
                 echo -e "${RED}Warning: packages/pkglist-debian.txt not found!${NC}"
@@ -178,7 +201,7 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
                 pkg_array=($packages)
                 if [[ ${#pkg_array[@]} -gt 0 ]]; then
                     echo -e "${BLUE}Installing Gentoo packages in bulk...${NC}"
-                    sudo emerge -av --noreplace "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check output above.${NC}"
+                    execute sudo emerge -av --noreplace "${pkg_array[@]}" || echo -e "${RED}Warning: Bulk install failed. Check output above.${NC}"
                 fi
             else
                 echo -e "${RED}Warning: packages/pkglist-gentoo.txt not found!${NC}"
@@ -201,9 +224,9 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             if ! command -v "$pkg" &> /dev/null; then
                 echo -e "${BLUE}Installing $pkg via cargo...${NC}"
                 if [[ "$pkg" == "swww" ]]; then
-                    cargo install --git https://github.com/LGFae/swww.git || echo -e "${RED}Failed to install swww.${NC}"
+                    execute cargo install --git https://github.com/LGFae/swww.git || echo -e "${RED}Failed to install swww.${NC}"
                 else
-                    cargo install "$pkg" || echo -e "${RED}Failed to install $pkg.${NC}"
+                    execute cargo install "$pkg" || echo -e "${RED}Failed to install $pkg.${NC}"
                 fi
             else
                 echo -e "${GREEN}$pkg is already installed.${NC}"
@@ -219,7 +242,7 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
         export PATH="$GOPATH/bin:$PATH"
         if ! command -v cliphist &> /dev/null; then
             echo -e "${BLUE}Installing cliphist via Go...${NC}"
-            go install go.senan.xyz/cliphist@latest || echo -e "${RED}Failed to install cliphist.${NC}"
+            execute go install go.senan.xyz/cliphist@latest || echo -e "${RED}Failed to install cliphist.${NC}"
         else
             echo -e "${GREEN}cliphist is already installed.${NC}"
         fi
@@ -230,8 +253,12 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
     if command -v flatpak &> /dev/null; then
         if [[ -f "flatpak.txt" ]]; then
             echo -e "${BLUE}Installing flatpak packages...${NC}"
-            sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-            grep -vE '^\s*#|^\s*$' flatpak.txt | xargs -r sudo flatpak install -y flathub || echo -e "${RED}Warning: Some flatpaks failed to install.${NC}"
+            execute sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+            if [[ "$DRY_RUN" -eq 1 ]]; then
+                echo -e "  ${BLUE}[DRY-RUN]${NC} Would install flatpaks listed in flatpak.txt"
+            else
+                grep -vE '^\s*#|^\s*$' flatpak.txt | xargs -r sudo flatpak install -y flathub || echo -e "${RED}Warning: Some flatpaks failed to install.${NC}"
+            fi
         else
             echo -e "${RED}Warning: flatpak.txt not found!${NC}"
         fi
@@ -245,7 +272,7 @@ fi
 CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync systemd wallpapers wallust waybar wlogout themes)
 
 echo -e "${BLUE}Creating backup of existing configs...${NC}"
-mkdir -p "$XDG_CONFIG_HOME"
+execute mkdir -p "$XDG_CONFIG_HOME"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_ARCHIVE="$HOME/nekoroshell_backup_$TIMESTAMP.tar.gz"
 BACKUP_ITEMS=()
@@ -257,7 +284,7 @@ for conf in "${CONFIGS[@]}"; do
 done
 
 if [[ ${#BACKUP_ITEMS[@]} -gt 0 ]]; then
-    tar -czf "$BACKUP_ARCHIVE" -C "$XDG_CONFIG_HOME" "${BACKUP_ITEMS[@]}"
+    execute tar -czf "$BACKUP_ARCHIVE" -C "$XDG_CONFIG_HOME" "${BACKUP_ITEMS[@]}"
     echo -e "${GREEN}Created backup archive at: $BACKUP_ARCHIVE${NC}"
 else
     echo -e "${GREEN}No existing configs found. Skipping backup.${NC}"
@@ -267,8 +294,8 @@ echo -e "${BLUE}Deploying NeKoRoSHELL configuration files...${NC}"
 
 for conf in "${CONFIGS[@]}"; do
     if [[ -d ".config/$conf" || -f ".config/$conf" ]]; then
-        rm -rf "$XDG_CONFIG_HOME/$conf"
-        cp -a ".config/$conf" "$XDG_CONFIG_HOME/"
+        execute rm -rf "$XDG_CONFIG_HOME/$conf"
+        execute cp -a ".config/$conf" "$XDG_CONFIG_HOME/"
         echo -e "  [✔] Copied $conf"
     else
         echo -e "${RED}  [!] Warning: .config/$conf missing in source directory.${NC}"
@@ -279,27 +306,79 @@ echo -e "${BLUE}Initializing user configuration sandbox...${NC}"
 
 USER_CONF_DIR="$XDG_CONFIG_HOME/hypr/user/configs"
 USER_SCRIPT_DIR="$XDG_CONFIG_HOME/hypr/user/scripts"
+USER_HOOKS_DIR="$CONF_DIR/hypr/user/hooks"
 TEMPLATE_DIR="$XDG_CONFIG_HOME/hypr/user/templates"
 
-mkdir -p "$USER_CONF_DIR"
-mkdir -p "$USER_SCRIPT_DIR"
+execute mkdir -p "$USER_CONF_DIR"
+execute mkdir -p "$USER_SCRIPT_DIR"
+execute mkdir -p "$USER_HOOKS_DIR"
 
 if [[ -d "$TEMPLATE_DIR" ]]; then
     for file in "$TEMPLATE_DIR"/*.conf; do
         [ -e "$file" ] || continue 
         filename=$(basename "$file")
         if [ ! -f "$USER_CONF_DIR/$filename" ]; then
-            cp "$file" "$USER_CONF_DIR/$filename"
+            execute cp "$file" "$USER_CONF_DIR/$filename"
             echo -e "  Initialized user config: $filename"
         fi
     done
 fi
 
 if [ ! -f "$USER_SCRIPT_DIR/autostart.sh" ]; then
-    echo "#!/bin/bash" > "$USER_SCRIPT_DIR/autostart.sh"
-    echo "# Add your personal startup commands here" >> "$USER_SCRIPT_DIR/autostart.sh"
-    chmod +x "$USER_SCRIPT_DIR/autostart.sh"
-    echo -e "  Initialized user autostart script."
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+        echo -e "  ${BLUE}[DRY-RUN]${NC} Would create initialized user autostart.sh"
+    else
+        echo "#!/bin/bash" > "$USER_SCRIPT_DIR/autostart.sh"
+        echo "# Add your personal startup commands here" >> "$USER_SCRIPT_DIR/autostart.sh"
+        chmod +x "$USER_SCRIPT_DIR/autostart.sh"
+        echo -e "  Initialized user autostart script."
+    fi
+fi
+
+if [ ! -f "$USER_HOOKS_DIR/post-install.sh" ]; then
+    echo -e "#!/usr/bin/env bash\n# Runs once after NeKoRoSHELL finishes a fresh install." > "$USER_HOOKS_DIR/post-install.sh"
+    chmod +x "$USER_HOOKS_DIR/post-install.sh"
+fi
+
+if [ ! -f "$USER_HOOKS_DIR/post-update.sh" ]; then
+    echo -e "#!/usr/bin/env bash\n# Runs every time 'nekoroshell update' completes successfully." > "$USER_HOOKS_DIR/post-update.sh"
+    chmod +x "$USER_HOOKS_DIR/post-update.sh"
+fi
+
+if [ ! -f "$USER_HOOKS_DIR/on-theme-change.sh" ]; then
+    echo -e "#!/usr/bin/env bash\n# Runs when a new theme is applied. \$1 is the theme name." > "$USER_HOOKS_DIR/on-theme-change.sh"
+    chmod +x "$USER_HOOKS_DIR/on-theme-change.sh"
+fi
+
+echo -e "\n${BLUE}Analyzing Hardware Chassis...${NC}"
+    
+IS_LAPTOP=0
+if ls /sys/class/power_supply/BAT* 1> /dev/null 2>&1; then
+    IS_LAPTOP=1
+    echo -e "  [${GREEN}Detected${NC}] Laptop configuration (Battery found)."
+else
+    echo -e "  [${GREEN}Detected${NC}] Desktop configuration."
+fi
+
+HARDWARE_CONF="$USER_CONF_DIR/hardware.conf"
+    
+if [ -f "$HARDWARE_CONF" ]; then
+    echo "# NeKoRoSHELL Auto-Generated Hardware Profile" > "$HARDWARE_CONF"
+    if [ "$IS_LAPTOP" -eq 1 ]; then
+        cat << 'EOF' >> "$HARDWARE_CONF"
+# Laptop-specific optimizations
+# Hyprland v0.51.0+ Trackpad Gestures
+gesture = 3, horizontal, workspace
+gesture = 3, down, close
+gesture = 4, pinch, fullscreen
+EOF
+    else
+        cat << 'EOF' >> "$HARDWARE_CONF"
+# Desktop-specific optimizations
+# Trackpad gestures intentionally omitted for desktop
+EOF
+    fi
+    echo -e "  [${GREEN}New${NC}] Initialized hardware-specific profile: hardware.conf"
 fi
 
 echo -e "${BLUE}Detecting monitors...${NC}"
@@ -331,14 +410,14 @@ if [[ "$MONITOR_COUNT" -gt 0 ]]; then
     echo -e "${GREEN}Detected $MONITOR_COUNT monitor(s). Primary: $PRIMARY_MONITOR${NC}"
 
     if [[ -d "$XDG_CONFIG_HOME/hypr" ]]; then
-        find "$XDG_CONFIG_HOME/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} + || true
+        execute find "$XDG_CONFIG_HOME/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} + || true
         
         if [[ "$MONITOR_COUNT" -ge 2 ]]; then
             echo -e "${GREEN}Secondary monitor detected: $SECONDARY_MONITOR${NC}"
-            find "$XDG_CONFIG_HOME/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} + || true
+            execute find "$XDG_CONFIG_HOME/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} + || true
         else
             echo -e "${BLUE}Only one monitor detected. Commenting out secondary monitor lines...${NC}"
-            find "$XDG_CONFIG_HOME/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} + || true
+            execute find "$XDG_CONFIG_HOME/hypr" -type d -path "*/user/templates" -prune -o -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} + || true
         fi
     fi
 else
@@ -348,8 +427,14 @@ fi
 SEARCH="/home/nekorosys"
 REPLACE="$HOME"
 
+REPLACE_ESCAPED=$(echo "$REPLACE" | sed 's/|/\\|/g; s/\\/\\\\/g')
+
 echo -e "${BLUE}Replacing hardcoded paths... ($SEARCH -> $REPLACE)...${NC}"
-find "$XDG_CONFIG_HOME" -type d -name "*_backup_*" -prune -o -type f \( -name "*.config" -o -name "*.css" -o -name "*.rasi" -o -name "*.conf" -o -name "*.sh" -o -name "*.json" -o -name "*.jsonc" -o -name "*.lua" -o -name "*.py" -o -name "*.yaml" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|$SEARCH|$REPLACE|g" || true
+if [[ "$DRY_RUN" -eq 1 ]]; then
+    echo -e "  ${BLUE}[DRY-RUN]${NC} Would replace hardcoded paths across config files."
+else
+    find "$XDG_CONFIG_HOME" -type d -name "*_backup_*" -prune -o -type f \( -name "*.config" -o -name "*.css" -o -name "*.rasi" -o -name "*.conf" -o -name "*.sh" -o -name "*.json" -o -name "*.jsonc" -o -name "*.lua" -o -name "*.py" -o -name "*.yaml" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|$SEARCH|$REPLACE_ESCAPED|g" || true
+fi
 
 inject_shell_config() {
     local shell_rc="$1"
@@ -365,26 +450,30 @@ inject_shell_config() {
     local export_bin_dir="${USER_BIN_DIR/$HOME/\$HOME}"
     
     if [[ -f "$shell_rc" ]]; then
-        sed -i '/# --- NeKoRoSHELL START ---/,/# --- NeKoRoSHELL END ---/d' "$shell_rc"
-        echo -e "\n# --- NeKoRoSHELL START ---" >> "$shell_rc"
-        [[ -f "$source_rc" ]] && cat "$source_rc" >> "$shell_rc"
-        echo "export PATH=\"$export_bin_dir:\$HOME/.cargo/bin:$go_bin_path:\$PATH\"" >> "$shell_rc"
-        echo -e "# --- NeKoRoSHELL END ---" >> "$shell_rc"
-        echo -e "${GREEN}Updated $shell_rc${NC}"
+        if [[ "$DRY_RUN" -eq 1 ]]; then
+            echo -e "  ${BLUE}[DRY-RUN]${NC} Would inject NeKoRoSHELL path/config blocks into $shell_rc"
+        else
+            sed -i '/# --- NeKoRoSHELL START ---/,/# --- NeKoRoSHELL END ---/d' "$shell_rc"
+            echo -e "\n# --- NeKoRoSHELL START ---" >> "$shell_rc"
+            [[ -f "$source_rc" ]] && cat "$source_rc" >> "$shell_rc"
+            echo "export PATH=\"$export_bin_dir:\$HOME/.cargo/bin:$go_bin_path:\$PATH\"" >> "$shell_rc"
+            echo -e "# --- NeKoRoSHELL END ---" >> "$shell_rc"
+            echo -e "${GREEN}Updated $shell_rc${NC}"
+        fi
     fi
 }
 
 inject_shell_config "$HOME/.bashrc" "home/.bashrc"
 inject_shell_config "$HOME/.zshrc" "home/.zshrc"
 
-[[ -f home/.p10k.zsh ]] && cp home/.p10k.zsh "$HOME/"
-[[ -f home/.face.icon ]] && cp home/.face.icon "$HOME/"
-[[ -f home/change-avatar.sh ]] && cp home/change-avatar.sh "$HOME/"
+[[ -f home/.p10k.zsh ]] && execute cp home/.p10k.zsh "$HOME/"
+[[ -f home/.face.icon ]] && execute cp home/.face.icon "$HOME/"
+[[ -f home/change-avatar.sh ]] && execute cp home/change-avatar.sh "$HOME/"
 
 if [[ -d bin ]]; then
     echo -e "${BLUE}Copying scripts to $USER_BIN_DIR...${NC}"
-    mkdir -p "$USER_BIN_DIR"
-    cp -r bin/* "$USER_BIN_DIR/" 2>/dev/null || true
+    execute mkdir -p "$USER_BIN_DIR"
+    execute cp -r bin/* "$USER_BIN_DIR/" 2>/dev/null || true
 fi
 
 # ==============================================================================
@@ -394,14 +483,14 @@ fi
 if [[ "$INSTALL_TYPE" == "compilation" ]]; then
     if ! command -v hyprshot &> /dev/null; then
         echo -e "${BLUE}Downloading hyprshot...${NC}"
-        mkdir -p "$USER_BIN_DIR"
-        curl -sLo "$USER_BIN_DIR/hyprshot" https://raw.githubusercontent.com/Gustash/Hyprshot/main/hyprshot || true
-        chmod +x "$USER_BIN_DIR/hyprshot" || true
+        execute mkdir -p "$USER_BIN_DIR"
+        execute curl -sLo "$USER_BIN_DIR/hyprshot" https://raw.githubusercontent.com/Gustash/Hyprshot/main/hyprshot || true
+        execute chmod +x "$USER_BIN_DIR/hyprshot" || true
     fi
 
     if [[ ! -d "$HOME/powerlevel10k" ]]; then
         echo -e "${BLUE}Cloning Powerlevel10k theme...${NC}"
-        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$HOME/powerlevel10k" || true
+        execute git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$HOME/powerlevel10k" || true
     fi
 
     if ! command -v g++ &> /dev/null; then
@@ -417,25 +506,14 @@ if [[ "$INSTALL_TYPE" == "compilation" ]]; then
             echo -e "${RED}Missing required C++ development headers: $REQUIRED_LIBS${NC}"
             echo -e "${RED}Please install the corresponding -dev / -devel packages. Compilation aborted.${NC}"
         else
-            echo -e "${BLUE}Compiling C++ Daemons...${NC}"
-            mkdir -p "$USER_BIN_DIR"
+            echo -e "${BLUE}Compiling C++ Daemons via Make...${NC}"
+            execute mkdir -p "$USER_BIN_DIR"
             
-            LIBS=$(pkg-config --cflags --libs $REQUIRED_LIBS)
-            
-            if [[ -f "src/navbar-hover.cpp" ]]; then
-                g++ -O3 -o "$USER_BIN_DIR/navbar-hover" src/navbar-hover.cpp $LIBS && echo -e "${GREEN}Successfully compiled navbar-hover.${NC}" || echo -e "${RED}Failed to compile navbar-hover.${NC}"
-            fi
-            
-            if [[ -f "src/navbar-watcher.cpp" ]]; then
-                g++ -O3 -o "$USER_BIN_DIR/navbar-watcher" src/navbar-watcher.cpp $LIBS && echo -e "${GREEN}Successfully compiled navbar-watcher.${NC}" || echo -e "${RED}Failed to compile navbar-watcher.${NC}"
-            fi
-            
-            if [[ -f "src/hypr-nice.cpp" ]]; then
-                g++ -O3 -o "$USER_BIN_DIR/hypr-nice" src/hypr-nice.cpp && echo -e "${GREEN}Successfully compiled hypr-nice.${NC}" || echo -e "${RED}Failed to compile hypr-nice.${NC}"
-            fi
-
-            if [[ -f "src/eject-forbidden.cpp" ]]; then
-                g++ -O3 -o "$USER_BIN_DIR/eject-forbidden" src/eject-forbidden.cpp && echo -e "${GREEN}Successfully compiled eject-forbidden.${NC}" || echo -e "${RED}Failed to compile eject-forbidden.${NC}"
+            if execute make clean all; then
+                echo -e "${GREEN}Successfully compiled all C++ daemons.${NC}"
+                execute cp build/* "$USER_BIN_DIR/" || echo -e "${RED}Warning: Failed to copy binaries to $USER_BIN_DIR${NC}"
+            else
+                echo -e "${RED}Compilation failed. Check the output above.${NC}"
             fi
         fi
     fi
@@ -446,11 +524,11 @@ fi
 # ==============================================================================
 
 echo -e "${BLUE}Setting script permissions...${NC}"
-find "$XDG_CONFIG_HOME/" -type f -name "*.sh" -exec chmod +x {} + 2>/dev/null || true
+execute find "$XDG_CONFIG_HOME/" -type f -name "*.sh" -exec chmod +x {} + 2>/dev/null || true
 
 for bin_dir in "$HOME/.local/bin/nekoroshell" "$HOME/bin/nekoroshell"; do
     if [[ -d "$bin_dir" ]]; then
-        find "$bin_dir/" -type f -exec chmod +x {} + 2>/dev/null || true
+        execute find "$bin_dir/" -type f -exec chmod +x {} + 2>/dev/null || true
     fi
 done
 
@@ -476,6 +554,11 @@ if [[ "$MISSING" -eq 0 ]]; then
 else
     echo -e "\n${RED}Warning: $MISSING core component(s) were not found.${NC}"
     echo -e "If you chose 'Minimal', this is expected. Otherwise, check the logs above."
+fi
+
+if [[ -x "$HOME/.config/hypr/user/hooks/post-install.sh" ]]; then
+    echo -e "\n${BLUE}Executing user post-install hook...${NC}"
+    "$HOME/.config/hypr/user/hooks/post-install.sh" || echo -e "${RED}Warning: post-install hook failed.${NC}"
 fi
 
 echo -e "${GREEN}Installation complete! Please restart your session to apply all changes.${NC}"

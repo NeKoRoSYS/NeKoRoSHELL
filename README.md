@@ -128,7 +128,6 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | wlogout integration | ✅ |
 | BETA<br>Support for other distros; Verified to be working on: Arch | 🔍 |
 | BETA<br>Make NeKoRoSHELL init-agnostic; Verified to be working on: Arch | 🔍 |
-| BETA<br>Make NeKoRoSHELL WM-agnostic; Verified to be working on: Hyprland | 🛠 |
 | Qt and Kvantum integration | 🤔 |
 
 </div>
@@ -138,8 +137,6 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 
 In the near future, I plan to expand upon what makes NeKoRoSHELL, well, "NeKoRoSHELL." The following plans MAY or MAY NOT happen, so do take it with a grain of salt:
 - **NeKoRoSHELL Headless**: A plug-and-play fork of NeKoRoSHELL that lets you integrate the config files and scripts to any wayland-based window manager/compositor.
-  - Barebones/DIY branch
-
 - **NeKoRoSHELL DLux (2.0)**: A reimagining of NeKoRoSHELL that uses Quickshell instead of waybar, SwayNC, rofi, and other packages; in an effort to unify everything. This will effectively rebrand this project as "NeKoRoSHELL Legacy."
 <br>
 
@@ -166,6 +163,8 @@ In the near future, I plan to expand upon what makes NeKoRoSHELL, well, "NeKoRoS
 <br>
 
 ## Acknowledgements
+- NeKoRoSHELL is fundamentally different and built with strict design/philosophy in mind; however, it's worth to mention that it is partially inspired by [JaKooLit's Hyprland Dots](github.com/JaKooLit/Hyprland-Dots/). Frankly, I only found out about the repository while I am deep into polising v1.6 and I realized how similar the two projects are. Given this, it is inevitable that I may use their project as reference for future updates while still keeping the features grounded enough to fit into NeKoRoSHELL.
+
 - Amelie ([@S-e-r-a-p-h-i-n-e](https://github.com/S-e-r-a-p-h-i-n-e)) for helping me transition the project from using pywal16 to wallust and letting me borrow a few scripts. Go check out [SeraDOTS](https://github.com/S-e-r-a-p-h-i-n-e/SeraDOTS)!
 
 - April for helping me figure out the cause of the now-fixed "keybinds not working" issue.

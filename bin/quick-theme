@@ -1,15 +1,44 @@
 #!/bin/bash
 
+set -e
+
 WALLPAPER=${1:-"random"}
 NAVBAR=${2:-"legacy"}
 LAUNCHER=${3:-"legacy"}
 LOCKSCREEN=${4:-"legacy"}
 PANEL=${5:-"legacy"}
-POWER=${5:-"legacy"}
+POWER=${6:-"legacy"}
 
-customize wallpaper $WALLPAPER
-customize navbar $NAVBAR
-customize launcher $LAUNCHER
-customize lockscreen $LOCKSCREEN
-customize panel $PANEL
-customize power $POWER
+echo "Applying theme components..."
+
+if ! customize wallpaper "$WALLPAPER"; then 
+    echo "Error: Failed to apply wallpaper '$WALLPAPER'."
+    exit 1
+fi
+
+if ! customize navbar "$NAVBAR"; then 
+    echo "Error: Failed to apply navbar skin '$NAVBAR'."
+    exit 1
+fi
+
+if ! customize launcher "$LAUNCHER"; then 
+    echo "Error: Failed to apply launcher skin '$LAUNCHER'."
+    exit 1
+fi
+
+if ! customize lockscreen "$LOCKSCREEN"; then 
+    echo "Error: Failed to apply lockscreen layout '$LOCKSCREEN'."
+    exit 1
+fi
+
+if ! customize panel "$PANEL"; then 
+    echo "Error: Failed to apply panel skin '$PANEL'."
+    exit 1
+fi
+
+if ! customize power "$POWER"; then 
+    echo "Error: Failed to apply power options skin '$POWER'."
+    exit 1
+fi
+
+echo "Theme successfully applied!"

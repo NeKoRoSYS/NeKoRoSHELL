@@ -13,6 +13,17 @@
 #include <sstream> 
 #include <dirent.h>
 #include <nlohmann/json.hpp>
+#include <optional>
+
+void log_error(const std::string& msg) {
+    std::ofstream log_file("/tmp/nekoroshell-navbar.log", std::ios_base::app);
+    if (log_file.is_open()) {
+        auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        std::string time_str = std::ctime(&now);
+        time_str.pop_back();
+        log_file << "[" << time_str << "] ERROR: " << msg << "\n";
+    }
+}
 
 using json = nlohmann::json;
 
@@ -31,7 +42,10 @@ std::string exec(const char* cmd) {
     char buffer[4096]; 
     std::string result = ""; 
     std::unique_ptr<FILE, PipeDeleter> pipe(popen(cmd, "r")); 
-    if (!pipe) return ""; 
+    if (!pipe) {
+        log_error("popen() failed to execute command: " + std::string(cmd));
+        return "";
+    }
     while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) { 
         result += buffer; 
     } 
@@ -154,11 +168,25 @@ void toggle_waybar(bool want_visible) {
     } 
 } 
 
-Config read_config() { 
-    Config cfg; 
-    const char* home_env = getenv("HOME"); 
-    std::string home = home_env ? home_env : ""; 
-    std::ifstream file(home + "/.cache/navbar-hover.conf"); 
+std::optional<Config> read_config() { 
+    Config cfg;
+
+    std::string cache_home;
+    const char* xdg_env = std::getenv("XDG_CACHE_HOME");
+    
+    if (xdg_env && *xdg_env != '\0') {
+        cache_home = xdg_env;
+    } else {
+        const char* home_env = std::getenv("HOME");
+        if (!home_env) {
+            std::cerr << "Error: Neither XDG_CONFIG_HOME nor HOME environment variables are set.\n";
+            return std::nullopt;
+        }
+        cache_home = std::string(home_env) + "/.cache";
+    }
+    
+    std::ifstream file(cache_home + "/nekoroshell/navbar-hover.conf"); 
+    if (!file.is_open()) return std::nullopt;
      
     if (file.is_open()) { 
         std::string line; 
@@ -185,7 +213,11 @@ int main() {
 
     std::thread(swaync_watcher_thread).detach(); 
 
-    Config cfg = read_config(); 
+    auto result = read_config();
+    if (!result) {
+        return 1;
+    }
+    Config cfg = *result;
     std::vector<Monitor> monitors = backend->get_monitors(); 
     int cycle_count = 0; 
 
@@ -201,7 +233,9 @@ int main() {
     if (pid == 0) { 
         char* args[] = {(char*)"waybar", nullptr}; 
         execvp(args[0], args); 
-        exit(1); 
+        std::ofstream log_file("/tmp/nekoroshell-navbar.log", std::ios_base::app);
+        log_file << "[FATAL] execvp failed to spawn Waybar. Error code: " << errno << "\n";
+        exit(1);
     } 
 
     for (int i = 0; i < 40; ++i) {  
@@ -231,7 +265,7 @@ int main() {
         } 
 
         if (++cycle_count >= 100) { 
-            cfg = read_config(); 
+            cfg = *result;
             monitors = backend->get_monitors(); 
             cycle_count = 0; 
         } 

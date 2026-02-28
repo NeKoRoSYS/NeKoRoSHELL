@@ -54,9 +54,10 @@ else
     else
         RAW_SELECTION=$(get_wallpapers | rofi -dmenu \
             -i \
-            -p "Select Wallpaper" \-show-icons \
+            -p "Select Wallpaper" \
+            -show-icons \
             -theme-str 'window { width: 800px; }' \
-	    -theme-str 'listview { columns: 4; lines: 3; spacing: 15px; fixed-columns: true; flow: horizontal; }' \
+            -theme-str 'listview { columns: 4; lines: 3; spacing: 15px; fixed-columns: true; flow: horizontal; }' \
             -theme-str 'element { orientation: vertical; padding: 10px; border-radius: 10px; }' \
             -theme-str 'element-icon { size: 120px; horizontal-align: 0.5; }' \
             -theme-str 'element-text { horizontal-align: 0.5; padding: 5px 0px 0px 0px; }');
@@ -81,6 +82,13 @@ fi
 
 if [[ "$SELECTED_FILE" =~ ^http ]]; then
     URL="$SELECTED_FILE"
+
+    if [[ ! "$URL" =~ ^https?:// ]]; then
+        echo "Error: Invalid URL. Must start with http:// or https://"
+        makenotif "Download" "dialog-error" "Invalid URL" "URL must start with http(s)://" "false" "error-sound" ""
+        exit 1
+    fi
+
     CLEAN_NAME=$(echo "${URL##*/}" | cut -d? -f1)
     EXT=$(echo "${CLEAN_NAME##*.}" | tr '[:upper:]' '[:lower:]')
     DEST="$WALL_DIR/$CLEAN_NAME"
