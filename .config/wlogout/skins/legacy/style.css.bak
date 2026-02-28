@@ -4,10 +4,10 @@
 window { background-color: rgba(12, 12, 12, 0.9); }
 
 button {
-    margin: 0.625rem;
-    border-radius: 0.625rem;
+    margin: 10px;
+    border-radius: 10px;
     border: none;
-    border-bottom: 0.3125rem solid @color13;
+    border-bottom: 5px solid @color13;
     color: white;
     background-repeat: no-repeat, repeat;
     background-position: center;
