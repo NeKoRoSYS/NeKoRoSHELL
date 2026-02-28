@@ -369,14 +369,8 @@ if [ -f "$HARDWARE_CONF" ]; then
 # Laptop-specific optimizations
 # Hyprland v0.51.0+ Trackpad Gestures
 gesture = 3, horizontal, workspace
-
-gestures {
-    workspace_swipe_distance = 300
-    workspace_swipe_invert = false
-}
-
-# Optional: Disable blur on battery to save power
-# decoration:blur:enabled = false
+gesture = 3, down, close
+gesture = 4, pinch, fullscreen
 EOF
     else
         cat << 'EOF' >> "$HARDWARE_CONF"
