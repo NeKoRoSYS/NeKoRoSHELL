@@ -55,7 +55,7 @@ prompt_merge() {
                 echo -e "${YELLOW}Kept current version.${NC}"
                 break ;;
             v)
-                diff --color=always -u "$target_file" "$new_file" | less -R
+                diff --color=always -u "$target_file" "$new_file" | less -R || true
                 ;;
             m)
                 USER_MERGE_TOOL="${MERGE_TOOL:-vimdiff}"
@@ -66,23 +66,26 @@ prompt_merge() {
                     if diff3 -m "$target_file" "$target_file" "$new_file" > "${target_file}.tmp_merge"; then
                         mv "${target_file}.tmp_merge" "$target_file"
                         echo -e "${GREEN}Merged cleanly using diff3.${NC}"
+                        break
                     else
                         echo -e "${YELLOW}Merge conflicts found! Opening in your standard editor to resolve manually...${NC}"
                         USER_EDITOR=${VISUAL:-${EDITOR:-nano}}
                         command -v "$USER_EDITOR" >/dev/null 2>&1 || USER_EDITOR="vi"
                         
-                        $USER_EDITOR "${target_file}.tmp_merge"
+                        "$USER_EDITOR" "${target_file}.tmp_merge" || true
                         mv "${target_file}.tmp_merge" "$target_file"
+                        echo -e "${YELLOW}Editor closed. Press [k] to keep your changes, or choose another action.${NC}"
                     fi
                 else
                     echo -e "${BLUE}Opening merge review in $USER_MERGE_TOOL...${NC}"
                     if [ "$USER_MERGE_TOOL" = "code" ]; then
-                        code --wait --diff "$target_file" "$new_file"
+                        code --wait --diff "$target_file" "$new_file" || true
                     else
-                        "$USER_MERGE_TOOL" "$target_file" "$new_file"
+                        "$USER_MERGE_TOOL" "$target_file" "$new_file" || true
                     fi
+                    echo -e "${YELLOW}Merge tool closed. Press [k] to keep your changes, or choose another action.${NC}"
                 fi
-                break ;;
+                ;;
             *)
                 echo -e "${RED}Invalid choice. Please press o, k, v, or m.${NC}" ;;
         esac
