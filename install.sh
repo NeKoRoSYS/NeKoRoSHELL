@@ -350,6 +350,43 @@ if [ ! -f "$USER_HOOKS_DIR/on-theme-change.sh" ]; then
     chmod +x "$USER_HOOKS_DIR/on-theme-change.sh"
 fi
 
+echo -e "\n${BLUE}Analyzing Hardware Chassis...${NC}"
+    
+IS_LAPTOP=0
+if ls /sys/class/power_supply/BAT* 1> /dev/null 2>&1; then
+    IS_LAPTOP=1
+    echo -e "  [${GREEN}Detected${NC}] Laptop configuration (Battery found)."
+else
+    echo -e "  [${GREEN}Detected${NC}] Desktop configuration."
+fi
+
+HARDWARE_CONF="$USER_CONF_DIR/hardware.conf"
+    
+if [ -f "$HARDWARE_CONF" ]; then
+    echo "# NeKoRoSHELL Auto-Generated Hardware Profile" > "$HARDWARE_CONF"
+    if [ "$IS_LAPTOP" -eq 1 ]; then
+        cat << 'EOF' >> "$HARDWARE_CONF"
+# Laptop-specific optimizations
+# Hyprland v0.51.0+ Trackpad Gestures
+gesture = 3, horizontal, workspace
+
+gestures {
+    workspace_swipe_distance = 300
+    workspace_swipe_invert = false
+}
+
+# Optional: Disable blur on battery to save power
+# decoration:blur:enabled = false
+EOF
+    else
+        cat << 'EOF' >> "$HARDWARE_CONF"
+# Desktop-specific optimizations
+# Trackpad gestures intentionally omitted for desktop
+EOF
+    fi
+    echo -e "  [${GREEN}New${NC}] Initialized hardware-specific profile: hardware.conf"
+fi
+
 echo -e "${BLUE}Detecting monitors...${NC}"
 declare -a MONITOR_LIST
 
