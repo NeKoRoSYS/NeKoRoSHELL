@@ -29,7 +29,7 @@ std::string sanitize_action(std::string action) {
     action = std::regex_replace(action, std::regex(R"(if\s+.*?;\s*then\s+)"), "");
     action = std::regex_replace(action, std::regex(R"(\bfi\b)"), "");
     action = std::regex_replace(action, std::regex(R"(;\s*(?=#|$))"), "");
-    action = std::regex_replace(action, std::regex(R"(\s*#\s*)"), "  ▏ 󰋎 ");
+    action = std::regex_replace(action, std::regex(R"(\s*#\s*)"), "  ▏ 󰞋 ");
     return trim(action);
 }
 
