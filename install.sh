@@ -525,4 +525,9 @@ else
     echo -e "If you chose 'Minimal', this is expected. Otherwise, check the logs above."
 fi
 
+if [[ -x "$HOME/.config/hypr/user/hooks/post-install.sh" ]]; then
+    echo -e "\n${BLUE}Executing user post-install hook...${NC}"
+    "$HOME/.config/hypr/user/hooks/post-install.sh" || echo -e "${RED}Warning: post-install hook failed.${NC}"
+fi
+
 echo -e "${GREEN}Installation complete! Please restart your session to apply all changes.${NC}"
