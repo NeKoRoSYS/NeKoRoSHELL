@@ -168,10 +168,23 @@ void toggle_waybar(bool want_visible) {
 } 
 
 Config read_config() { 
-    Config cfg; 
-    const char* home_env = getenv("HOME"); 
-    std::string home = home_env ? home_env : ""; 
-    std::ifstream file(home + "/.cache/navbar-hover.conf"); 
+    Config cfg;
+
+    std::string cache_home;
+    const char* xdg_env = std::getenv("XDG_CACHE_HOME");
+    
+    if (xdg_env && *xdg_env != '\0') {
+        cache_home = xdg_env;
+    } else {
+        const char* home_env = std::getenv("HOME");
+        if (!home_env) {
+            std::cerr << "Error: Neither XDG_CONFIG_HOME nor HOME environment variables are set.\n";
+            return 1;
+        }
+        cache_home = std::string(home_env) + "/.cache";
+    }
+    
+    std::ifstream file(cache_home + "/nekoroshell/navbar-hover.conf"); 
      
     if (file.is_open()) { 
         std::string line; 
