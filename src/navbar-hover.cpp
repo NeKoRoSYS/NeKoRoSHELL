@@ -167,7 +167,7 @@ void toggle_waybar(bool want_visible) {
     } 
 } 
 
-Config read_config() { 
+std::optional<Config> read_config() { 
     Config cfg;
 
     std::string cache_home;
@@ -179,7 +179,7 @@ Config read_config() {
         const char* home_env = std::getenv("HOME");
         if (!home_env) {
             std::cerr << "Error: Neither XDG_CONFIG_HOME nor HOME environment variables are set.\n";
-            return 1;
+            return std::nullopt;
         }
         cache_home = std::string(home_env) + "/.cache";
     }
