@@ -100,7 +100,7 @@ int main() {
         config_home = std::string(home_env) + "/.config";
     }
 
-    std::string core_conf = config_home + "/hypr/conf.d/08-keybinds.conf";
+    std::string core_conf = config_home + "/hypr/conf.d/06-keybinds.conf";
     std::string user_conf = config_home + "/hypr/user/configs/keybinds.conf";
 
     std::string full_output = parse_binds(core_conf, "SYSTEM CORE BINDS");
