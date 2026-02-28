@@ -396,7 +396,7 @@ do_create_skin() {
     echo "4) Panel (swaync)"
     echo "5) Power (wlogout)"
     echo "6) Windows (hyprland)"
-    read -r -p "Select option (1-5): " feature_opt
+    read -r -p "Select option (1-6): " feature_opt
 
     local target_dir=""
     local required_files=()
