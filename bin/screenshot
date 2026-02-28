@@ -10,7 +10,7 @@ MODE="${1:-}"
 FILENAME="screenshot_$(date +%s).png"
 IMG_PATH="/tmp/$FILENAME"
 
-rm -f /tmp/screenshot_*.png
+rm -f /tmp/screenshot_*.png || true
 
 if [[ "$MODE" == "region" ]]; then
     hyprshot -m region --freeze -s -o /tmp -f "$FILENAME"
