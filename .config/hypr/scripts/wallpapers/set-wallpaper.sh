@@ -1,5 +1,5 @@
-#!/bin/bash
-set -eu
+#!/usr/bin/env bash
+set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 WALL_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/wallpapers"
@@ -10,79 +10,63 @@ SOCKET="/tmp/mpvsocket"
 mkdir -p "$THUMB_CACHE"
 [[ ! -d "$WALL_DIR" ]] && echo "Wallpapers not found: $WALL_DIR" && exit 1
 
-gen_thumb() {
-    local FILE_PATH="$1"
-    local FILENAME=$(basename "$FILE_PATH")
-    local OUT="$THUMB_CACHE/${FILENAME}.jpg"
+gen_thumb_async() {
+    local file_path="$1"
+    local filename="${file_path##*/}"
+    local out="$THUMB_CACHE/${filename}.jpg"
 
-    [ -f "$OUT" ] && return
+    [ -f "$out" ] && return
 
-    case "${FILENAME##*.}" in
-        mp4|mkv|webm|MP4|MKV|WEBM)
-            ffmpeg -y -discard nokey -i "$FILE_PATH" -ss 00:00:02 -frames:v 1 -vf "scale=200:-1" "$OUT" > /dev/null 2>&1
-            ;;
-        png|jpg|jpeg|PNG|JPG|JPEG)
-            magick "$FILE_PATH" -thumbnail 200x "$OUT" > /dev/null 2>&1
-            ;;
-    esac
+    (
+        case "${filename##*.}" in
+            mp4|mkv|webm|MP4|MKV|WEBM)
+                nice -n 19 ffmpeg -y -discard nokey -i "$file_path" -ss 00:00:02 -frames:v 1 -vf "scale=200:-1" "$out" > /dev/null 2>&1
+                ;;
+            png|jpg|jpeg|PNG|JPG|JPEG)
+                nice -n 19 magick "$file_path" -thumbnail 200x "$out" > /dev/null 2>&1
+                ;;
+        esac
+    ) &
 }
 
+SELECTED_FILE=""
+RAW_SELECTION=""
+
 if [ -n "${1:-}" ]; then
-    if [[ "$1" =~ ^http ]]; then
-        SELECTED_FILE="$1"
-    else
-        SELECTED_FILE="${1##*/}"
-    fi
+    RAW_SELECTION="$1"
 else
     shopt -s nocaseglob nullglob
-
     get_wallpapers() {
         for file in "$WALL_DIR"/*.{jpg,jpeg,png,mp4,mkv,webm}; do
-            FILENAME="${file##*/}"
-            THUMB_PATH="$THUMB_CACHE/${FILENAME}.jpg"
+            local filename="${file##*/}"
+            local thumb_path="$THUMB_CACHE/${filename}.jpg"
             
-            if [[ ! -f "$THUMB_PATH" ]]; then
-                gen_thumb "$file"
+            if [[ -f "$thumb_path" ]]; then
+                echo -en "${filename}\0icon\x1f${thumb_path}\n"
+            else
+                echo -en "${filename}\0icon\x1fimage-x-generic\n"
+                gen_thumb_async "$file"
             fi
-            
-            echo -en "${FILENAME}\0icon\x1f${THUMB_PATH}\n"
         done
     }
 
-    if [ -n "${1:-}" ]; then
-        RAW_SELECTION="$1"
-    else
-        RAW_SELECTION=$(get_wallpapers | rofi -dmenu \
-            -i \
-            -p "Select Wallpaper" \
-            -show-icons \
-            -theme-str 'window { width: 800px; }' \
-            -theme-str 'listview { columns: 4; lines: 3; spacing: 15px; fixed-columns: true; flow: horizontal; }' \
-            -theme-str 'element { orientation: vertical; padding: 10px; border-radius: 10px; }' \
-            -theme-str 'element-icon { size: 120px; horizontal-align: 0.5; }' \
-            -theme-str 'element-text { horizontal-align: 0.5; padding: 5px 0px 0px 0px; }');
-    fi
-
-    [ -z "$RAW_SELECTION" ] && exit 0
-
-    if [[ -f "$RAW_SELECTION" ]]; then
-        WALL="$RAW_SELECTION"
-        SELECTED_FILE="${RAW_SELECTION##*/}"
-    elif [[ "$RAW_SELECTION" =~ ^http ]]; then
-        SELECTED_FILE="$RAW_SELECTION"
-    else
-        SELECTED_FILE="${RAW_SELECTION##*/}"
-        WALL="$WALL_DIR/$SELECTED_FILE"
-    fi
-    
+    RAW_SELECTION=$(get_wallpapers | rofi -dmenu \
+        -i \
+        -p "Select Wallpaper" \
+        -show-icons \
+        -theme-str 'window { width: 800px; }' \
+        -theme-str 'listview { columns: 4; lines: 3; spacing: 15px; fixed-columns: true; flow: horizontal; }' \
+        -theme-str 'element { orientation: vertical; padding: 10px; border-radius: 10px; }' \
+        -theme-str 'element-icon { size: 120px; horizontal-align: 0.5; }' \
+        -theme-str 'element-text { horizontal-align: 0.5; padding: 5px 0px 0px 0px; }')
     shopt -u nocaseglob nullglob
 fi
 
-[ -z "$SELECTED_FILE" ] && exit 0
+[ -z "$RAW_SELECTION" ] && exit 0
 
-if [[ "$SELECTED_FILE" =~ ^http ]]; then
-    URL="$SELECTED_FILE"
-
+if [[ "$RAW_SELECTION" =~ ^http ]]; then
+    URL="$RAW_SELECTION"
+    
     if [[ ! "$URL" =~ ^https?:// ]]; then
         echo "Error: Invalid URL. Must start with http:// or https://"
         makenotif "Download" "dialog-error" "Invalid URL" "URL must start with http(s)://" "false" "error-sound" ""
@@ -117,21 +101,29 @@ if [[ "$SELECTED_FILE" =~ ^http ]]; then
 
     if [ "$DL_STATUS" -eq 0 ]; then
         SELECTED_FILE="$CLEAN_NAME"
-        gen_thumb "$DEST"
+        WALL="$DEST"
+        gen_thumb_async "$DEST"
         makenotif "Download" "folder-download" "Download Complete" "$CLEAN_NAME" "true" "complete.oga" "100"
     else
         makenotif "Download" "dialog-error" "Download Failed" "Check your connection." "false" "error-sound" ""
         rm -f "$DEST"
         exit 1
     fi
+else
+    if [[ -f "$RAW_SELECTION" ]]; then
+        WALL="$RAW_SELECTION"
+        SELECTED_FILE="${RAW_SELECTION##*/}"
+    else
+        SELECTED_FILE="${RAW_SELECTION##*/}"
+        WALL="$WALL_DIR/$SELECTED_FILE"
+    fi
 fi
 
-WALL="$WALL_DIR/$SELECTED_FILE"
 EXTENSION="${SELECTED_FILE##*.}"
 
 cleanup_backgrounds() {
     set +e
-    pkill mpvpaper || true
+    pkill -x mpvpaper || true
     pkill -f mpvpaper-stop || true
     rm -f "$SOCKET" || true
     set -e
@@ -147,7 +139,7 @@ case "$(echo "$EXTENSION" | tr '[:upper:]' '[:lower:]')" in
         TEMP_THUMB="/tmp/wall_thumb.jpg"
         ffmpeg -y -ss 00:00:05 -i "$WALL" -frames:v 1 -vf "scale=200:-1" "$TEMP_THUMB" > /dev/null 2>&1
 
-        bash "$SCRIPT_DIR/apply-colors.sh" "$WALL"
+        bash "$SCRIPT_DIR/apply-colors.sh" "$WALL" &
 
         export LIBVA_DRIVER_NAME=iHD
         if lspci | grep -qi nvidia; then
@@ -169,7 +161,7 @@ case "$(echo "$EXTENSION" | tr '[:upper:]' '[:lower:]')" in
 
         swww img "$WALL"
 
-        bash "$SCRIPT_DIR/apply-colors.sh" "$WALL"
+        bash "$SCRIPT_DIR/apply-colors.sh" "$WALL" &
         ;;
     *)
         echo "Unsupported format: $EXTENSION"
