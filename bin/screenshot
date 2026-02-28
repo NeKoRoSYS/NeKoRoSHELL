@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -uo pipefail
 
-if pgrep -x hyprshot > /dev/null || pgrep -x slurp > /dev/null; then
-    killall -9 hyprshot slurp hyprpicker grim || true
+if pgrep -x hyprshot >/dev/null || pgrep -x slurp >/dev/null; then
+    killall -9 hyprshot slurp hyprpicker grim 2>/dev/null || true
     exit 0
 fi
 
@@ -11,14 +12,14 @@ IMG_PATH="/tmp/$FILENAME"
 
 rm -f /tmp/screenshot_*.png
 
-if [ "$MODE" == "region" ]; then
+if [[ "$MODE" == "region" ]]; then
     hyprshot -m region --freeze -s -o /tmp -f "$FILENAME"
 else
-    hyprshot -m $MODE -s -o /tmp -f "$FILENAME"
+    hyprshot -m "$MODE" -s -o /tmp -f "$FILENAME"
 fi
 
-pkill rofi || true
+pkill -x rofi || true
 
-if [ -f "$IMG_PATH" ]; then
-    makenotif hyprshot "$IMG_PATH" Hyprshot "Captured $MODE to clipboard!" true camera-shutter.oga
+if [[ -f "$IMG_PATH" ]]; then
+    command -v makenotif >/dev/null && makenotif hyprshot "$IMG_PATH" Hyprshot "Captured $MODE to clipboard!" true camera-shutter.oga
 fi
