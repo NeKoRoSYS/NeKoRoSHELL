@@ -23,6 +23,16 @@ void replace_all(std::string& str, const std::string& from, const std::string& t
     }
 }
 
+std::string sanitize_action(std::string action) {
+    action = std::regex_replace(action, std::regex(R"(^\s*exec,\s*)"), "");
+    action = std::regex_replace(action, std::regex(R"(\$killPanel;(\s*pkill\s+\$launcher\s*(\|\||;))?\s*)"), "");
+    action = std::regex_replace(action, std::regex(R"(if\s+.*?;\s*then\s+)"), "");
+    action = std::regex_replace(action, std::regex(R"(\bfi\b)"), "");
+    action = std::regex_replace(action, std::regex(R"(;\s*(?=#|$))"), "");
+    action = std::regex_replace(action, std::regex(R"(\s*#\s*)"), "  ▏ 󰋎 ");
+    return trim(action);
+}
+
 std::string parse_binds(const std::string& filepath, const std::string& category) {
     std::ifstream file(filepath);
     if (!file.is_open()) return "";
@@ -56,10 +66,8 @@ std::string parse_binds(const std::string& filepath, const std::string& category
                     action += parts[i];
                     if (i != parts.size() - 1) action += ",";
                 }
-                action = trim(action);
-
-                std::regex comment_regex(R"(\s*#\s*)");
-                action = std::regex_replace(action, comment_regex, " ▏ 󰋎 ");
+                
+                action = sanitize_action(action);
 
                 std::string keys_combo = "[" + mod + " + " + key + "]";
                 
