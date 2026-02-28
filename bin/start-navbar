@@ -1,13 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 MODE_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/nekoroshell/navbar_mode"
 CURRENT_MODE=$(cat "$MODE_FILE" 2>/dev/null || echo "static")
 
 killall -q waybar navbar-watcher navbar-hover 2>/dev/null || true
+sleep 0.2
 
-if [ "$CURRENT_MODE" = "dynamic" ]; then
+if [[ "$CURRENT_MODE" == "dynamic" ]]; then
     navbar-watcher &
-elif [ "$CURRENT_MODE" = "hover" ]; then
+elif [[ "$CURRENT_MODE" == "hover" ]]; then
     navbar-hover &
 else
     waybar &
