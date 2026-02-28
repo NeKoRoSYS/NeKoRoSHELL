@@ -84,7 +84,7 @@ The following are what NeKoRoSHELL currently offers:
   - NeKoRoSHELL is not just an identity, it is a framework. This repo gives you at most 2 pre-installed out-of-the-box layouts/styling for waybar, hyprlock, and SwayNC. The best part? You can make your own!
   - Switch to Dark and Light contrast modes
   - [Dedicated Theming System](THEMING.md):
-    - Select individual skins for waybar, rofi, hyprlock, SwayNC, and wlogout.
+    - Select individual skins for waybar, rofi, hyprlock, SwayNC, wlogout, and even hyprland windows.
     - **Wallpaper Handling**
       - Supports both online and offline image (via `swww`) and video (via `mpvpaper`) formats.
         - `mpvpaper` automatically stops if an app is on fullscreen mode to save CPU/RAM and GPU space.
