@@ -231,16 +231,18 @@ update() {
         else
             pushd "$TEMP_DIR" >/dev/null
             if make clean all >/dev/null 2>&1; then
+                local copy_failed=0
                 for compiled_file in build/*; do
                     if [[ -f "$compiled_file" ]]; then
                         local bin_name=$(basename "$compiled_file")
                         rm -f "$bin_dir/$bin_name" 2>/dev/null || true
-                        cp "$compiled_file" "$bin_dir/"
+                        cp "$compiled_file" "$bin_dir/" || copy_failed=1
                         log_success "Successfully compiled and updated \"$bin_name\""
                     fi
                 done
+                [[ $copy_failed -eq 1 ]] && log_warn "Failed to copy some binaries."
             else
-                log_error "Warning: Compilation failed. Check build logs for details.\n"
+                log_error "Warning: Compilation failed.\n"
             fi
             popd >/dev/null
         fi
