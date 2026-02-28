@@ -33,6 +33,28 @@ save_hash() {
     md5sum "$file" | cut -d' ' -f1 > "$file.sum"
 }
 
+apply_config() {
+    local type="$1"
+    local target="$2"
+    local source_abs="$3"
+
+    check_user_mod "$target"
+
+    if [ -L "$target" ]; then
+        rm -f "$target"
+    fi
+
+    case "$type" in
+        css)   echo -e "${WARNING_CSS}@import \"$source_abs\";" > "$target" ;;
+        rasi)  echo -e "${WARNING_CSS}@import \"$source_abs/config.rasi\"\n@import \"$source_abs/style.rasi\"" > "$target" ;;
+        jsonc) echo -e "${WARNING_JSONC}{ \"include\": [ \"$source_abs\" ] }" > "$target" ;;
+        hypr)  echo -e "${WARNING_CONF}" > "$target"; cat "$source_abs" >> "$target" ;;
+        copy)  cp "$source_abs" "$target" || true ;;
+    esac
+
+    save_hash "$target"
+}
+
 apply_ui_skin() {
     local feature="$1"
     local choice="$2"
@@ -40,34 +62,44 @@ apply_ui_skin() {
 
     case "$feature" in
         launcher)
-            name="Launcher" icon="preferences-desktop-theme" msg="Select a Launcher skin."
+            name="Launcher"
+            icon="preferences-desktop-theme"
+            msg="Select a Launcher skin."
             dir="$CONF_DIR/rofi/skins"
             config="$CONF_DIR/rofi/config.rasi"
             req_files=("config.rasi" "style.rasi")
             ;;
         panel)
-            name="Control Centre" icon="preferences-desktop-theme" msg="Select Control Centre style."
+            name="Control Centre"
+            icon="preferences-desktop-theme"
+            msg="Select Control Centre style."
             dir="$CONF_DIR/swaync/skins"
             config="$CONF_DIR/swaync/config.json"
             style="$CONF_DIR/swaync/style.css"
             req_files=("style.css" "config.json")
             ;;
         navbar)
-            name="Navbar" icon="preferences-desktop-theme" msg="Select a Navbar skin."
+            name="Navbar"
+            icon="preferences-desktop-theme"
+            msg="Select a Navbar skin."
             dir="$CONF_DIR/waybar/skins"
             config="$CONF_DIR/waybar/config.jsonc"
             style="$CONF_DIR/waybar/style.css"
             req_files=("style.css" "layout.jsonc" "navbar-hover.conf")
             ;;
         power)
-            name="Power Options" icon="preferences-desktop-theme" msg="Select a Power Options layout."
+            name="Power Options"
+            icon="preferences-desktop-theme"
+            msg="Select a Power Options layout."
             dir="$CONF_DIR/wlogout/skins"
             config="$CONF_DIR/wlogout/layout"
             style="$CONF_DIR/wlogout/style.css"
             req_files=("style.css" "layout")
             ;;
         windows)
-            name="Windows" icon="preferences-desktop-theme" msg="Select a Windows skin."
+            name="Windows"
+            icon="preferences-desktop-theme"
+            msg="Select a Windows skin."
             dir="$CONF_DIR/hypr/user/skins"
             req_files=("appearance.conf" "animations.conf")
             ;;
@@ -102,28 +134,19 @@ apply_ui_skin() {
 
     case "$feature" in
         launcher)
-            check_user_mod "$config"
-            echo -e "${WARNING_CSS}@import \"$path_skin/config.rasi\"\n@import \"$path_skin/style.rasi\"" > "$config"
-            save_hash "$config"
+            apply_config rasi "$config" "$path_skin"
             ;;
         panel)
-            check_user_mod "$style"
-            check_user_mod "$config"
-            echo -e "${WARNING_CSS}@import \"$path_skin/style.css\";" > "$style"
-            cp "$path_skin/config.json" "$config" || true
-            save_hash "$style"
-            save_hash "$config"
-            swaync-client -R
-            swaync-client -rs
+            apply_config css "$style" "$path_skin/style.css"
+            apply_config copy "$config" "$path_skin/config.json"
+            
+            swaync-client -R || true
+            swaync-client -rs || true
             ;;
         navbar)
-            check_user_mod "$style"
-            check_user_mod "$config"
-            echo -e "${WARNING_CSS}@import \"$path_skin/style.css\";" > "$style"
-            echo -e "${WARNING_JSONC}{ \"include\": [ \"$path_skin/layout.jsonc\" ] }" > "$config"
-            cp "$path_skin/navbar-hover.conf" "$NAVBAR_HOVER_CONF"
-            save_hash "$style"
-            save_hash "$config"
+            apply_config css "$style" "$path_skin/style.css"
+            apply_config jsonc "$config" "$path_skin/layout.jsonc"
+            cp "$path_skin/navbar-hover.conf" "$NAVBAR_HOVER_CONF" || true
 
             killall -q navbar-hover navbar-watcher 2>/dev/null || true
             killall -q waybar 2>/dev/null || true
@@ -138,28 +161,15 @@ apply_ui_skin() {
             fi
             ;;
         power)
-            check_user_mod "$style"
-            check_user_mod "$config"
-            echo -e "${WARNING_CSS}@import \"$path_skin/style.css\";" > "$style"
-            cp "$path_skin/layout" "$config"
-            save_hash "$style"
-            save_hash "$config"
+            apply_config css "$style" "$path_skin/style.css"
+            apply_config copy "$config" "$path_skin/layout"
             ;;
         windows)
             local app_conf="$CONF_DIR/hypr/user/configs/appearance.conf"
             local anim_conf="$CONF_DIR/hypr/user/configs/animations.conf"
             
-            check_user_mod "$app_conf"
-            check_user_mod "$anim_conf"
-            
-            echo -e "${WARNING_CONF}" > "$app_conf"
-            cat "$path_skin/appearance.conf" >> "$app_conf"
-            
-            echo -e "${WARNING_CONF}" > "$anim_conf"
-            cat "$path_skin/animations.conf" >> "$anim_conf"
-            
-            save_hash "$app_conf"
-            save_hash "$anim_conf"
+            apply_config hypr "$app_conf" "$path_skin/appearance.conf"
+            apply_config hypr "$anim_conf" "$path_skin/animations.conf"
             
             if command -v hyprctl >/dev/null 2>&1; then
                 hyprctl reload >/dev/null 2>&1
@@ -210,7 +220,7 @@ case "$FEATURE" in
             makenotif customize preferences-desktop-theme Themes "Select a Theme." true
         fi
 
-        CHOICE=${CMD_CHOICE:-$(find "$THEME_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | sort | rofi -dmenu -p "Select Theme")}
+        CHOICE=${CMD_CHOICE:-$(find "$THEME_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort | rofi -dmenu -p "Select Theme")}
 
         if [ -n "$CHOICE" ]; then
             TARGET_SCRIPT=$(find "$THEME_DIR/$CHOICE" -maxdepth 1 -name "*.sh" | head -n 1)
@@ -232,7 +242,7 @@ case "$FEATURE" in
             makenotif customize preferences-desktop-theme Lockscreen "Select a Lockscreen layout." true
         fi
 
-        CHOICE="${CMD_CHOICE:-$(find "$SKIN_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | sort | rofi -dmenu -p "Select Lockscreen Layout")}"
+        CHOICE="${CMD_CHOICE:-$(find "$SKIN_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort | rofi -dmenu -p "Select Lockscreen Layout")}"
 
         if [ -n "$CHOICE" ]; then
             TARGET_CONF="$(find "$SKIN_DIR/$CHOICE" -maxdepth 1 -name "*.conf" | head -n 1)"
