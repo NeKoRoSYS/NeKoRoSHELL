@@ -4,5 +4,7 @@
 
 .config/hypr/user/configs/*
 .config/hypr/user/scripts/*
+.config/hypr/user/hooks/*
+.config/hypr/user/skins/*
 .config/hypremoji/recents.json
 !.config/hypr/user/templates/
