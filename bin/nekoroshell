@@ -379,6 +379,11 @@ do_update() {
         hyprctl reload >/dev/null 2>&1
     fi
 
+    if [[ -x "$CONF_DIR/hypr/user/hooks/post-update.sh" ]]; then
+        echo -e "\n${BLUE}Executing user post-update hook...${NC}"
+        "$CONF_DIR/hypr/user/hooks/post-update.sh" || echo -e "${RED}Warning: post-update hook failed.${NC}"
+    fi
+
     echo -e "\n${GREEN}Upgrade to $LATEST_TAG complete!${NC}"
 }
 
@@ -397,7 +402,7 @@ do_create_skin() {
     local feature_name=""
 
     case "$feature_opt" in
-        1) feature_name="navbar"; target_dir="$CONF_DIR/waybar/skins"; required_files=("style.css" "layout.jsonc" "navbar-hover.conf") ;;
+        1) feature_name="navbar"; target_dir="$/waybar/skins"; required_files=("style.css" "layout.jsonc" "navbar-hover.conf") ;;
         2) feature_name="launcher"; target_dir="$CONF_DIR/rofi/skins"; required_files=("config.rasi" "style.rasi") ;;
         3) feature_name="lockscreen"; target_dir="$CONF_DIR/hypr/hyprlock/skins"; ;;
         4) feature_name="panel"; target_dir="$CONF_DIR/swaync/skins"; required_files=("style.css" "config.json") ;;
