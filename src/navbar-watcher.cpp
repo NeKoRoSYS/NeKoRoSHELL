@@ -83,21 +83,58 @@ private:
         return tokens;
     }
 
+    std::string hyprland_ipc_request(const std::string& command) {
+        const char* runtime_dir = getenv("XDG_RUNTIME_DIR");
+        const char* signature = getenv("HYPRLAND_INSTANCE_SIGNATURE");
+        if (!runtime_dir || !signature) return "";
+    
+        std::string socket_path = std::string(runtime_dir) + "/hypr/" + std::string(signature) + "/.socket.sock";
+        
+        int sfd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (sfd == -1) return "";
+    
+        struct sockaddr_un addr;
+        memset(&addr, 0, sizeof(struct sockaddr_un));
+        addr.sun_family = AF_UNIX;
+        strncpy(addr.sun_path, socket_path.c_str(), sizeof(addr.sun_path) - 1);
+    
+        if (connect(sfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1) {
+            close(sfd);
+            return "";
+        }
+    
+        if (write(sfd, command.c_str(), command.length()) == -1) {
+            close(sfd);
+            return "";
+        }
+    
+        char buffer[8192];
+        std::string response = "";
+        ssize_t bytes_read;
+        while ((bytes_read = read(sfd, buffer, sizeof(buffer) - 1)) > 0) {
+            buffer[bytes_read] = '\0';
+            response += buffer;
+        }
+        
+        close(sfd);
+        return response;
+    }
+
     void sync_state_from_json() {
         try {
             window_to_workspace.clear();
             workspace_window_count.clear();
             active_workspaces.clear();
-
-            std::string mon_out = exec("hyprctl -j monitors");
+    
+            std::string mon_out = hyprland_ipc_request("j/monitors");
             if (!mon_out.empty() && mon_out.front() == '[') {
                 auto monitors = json::parse(mon_out);
                 for (const auto& mon : monitors) {
                     active_workspaces.insert(mon["activeWorkspace"]["name"].get<std::string>());
                 }
             }
-
-            std::string cli_out = exec("hyprctl -j clients");
+    
+            std::string cli_out = hyprland_ipc_request("j/clients");
             if (!cli_out.empty() && cli_out.front() == '[') {
                 auto clients = json::parse(cli_out);
                 for (const auto& client : clients) {
