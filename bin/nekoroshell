@@ -1,16 +1,21 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 set -euo pipefail
 
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m'
+readonly GREEN='\033[0;32m'
+readonly BLUE='\033[0;34m'
+readonly YELLOW='\033[1;33m'
+readonly RED='\033[0;31m'
+readonly NC='\033[0m'
 
-REPO="nekorosys/nekoroshell"
-TEMP_DIR="/tmp/nekoroshell_upgrade"
-CONF_DIR=${XDG_CONFIG_HOME:-$HOME/.config}
+readonly REPO="nekorosys/nekoroshell"
+readonly TEMP_DIR="/tmp/nekoroshell_upgrade"
+readonly CONF_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+readonly CORE_CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync themes wallpapers wallust waybar wlogout)
+
+log_info()    { echo -e "${BLUE}$1${NC}"; }
+log_success() { echo -e "  [✔] ${GREEN}$1${NC}"; }
+log_warn()    { echo -e "  [!] ${YELLOW}$1${NC}"; }
+log_error()   { echo -e "${RED}$1${NC}"; }
 
 usage() {
     echo -e "${BLUE}NeKoRoSHELL Management Utility${NC}\n"
@@ -19,18 +24,15 @@ usage() {
     echo -e "  ${GREEN}update${NC}        Fetch and apply the latest NeKoRoSHELL release."
     echo -e "  ${GREEN}create-skin${NC}   Create a new empty skin template for a specific feature."
     echo -e "  ${GREEN}create-theme${NC}  Create a new theme script bundle from existing skins."
-    echo -e "  ${RED}uninstall${NC}     Remove all NeKoRoSHELL configurations and scripts."
-    echo ""
+    echo -e "  ${RED}uninstall${NC}     Remove all NeKoRoSHELL configurations and scripts.\n"
     exit 1
 }
 
 clean_shell_rc() {
     local shell_rc="$1"
-    if [[ -f "$shell_rc" ]]; then
-        if grep -q "# --- NeKoRoSHELL START ---" "$shell_rc"; then
-            sed -i '/# --- NeKoRoSHELL START ---/,/# --- NeKoRoSHELL END ---/d' "$shell_rc"
-            echo -e "  Cleaned ${GREEN}$shell_rc${NC}"
-        fi
+    if [[ -f "$shell_rc" ]] && grep -q "# --- NeKoRoSHELL START ---" "$shell_rc"; then
+        sed -i '/# --- NeKoRoSHELL START ---/,/# --- NeKoRoSHELL END ---/d' "$shell_rc"
+        log_success "Cleaned $shell_rc"
     fi
 }
 
@@ -42,115 +44,88 @@ prompt_merge() {
     while true; do
         echo -e "\n${YELLOW}Conflict detected in: ${NC}$relative_path"
         echo -ne "Action: [${GREEN}o${NC}]verwrite, [${RED}k${NC}]eep current, [${BLUE}v${NC}]iew diff, [${YELLOW}m${NC}]erge? "
-        
         read -r -n 1 choice 
         echo ""
         
         case "${choice,,}" in
-            o)
-                cp "$new_file" "$target_file"
-                echo -e "${GREEN}Overwritten.${NC}"
-                break ;;
-            k)
-                echo -e "${YELLOW}Kept current version.${NC}"
-                break ;;
-            v)
-                diff --color=always -u "$target_file" "$new_file" | less -R || true
-                ;;
-            m)
-                USER_MERGE_TOOL="${MERGE_TOOL:-vimdiff}"
-                
-                if ! command -v "$USER_MERGE_TOOL" &> /dev/null; then
-                    echo -e "${BLUE}$USER_MERGE_TOOL not found. Falling back to diff3...${NC}"
-                    
+            o) cp "$new_file" "$target_file"; log_success "Overwritten."; return ;;
+            k) log_warn "Kept current version."; return ;;
+            v) diff --color=always -u "$target_file" "$new_file" | less -R || true ;;
+            m) 
+                local merge_tool="${MERGE_TOOL:-vimdiff}"
+                if command -v "$merge_tool" &> /dev/null; then
+                    log_info "Opening merge review in $merge_tool..."
+                    # Specific flag handling for VS Code restored
+                    if [ "$merge_tool" = "code" ]; then
+                        code --wait --diff "$target_file" "$new_file" || true
+                    else
+                        "$merge_tool" "$target_file" "$new_file" || true
+                    fi
+                    echo -e "${YELLOW}Merge tool closed. Press [k] to keep your changes, or choose another action.${NC}"
+                else
+                    log_warn "$merge_tool not found. Falling back to diff3..."
                     if diff3 -m "$target_file" "$target_file" "$new_file" > "${target_file}.tmp_merge"; then
                         mv "${target_file}.tmp_merge" "$target_file"
-                        echo -e "${GREEN}Merged cleanly using diff3.${NC}"
-                        break
+                        log_success "Merged cleanly using diff3."
+                        return
                     else
-                        echo -e "${YELLOW}Merge conflicts found! Opening in your standard editor to resolve manually...${NC}"
-                        USER_EDITOR=${VISUAL:-${EDITOR:-nano}}
-                        command -v "$USER_EDITOR" >/dev/null 2>&1 || USER_EDITOR="vi"
+                        log_warn "Merge conflicts found! Opening in your standard editor to resolve manually..."
+                        local user_editor=${VISUAL:-${EDITOR:-nano}}
+                        command -v "$user_editor" >/dev/null 2>&1 || user_editor="vi"
                         
-                        "$USER_EDITOR" "${target_file}.tmp_merge" || true
+                        "$user_editor" "${target_file}.tmp_merge" || true
                         mv "${target_file}.tmp_merge" "$target_file"
                         echo -e "${YELLOW}Editor closed. Press [k] to keep your changes, or choose another action.${NC}"
                     fi
-                else
-                    echo -e "${BLUE}Opening merge review in $USER_MERGE_TOOL...${NC}"
-                    if [ "$USER_MERGE_TOOL" = "code" ]; then
-                        code --wait --diff "$target_file" "$new_file" || true
-                    else
-                        "$USER_MERGE_TOOL" "$target_file" "$new_file" || true
-                    fi
-                    echo -e "${YELLOW}Merge tool closed. Press [k] to keep your changes, or choose another action.${NC}"
                 fi
                 ;;
-            *)
-                echo -e "${RED}Invalid choice. Please press o, k, v, or m.${NC}" ;;
+            *) log_error "Invalid choice. Please press o, k, v, or m." ;;
         esac
     done
 }
 
-do_uninstall() {
-    echo -e "# ======================================================= #"
-    echo -e "#              NeKoRoSHELL Uninstallation Utility         #"
-    echo -e "# ======================================================= #\n"
+uninstall() {
+    log_info "# ======================================================= #"
+    log_info "#              NeKoRoSHELL Uninstallation Utility         #"
+    log_info "# ======================================================= #\n"
 
-    echo -e "${YELLOW}WARNING: This script will remove all NeKoRoSHELL configurations, scripts, and services.${NC}"
+    log_warn "WARNING: This script will remove all NeKoRoSHELL configurations, scripts, and services."
     echo -e "System packages (Hyprland, Waybar, etc.) will NOT be uninstalled."
     echo -e "If backups of your original configs exist, this script will attempt to restore them.\n"
 
     echo -ne "${RED}Are you absolutely sure you want to proceed? (y/n): ${NC}"
     read -r confirm
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-        echo -e "${GREEN}Uninstallation aborted.${NC}"
-        exit 0
-    fi
+    [[ ! "$confirm" =~ ^[Yy]$ ]] && { log_success "Uninstallation aborted."; exit 0; }
 
-    echo -e "\n${BLUE}Stopping and disabling NeKoRoSHELL services...${NC}"
-
+    log_info "\nStopping and disabling NeKoRoSHELL services..."
     if command -v systemctl >/dev/null 2>&1; then
-        SERVICES=("waybar" "swaync" "navbar" "navbar-hover" "navbar-watcher")
-        
-        for svc in "${SERVICES[@]}"; do
-            if systemctl --user is-active --quiet "$svc.service" 2>/dev/null; then
-                systemctl --user stop "$svc.service" 2>/dev/null
-            fi
-            if systemctl --user is-enabled --quiet "$svc.service" 2>/dev/null; then
-                systemctl --user disable "$svc.service" 2>/dev/null
-            fi
+        for svc in waybar swaync navbar navbar-hover navbar-watcher; do
+            systemctl --user stop "$svc.service" 2>/dev/null || true
+            systemctl --user disable "$svc.service" 2>/dev/null || true
         done
-        
         rm -f "$CONF_DIR/systemd/user/navbar"*
         systemctl --user daemon-reload
-        echo -e "${GREEN}Services stopped and removed.${NC}"
+        log_success "Services stopped and removed."
     fi
 
-    echo -e "\n${BLUE}Removing NeKoRoSHELL configs and restoring backups...${NC}"
-
-    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync themes wallpapers wallust waybar wlogout)
-
-    for conf in "${CONFIGS[@]}"; do
-        target_dir="$CONF_DIR/$conf"
-        if [[ -d "$target_dir" ]]; then
-            rm -rf "$target_dir"
+    log_info "\nRemoving NeKoRoSHELL configs and restoring backups..."
+    for conf in "${CORE_CONFIGS[@]}"; do
+        if [[ -d "$CONF_DIR/$conf" ]]; then
+            rm -rf "$CONF_DIR/$conf"
             echo -e "  Removed ${YELLOW}$conf${NC} configuration."
         fi
     done
 
-    latest_backup=$(ls -1 "$HOME/nekoroshell_backup_"*.tar.gz 2>/dev/null | sort -V | tail -n 1)
-    
+    local latest_backup=$(ls -1 "$HOME/nekoroshell_backup_"*.tar.gz 2>/dev/null | sort -V | tail -n 1)
     if [[ -n "$latest_backup" ]]; then
-        echo -e "\n${BLUE}Restoring from backup archive: $(basename "$latest_backup")...${NC}"
+        log_info "\nRestoring from backup archive: $(basename "$latest_backup")..."
         tar -xzf "$latest_backup" -C "$CONF_DIR"
-        echo -e "  [${GREEN}Restored${NC}] Configurations recovered from tarball."
+        log_success "Configurations recovered from tarball."
     else
-        echo -e "  ${YELLOW}No tarball backup found to restore.${NC}"
+        log_warn "No tarball backup found to restore."
     fi
 
-    echo -e "\n${BLUE}Cleaning up NeKoRoSHELL scripts and binaries...${NC}"
-
+    log_info "\nCleaning up NeKoRoSHELL scripts and binaries..."
     for bin_dir in "$HOME/.local/bin/nekoroshell" "$HOME/bin/nekoroshell"; do
         if [[ -d "$bin_dir" ]]; then
             rm -rf "$bin_dir"
@@ -158,216 +133,109 @@ do_uninstall() {
         fi
     done
 
-    for misc_file in .p10k.zsh .face.icon change-avatar.sh; do
-        if [[ -f "$HOME/$misc_file" ]]; then
-            rm -f "$HOME/$misc_file"
-            echo -e "  Removed file: ${YELLOW}$misc_file${NC}"
+    for f in .p10k.zsh .face.icon change-avatar.sh; do
+        if [[ -f "$HOME/$f" ]]; then
+            rm -f "$HOME/$f"
+            echo -e "  Removed file: ${YELLOW}$f${NC}"
         fi
     done
 
-    echo -e "\n${BLUE}Removing injected NeKoRoSHELL path variables from shell profiles...${NC}"
-
+    log_info "\nRemoving injected NeKoRoSHELL path variables from shell profiles..."
     clean_shell_rc "$HOME/.bashrc"
     clean_shell_rc "$HOME/.zshrc"
-
+    
     echo -e "\n${GREEN}Uninstallation complete!${NC}"
     echo -e "You may need to log out and log back in, or restart your computer, for all changes to fully take effect."
 }
 
-do_update() {
-    echo -e "# ======================================================= #"
-    echo -e "#              NeKoRoSHELL Upgrade Utility                #"
-    echo -e "# ======================================================= #\n"
+update() {
+    log_info "# ======================================================= #"
+    log_info "#              NeKoRoSHELL Upgrade Utility                #"
+    log_info "# ======================================================= #\n"
 
-    echo -e "${BLUE}Fetching latest release info from GitHub...${NC}"
-    LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-    TARBALL_URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tarball_url":' | sed -E 's/.*"([^"]+)".*/\1/')
+    log_info "Fetching latest release info from GitHub..."
+    local release_json=$(curl -s "https://api.github.com/repos/$REPO/releases/latest")
+    local tag=$(echo "$release_json" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    local tar_url=$(echo "$release_json" | grep '"tarball_url":' | sed -E 's/.*"([^"]+)".*/\1/')
 
-    if [[ -z "$LATEST_TAG" || -z "$TARBALL_URL" ]]; then
-        echo -e "${RED}Error: Could not fetch release data. Are you connected to the internet?${NC}"
-        exit 1
-    fi
-
-    echo -e "${GREEN}Latest release found: $LATEST_TAG${NC}\n"
-
-    echo -ne "${YELLOW}Do you want to proceed with the upgrade to $LATEST_TAG? (y/n): ${NC}"
+    [[ -z "$tag" || -z "$tar_url" ]] && { log_error "Error: Could not fetch release data. Are you connected to the internet?"; exit 1; }
+    
+    log_success "Latest release found: $tag\n"
+    
+    echo -ne "${YELLOW}Do you want to proceed with the upgrade to $tag? (y/n): ${NC}"
     read -r confirm
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-        echo -e "${RED}Upgrade aborted by user.${NC}"
-        exit 0
-    fi
+    [[ ! "$confirm" =~ ^[Yy]$ ]] && { log_error "Upgrade aborted by user."; exit 0; }
 
-    echo -e "\n${BLUE}Creating backup before update...${NC}"
-    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-    BACKUP_ARCHIVE="$HOME/nekoroshell_backup_$TIMESTAMP.tar.gz"
-    BACKUP_ITEMS=()
-    CONFIGS=(btop cava fastfetch hypr hypremoji kitty rofi swaync wallpapers wallust waybar wlogout themes)
-
+    log_info "\nCreating backup before update..."
+    local backup_archive="$HOME/nekoroshell_backup_$(date +%Y%m%d_%H%M%S).tar.gz"
+    local backup_items=()
     mkdir -p "$CONF_DIR"
-    for conf in "${CONFIGS[@]}"; do
-        if [[ -e "$CONF_DIR/$conf" ]]; then
-            BACKUP_ITEMS+=("$conf")
-        fi
+
+    for conf in "${CORE_CONFIGS[@]}"; do
+        [[ -e "$CONF_DIR/$conf" ]] && backup_items+=("$conf")
     done
 
-    if [[ ${#BACKUP_ITEMS[@]} -gt 0 ]]; then
-        tar -czf "$BACKUP_ARCHIVE" -C "$CONF_DIR" "${BACKUP_ITEMS[@]}"
-        echo -e "${GREEN}Created pre-update backup archive at: $BACKUP_ARCHIVE${NC}"
+    if [[ ${#backup_items[@]} -gt 0 ]]; then
+        tar -czf "$backup_archive" -C "$CONF_DIR" "${backup_items[@]}"
+        log_success "Created pre-update backup archive at: $backup_archive"
     else
-        echo -e "${YELLOW}No existing configs found to backup. Proceeding...${NC}"
+        log_warn "No existing configs found to backup. Proceeding..."
     fi
 
-    echo -e "\n${BLUE}Downloading and extracting...${NC}"
+    log_info "\nDownloading and extracting..."
+    rm -rf "$TEMP_DIR" && mkdir -p "$TEMP_DIR"
+    curl -sL "$tar_url" | tar -xz -C "$TEMP_DIR" --strip-components=1
 
-    rm -rf "$TEMP_DIR"
-    mkdir -p "$TEMP_DIR"
-    curl -sL "$TARBALL_URL" | tar -xz -C "$TEMP_DIR" --strip-components=1
+    [[ ! -d "$TEMP_DIR/.config" ]] && { log_error "Error: Extraction failed or invalid repository structure."; exit 1; }
 
-    if [[ ! -d "$TEMP_DIR/.config" ]]; then
-        echo -e "${RED}Error: Extraction failed or invalid repository structure.${NC}"
-        exit 1
-    fi
+    log_info "Pre-processing downloaded files to match your system..."
+    local search="/home/nekorosys"
+    local rep_escaped=$(echo "$HOME" | sed 's/|/\\|/g; s/\\/\\\\/g')
+    find "$TEMP_DIR/.config" -type f \( -name "*.config" -o -name "*.css" -o -name "*.rasi" -o -name "*.conf" -o -name "*.sh" -o -name "*.json" -o -name "*.jsonc" -o -name "*.lua" -o -name "*.py" -o -name "*.yaml" \) -exec grep -l "$search" {} + 2>/dev/null | xargs -r sed -i "s|$search|$rep_escaped|g" || true
 
-    echo -e "${BLUE}Pre-processing downloaded files to match your system...${NC}"
-    
-    SEARCH="/home/nekorosys"
-    REPLACE="$HOME"
-    REPLACE_ESCAPED=$(echo "$REPLACE" | sed 's/|/\\|/g; s/\\/\\\\/g')
-    
-    find "$TEMP_DIR/.config" -type f \( -name "*.config" -o -name "*.css" -o -name "*.rasi" -o -name "*.conf" -o -name "*.sh" -o -name "*.json" -o -name "*.jsonc" -o -name "*.lua" -o -name "*.py" -o -name "*.yaml" \) -print0 2>/dev/null | xargs -0 -r sed -i "s|$SEARCH|$REPLACE_ESCAPED|g" || true
-
-    declare -a MONITOR_LIST
-    if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE:-" ]] && command -v hyprctl &> /dev/null; then
-        mapfile -t MONITOR_LIST < <(hyprctl monitors | awk '/Monitor/ {print $2}')
-    else
-        for f in /sys/class/drm/*/status; do
-            if grep -q "^connected$" "$f" 2>/dev/null; then
-                monitor_name=$(basename "$(dirname "$f")" | sed -E 's/^card[0-9]+-//')
-                [[ ! " ${MONITOR_LIST[*]} " =~ " ${monitor_name} " ]] && MONITOR_LIST+=("$monitor_name")
-            fi
-        done
-    fi
-
-    echo -e "\n${BLUE}Comparing configurations...${NC}"
-
+    log_info "\nComparing configurations..."
     while IFS= read -r -u 3 new_file; do
-        relative_path="${new_file#$TEMP_DIR/}"
-        target_file="$HOME/$relative_path"
-        target_dir=$(dirname "$target_file")
-
-        if [[ ! -f "$target_file" ]]; then
-            mkdir -p "$target_dir"
-            cp "$new_file" "$target_file"
-            echo -e "${GREEN}Added new file:${NC} $relative_path"
-            continue
-        fi
-
-        if ! cmp -s "$new_file" "$target_file"; then
-            prompt_merge "$new_file" "$target_file"
+        local rel_path="${new_file#$TEMP_DIR/}"
+        local tgt_file="$HOME/$rel_path"
+        
+        if [[ ! -f "$tgt_file" ]]; then
+            mkdir -p "$(dirname "$tgt_file")"
+            cp "$new_file" "$tgt_file"
+            echo -e "${GREEN}Added new file:${NC} $rel_path"
+        elif ! cmp -s "$new_file" "$tgt_file"; then
+            prompt_merge "$new_file" "$tgt_file"
         fi
     done 3< <(find "$TEMP_DIR/.config" -type f)
 
-    echo -e "\n${BLUE}Verifying user configuration sandbox...${NC}"
-
-    USER_CONF_DIR="$CONF_DIR/hypr/user/configs"
-    USER_SCRIPT_DIR="$CONF_DIR/hypr/user/scripts"
-    TEMPLATE_DIR="$CONF_DIR/hypr/user/templates"
-
-    mkdir -p "$USER_CONF_DIR"
-    mkdir -p "$USER_SCRIPT_DIR"
-
-    if [[ -d "$TEMPLATE_DIR" ]]; then
-        for file in "$TEMPLATE_DIR"/*.conf; do
-            [ -e "$file" ] || continue
-            filename=$(basename "$file")
-            if [ ! -f "$USER_CONF_DIR/$filename" ]; then
-                cp "$file" "$USER_CONF_DIR/$filename"
-                echo -e "  [${GREEN}New${NC}] Initialized missing user config: $filename"
-            fi
-        done
-    fi
-
-    if [ ! -f "$USER_SCRIPT_DIR/autostart.sh" ]; then
-        echo "#!/bin/bash" > "$USER_SCRIPT_DIR/autostart.sh"
-        echo "# Add your personal startup commands here" >> "$USER_SCRIPT_DIR/autostart.sh"
-        chmod +x "$USER_SCRIPT_DIR/autostart.sh"
-        echo -e "  [${GREEN}New${NC}] Initialized user autostart script."
-    fi
-
-    MONITOR_COUNT=${#MONITOR_LIST[@]}
-    if [[ "$MONITOR_COUNT" -gt 0 ]]; then
-        PRIMARY_MONITOR=${MONITOR_LIST[0]}
-        SECONDARY_MONITOR=${MONITOR_LIST[1]:-$PRIMARY_MONITOR}
-        
-        if [[ -d "$USER_CONF_DIR" ]]; then
-            find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i "s/__PRIMARY_MONITOR__/$PRIMARY_MONITOR/g" {} +
-            if [[ "$MONITOR_COUNT" -ge 2 ]]; then
-                find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i "s/__SECONDARY_MONITOR__/$SECONDARY_MONITOR/g" {} +
-            else
-                find "$USER_CONF_DIR" -type f -name "*.conf" -exec sed -i '/monitor=__SECONDARY_MONITOR__/s/^/#/' {} +
-            fi
-        fi
-    fi
-
-    echo -e "\n${BLUE}Scanning for and removing legacy root-level scripts...${NC}"
-
-    for legacy_dir in "$HOME/.local/bin" "$HOME/bin"; do
-        if [[ -d "$legacy_dir" ]]; then
-            for new_script in "$TEMP_DIR/bin/"*; do
-                if [[ -f "$new_script" ]]; then
-                    script_name=$(basename "$new_script")
-                    if [[ -f "$legacy_dir/$script_name" ]]; then
-                        echo -e "${YELLOW}Removing old script to prevent conflicts:${NC} $legacy_dir/$script_name"
-                        rm -f "$legacy_dir/$script_name"
-                    fi
-                fi
-            done
-        fi
-    done
-
-    echo -e "\n${BLUE}Updating core scripts and binaries...${NC}"
-
+    log_info "\nUpdating core scripts and binaries..."
+    local base_bin_dir
     if [[ -d "$HOME/.local/bin" ]]; then
-        BASE_BIN_DIR="$HOME/.local/bin"
-    elif [[ -d "$HOME/bin" ]]; then
-        BASE_BIN_DIR="$HOME/bin"
+        base_bin_dir="$HOME/.local/bin"
     else
-        BASE_BIN_DIR="$HOME/.local/bin"
+        base_bin_dir="$HOME/bin"
     fi
-    BIN_DIR="$BASE_BIN_DIR/nekoroshell"
-    mkdir -p "$BIN_DIR"
+    local bin_dir="$base_bin_dir/nekoroshell"
+    mkdir -p "$bin_dir"
 
     if [[ -d "$TEMP_DIR/bin" ]]; then
-        for new_script in "$TEMP_DIR/bin/"*; do
-            script_name=$(basename "$new_script")
-            if [[ "$script_name" != "nekoroshell" ]]; then
-                cp -r "$new_script" "$BIN_DIR/" 2>/dev/null
-            fi
-        done
-
-        if [[ -f "$TEMP_DIR/bin/nekoroshell" ]]; then
-            cp "$TEMP_DIR/bin/nekoroshell" "$BIN_DIR/nekoroshell.new"
-            mv "$BIN_DIR/nekoroshell.new" "$BIN_DIR/nekoroshell"
-        fi
-
-        chmod +x "$BIN_DIR"/* 2>/dev/null
-        echo -e "${GREEN}Successfully updated bash scripts in $BIN_DIR${NC}"
+        cp -r "$TEMP_DIR/bin/"* "$bin_dir/" 2>/dev/null || true
+        chmod +x "$bin_dir"/* 2>/dev/null || true
+        log_success "Successfully updated bash scripts in $bin_dir"
     fi
 
-    echo -e "\n${BLUE}Recompiling C++ Daemons via Make...${NC}"
+    log_info "\nRecompiling C++ Daemons via Make..."
     if ! command -v make &> /dev/null || ! command -v g++ &> /dev/null || ! command -v pkg-config &> /dev/null; then
-        echo -e "${RED}Warning: make, g++, or pkg-config not found. Skipping C++ recompilation.${NC}"
+        log_warn "make, g++, or pkg-config not found. Skipping C++ recompilation."
     else
-        REQUIRED_LIBS="wayland-client" 
-        if ! pkg-config --exists $REQUIRED_LIBS; then
-            echo -e "${RED}Warning: Missing development headers for $REQUIRED_LIBS. Skipping compilation.${NC}"
+        if ! pkg-config --exists "wayland-client"; then
+            log_warn "Missing development headers for wayland-client. Skipping compilation."
         else
             pushd "$TEMP_DIR" >/dev/null
             if make clean all; then
-                echo -e "  [${GREEN}OK${NC}] Successfully compiled C++ daemons."
-                cp build/* "$BIN_DIR/" 2>/dev/null || echo -e "${RED}Warning: Failed to copy binaries.${NC}"
+                log_success "Successfully compiled C++ daemons."
+                cp build/* "$bin_dir/" 2>/dev/null || log_warn "Failed to copy binaries."
             else
-                echo -e "${RED}Warning: Compilation failed.${NC}"
+                log_error "Warning: Compilation failed."
             fi
             popd >/dev/null
         fi
@@ -375,19 +243,17 @@ do_update() {
 
     rm -rf "$TEMP_DIR"
 
-    if command -v hyprctl >/dev/null 2>&1; then
-        hyprctl reload >/dev/null 2>&1
-    fi
+    command -v hyprctl >/dev/null 2>&1 && hyprctl reload >/dev/null 2>&1
 
     if [[ -x "$CONF_DIR/hypr/user/hooks/post-update.sh" ]]; then
-        echo -e "\n${BLUE}Executing user post-update hook...${NC}"
-        "$CONF_DIR/hypr/user/hooks/post-update.sh" || echo -e "${RED}Warning: post-update hook failed.${NC}"
+        log_info "\nExecuting user post-update hook..."
+        "$CONF_DIR/hypr/user/hooks/post-update.sh" || log_error "Warning: post-update hook failed."
     fi
-
-    echo -e "\n${GREEN}Upgrade to $LATEST_TAG complete!${NC}"
+    
+    echo -e "\n${GREEN}Upgrade to $tag complete!${NC}"
 }
 
-do_create_skin() {
+create_skin() {
     echo -e "${BLUE}NeKoRoSHELL Skin Template Generator${NC}\n"
     echo -e "Which feature do you want to create a skin for?"
     echo "1) Navbar (waybar)"
@@ -403,7 +269,7 @@ do_create_skin() {
     local feature_name=""
 
     case "$feature_opt" in
-        1) feature_name="navbar"; target_dir="$/waybar/skins"; required_files=("style.css" "layout.jsonc" "navbar-hover.conf" "layerrule.conf") ;;
+        1) feature_name="navbar"; target_dir="$CONF_DIR/waybar/skins"; required_files=("style.css" "layout.jsonc" "navbar-hover.conf" "layerrule.conf") ;;
         2) feature_name="launcher"; target_dir="$CONF_DIR/rofi/skins"; required_files=("config.rasi" "style.rasi" "layerrule.conf") ;;
         3) feature_name="lockscreen"; target_dir="$CONF_DIR/hypr/hyprlock/skins"; ;;
         4) feature_name="panel"; target_dir="$CONF_DIR/swaync/skins"; required_files=("style.css" "config.json" "layerrule.conf") ;;
@@ -449,7 +315,7 @@ do_create_skin() {
     echo "You can now edit these files to build your skin."
 }
 
-do_create_theme() {
+create_theme() {
     echo -e "${BLUE}NeKoRoSHELL Theme Generator${NC}\n"
     read -r -p "Enter the name for your new theme: " theme_name
     if [[ -z "$theme_name" ]]; then echo -e "${RED}Theme name cannot be empty.${NC}"; exit 1; fi
@@ -557,24 +423,16 @@ EOF
     echo "You can apply it via the customizer GUI tool or by running the script directly."
 }
 
-if [ $# -eq 0 ]; then
-    usage
-fi
+main() {
+    [[ $# -eq 0 ]] && usage
+    
+    case "$1" in
+        update|upgrade)   update ;;
+        uninstall|remove) uninstall ;;
+        create-skin)      create_skin ;; 
+        create-theme)     create_theme ;;
+        *)                usage ;;
+    esac
+}
 
-case "$1" in
-    update|upgrade)
-        do_update
-        ;;
-    create-skin)
-        do_create_skin
-        ;;
-    create-theme)
-        do_create_theme
-        ;;
-    uninstall|remove)
-        do_uninstall
-        ;;
-    *)
-        usage
-        ;;
-esac
+main "$@"
