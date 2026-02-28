@@ -185,6 +185,7 @@ std::optional<Config> read_config() {
     }
     
     std::ifstream file(cache_home + "/nekoroshell/navbar-hover.conf"); 
+    if (!file.is_open()) return std::nullopt;
      
     if (file.is_open()) { 
         std::string line; 
@@ -211,7 +212,11 @@ int main() {
 
     std::thread(swaync_watcher_thread).detach(); 
 
-    Config cfg = read_config(); 
+    auto result = read_config();
+    if (!result) {
+        return 1;
+    }
+    Config cfg = *result;
     std::vector<Monitor> monitors = backend->get_monitors(); 
     int cycle_count = 0; 
 
@@ -259,7 +264,7 @@ int main() {
         } 
 
         if (++cycle_count >= 100) { 
-            cfg = read_config(); 
+            cfg = *result;
             monitors = backend->get_monitors(); 
             cycle_count = 0; 
         } 
