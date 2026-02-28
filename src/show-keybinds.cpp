@@ -81,15 +81,22 @@ std::string parse_binds(const std::string& filepath, const std::string& category
 }
 
 int main() {
-    const char* home_env = std::getenv("HOME");
-    if (!home_env) {
-        std::cerr << "Error: HOME environment variable not set.\n";
-        return 1;
+    std::string config_home;
+    const char* xdg_env = std::getenv("XDG_CONFIG_HOME");
+    
+    if (xdg_env && *xdg_env != '\0') {
+        config_home = xdg_env;
+    } else {
+        const char* home_env = std::getenv("HOME");
+        if (!home_env) {
+            std::cerr << "Error: Neither XDG_CONFIG_HOME nor HOME environment variables are set.\n";
+            return 1;
+        }
+        config_home = std::string(home_env) + "/.config";
     }
-    std::string home(home_env);
 
-    std::string core_conf = home + "/.config/hypr/conf.d/08-keybinds.conf";
-    std::string user_conf = home + "/.config/hypr/user/configs/keybinds.conf";
+    std::string core_conf = config_home + "/hypr/conf.d/08-keybinds.conf";
+    std::string user_conf = config_home + "/hypr/user/configs/keybinds.conf";
 
     std::string full_output = parse_binds(core_conf, "SYSTEM CORE BINDS");
     full_output += parse_binds(user_conf, "USER OVERRIDES");
