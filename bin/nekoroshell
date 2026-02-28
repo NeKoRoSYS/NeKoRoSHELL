@@ -232,13 +232,15 @@ update() {
         else
             pushd "$TEMP_DIR" >/dev/null
             make clean >/dev/null 2>&1 || true
+
+            mkdir -p build
             
             local binaries=("show-keybinds" "navbar-hover" "navbar-watcher" "hypr-nice" "eject-forbidden")
             
             for bin in "${binaries[@]}"; do
                 if make "build/$bin" >/dev/null 2>&1; then
                     rm -f "$bin_dir/$bin" 2>/dev/null || true
-                    cp "build/$bin" "$bin_dir/"
+                    cp "build/$bin" "$bin_dir/" || true
                     log_success "Successfully compiled and updated \"$bin\""
                 else
                     log_error "Error: Failed to compile \"$bin\""
