@@ -25,6 +25,7 @@ void replace_all(std::string& str, const std::string& from, const std::string& t
 
 std::string sanitize_action(std::string action) {
     action = std::regex_replace(action, std::regex(R"(^\s*exec,\s*)"), "");
+    action = std::regex_replace(action, std::regex(R"(^\s*setprop,\s*)"), "");
     action = std::regex_replace(action, std::regex(R"(\$killPanel;(\s*pkill\s+\$launcher\s*(\|\||;))?\s*)"), "");
     action = std::regex_replace(action, std::regex(R"(kill-layers;\s*)"), "");
     action = std::regex_replace(action, std::regex(R"(pkill\s+wlogout\s*\|\|\s*)"), "");
@@ -33,7 +34,7 @@ std::string sanitize_action(std::string action) {
     action = std::regex_replace(action, std::regex(R"(\bfi\b)"), "");
     action = std::regex_replace(action, std::regex(R"(;\s*(?=#|$))"), "");
     action = std::regex_replace(action, std::regex(R"(,\s*(?=#|$))"), "");
-    action = std::regex_replace(action, std::regex(R"(\s*#\s*)"), "  ▏ 󰮦 ");
+    action = std::regex_replace(action, std::regex(R"(\s*#\s*)"), "  ▏ 󰋖 ");
     return trim(action);
 }
 
