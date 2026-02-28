@@ -1,27 +1,23 @@
-/* 1. THEME & VARIABLE INTEGRATION */
 @import "/home/nekorosys/.cache/wallust/colors-waybar.css";
 
 :root {
-    /* Synced with your appearance.conf active_opacity = 0.75 */
     --noti-bg: color-mix(in srgb, @background, transparent 39%); 
     --noti-bg-clearer: color-mix(in srgb, @background, transparent 65%); 
-    --noti-border: @color13;           /* Matches col.active_border */
-    --noti-radius: 10px;               /* Matches rounding = 10 */
-    --noti-margin: 20px;               /* Matches gaps_out = 20 */
+    --noti-border: @color13;
+    --noti-radius: 0.625rem;
+    --noti-margin: 1.25rem;
     
-    /* Selection & Focus Reset Variables */
     --bg-selected: transparent;
     --noti-bg-hover: color-mix(in srgb, @text, transparent 93%);
     --noti-bg-focus: transparent;
     
-    /* Text & Sizing */
     --font: "JetBrainsMono Nerd Font", monospace;
     --font-bold: "JetBrains Mono Extrabold";
     --text-color: @text;
     --text-color-invert: @text-invert;
     --text-disabled: #969696;
-    --notification-icon-size: 64px;
-    --notification-app-icon-size: 21px;
+    --notification-icon-size: 4rem;
+    --notification-app-icon-size: 1.3125rem;
 }
 
 * {
@@ -57,10 +53,10 @@ notificationwindow, blankwindow {
 
 .control-center {
     background: var(--noti-bg);
-    border: 2px solid var(--noti-border); 
+    border: 0.155rem solid var(--noti-border); 
     border-radius: var(--noti-radius);    
     margin: var(--noti-margin);           
-    box-shadow: -15px 0px 20px 1px rgba(0, 0, 0, 0.4), 0 0 4px @color0;
+    box-shadow: -0.9375rem 0rem 1.25rem 0.0625rem rgba(0, 0, 0, 0.4), 0 0 0.25rem @color0;
 }
 
 .control-center .placeholder {
@@ -79,34 +75,34 @@ notificationwindow, blankwindow {
 
 .notification-background {
     background: transparent;
-    padding: 6px 12px;
+    padding: 0.375rem 0.75rem;
 }
 
 .notification {
     background: var(--noti-bg);
-    border: 2px solid var(--noti-border);
+    border: 0.125rem solid var(--noti-border);
     border-radius: var(--noti-radius);
     transition: background 0.15s ease-in-out;
 }
 
 .notification-content .summary {
-    text-shadow: 0 0 5px white;
+    text-shadow: 0 0 0.3125rem white;
 }
 
 .notification-content .image {
-    padding-right: 5px;
-    margin: 10px;
-    min-width: 64px;    /* Force a specific width */
-    min-height: 64px;
+    padding-right: 0.3125rem;
+    margin: 0.625rem;
+    min-width: 4rem;    /* Force a specific width */
+    min-height: 4rem;
     object-fit: cover;
-    border-radius: 12px;
+    border-radius: 0.75rem;
 }
 
 .notification-content .app-icon {
-    -gtk-icon-size: 24px;
-    min-width: 24px;
-    min-height: 24px;
-    margin: 5px;
+    -gtk-icon-size: 1.5rem;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    margin: 0.3125rem;
 }
 
 .notification-row .notification-background .close-button {
@@ -130,30 +126,30 @@ notificationwindow, blankwindow {
 }
 
 .inline-reply {
-    margin-top: 8px;
+    margin-top: 0.5rem;
     background: transparent;
 }
 
 .inline-reply-entry {
     background: rgba(0, 0, 0, 0.3);
     color: var(--text-color);
-    border: 1px solid var(--noti-border);
+    border: 0.0625rem solid var(--noti-border);
     border-radius: var(--noti-radius);
-    padding: 4px;
+    padding: 0.25rem;
 }
 
 .inline-reply-entry:focus {
     background: rgba(0, 0, 0, 0.4);
-    border: 1px solid var(--noti-border);
+    border: 0.0625rem solid var(--noti-border);
     outline: none !important;
 }
 
 .inline-reply-button {
     background: var(--noti-bg);
-    border: 1px solid var(--noti-border);
+    border: 0.0625rem solid var(--noti-border);
     border-radius: var(--noti-radius);
     color: var(--text-color);
-    margin-left: 4px;
+    margin-left: 0.25rem;
 }
 
 .inline-reply-button:hover {
@@ -162,13 +158,13 @@ notificationwindow, blankwindow {
 }
 
 .notification-action {
-    margin: 4px;
+    margin: 0.25rem;
 }
 
 .notification-action > button {
-    text-shadow: 0 0 5px white;
+    text-shadow: 0 0 0.3125rem white;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--noti-border);
+    border: 0.0625rem solid var(--noti-border);
     border-radius: var(--noti-radius);
     color: var(--text-color);
 }
@@ -179,8 +175,8 @@ notificationwindow, blankwindow {
 
 /* 6. WIDGETS */
 .widget {
-    margin: 8px;
-    padding: 8px;
+    margin: 0.5rem;
+    padding: 0.5rem;
 }
 
 .widget-title {
@@ -188,54 +184,54 @@ notificationwindow, blankwindow {
 }
 
 .widget-title > label {
-    text-shadow: 0 0 5px white;
+    text-shadow: 0 0 0.3125rem white;
     font-family: var(--font-bold);
-    font-size: 2rem;
+    font-size: 24pt;
     color: var(--text-color);
-    margin-left: 5px;
+    margin-left: 0.3125rem;
 }
 
 .widget-title button {
     background: var(--noti-bg-clearer);;
-    margin-right: 5px;
-    border: 1px solid #45475a;
-    border-bottom: 2px solid @fg;
+    margin-right: 0.3125rem;
+    border: 0.0625rem solid #45475a;
+    border-bottom: 0.175rem solid @fg;
     color: var(--text-color);
     transition: background 0.15s ease-in-out;
 }
 
 .widget-title button:hover {
     background: var(--text-color);
-    border-bottom: 2px solid @color5;
+    border-bottom: 0.175rem solid @color5;
     color: @text-invert;
 }
 
 /* Container for the DND row */
 .widget-dnd {
-    margin: 8px;
+    margin: 0.5rem;
     font-family: var(--font);
 }
 
 /* "Do Not Disturb" text */
 .widget-dnd > label {
-    font-size: 1.1rem;
+    font-size: 13.2pt;
     font-weight: normal;
-    margin-left: 5px;
+    margin-left: 0.3125rem;
     color: var(--text-color);
 }
 
 /* The toggle switch */
 .widget-dnd switch {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    border: 1px solid var(--noti-border);
-    margin-right: 5px;
+    border-radius: 1.25rem;
+    border: 0.0625rem solid var(--noti-border);
+    margin-right: 0.3125rem;
 }
 
 /* The slider circle inside the switch */
 .widget-dnd switch slider {
     background: var(--text-color);
-    border-radius: 20px;
+    border-radius: 1.25rem;
 }
 
 /* Switch state when turned ON */
@@ -246,23 +242,23 @@ notificationwindow, blankwindow {
 .widget-mpris-player {
     @mpris-album-art;
     background: var(--noti-bg);
-    border: 2px solid var(--noti-border);
+    border: 0.125rem solid var(--noti-border);
     border-radius: var(--noti-radius);
-    margin: 5px;
+    margin: 0.3125rem;
 }
 
 .widget-mpris-album-art {
-    border-radius: 12px;
+    border-radius: 0.75rem;
 }
 
 .widget-buttons-grid {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, alpha(@color5, 0.25) 100%);
-  margin-top: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
-  padding-top: 10px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid @color5;
+  margin-top: 1.25rem;
+  margin-left: 1.25rem;
+  margin-right: 1.25rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.9375rem;
+  border-bottom: 0.175rem solid @color5;
 }
 
 /* Individual button styling */
@@ -273,51 +269,51 @@ notificationwindow, blankwindow {
 
 .widget-buttons-grid > flowbox > flowboxchild > button {
   background: var(--noti-bg-clearer);
-  border: 1px solid #45475a;
-  border-radius: 999px; 
-  padding: 4px 27px;    /* Vertical vs Horizontal padding */
+  border: 0.0625rem solid #45475a;
+  border-radius: 62.4375rem; 
+  padding: 0.25rem 1.975rem;    /* Vertical vs Horizontal padding */
   transition: all 0.15s ease-in-out;
-  margin: 5px;  
-  border-bottom: 2px solid @fg;
+  margin: 0.3125rem;  
+  border-bottom: 0.175rem solid @fg;
   color: var(--text-color);
 }
 
 /* Hover and Active (Toggle) states */
 
 .widget-mpris {
-  margin-left: 20px;
-  margin-right: 20px;
-  padding-top: 10px;
-  padding-bottom: 0px;
+  margin-left: 1.25rem;
+  margin-right: 1.25rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0rem;
   border-radius: 0;
 }
 
 .widget-notifications {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, alpha(@color5, 0.25) 100%);
-  margin-left: 20px;
-  border-bottom: 2px solid @color5;
-  margin-right: 20px;
-  margin-bottom: 20px;
+  margin-left: 1.25rem;
+  border-bottom: 0.175rem solid @color5;
+  margin-right: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
 .widget-buttons-grid > flowbox > flowboxchild > button:hover {
   background: @text;
   color: @text-invert;
-  border-bottom: 2px solid @color5;
+  border-bottom: 0.175rem solid @color5;
 }
 
 /* Special styling for active toggle buttons */
 .widget-buttons-grid > flowbox > flowboxchild > button.toggle:checked {
-  text-shadow: 0 0 5px white;
+  text-shadow: 0 0 0.3125rem white;
   background-color: @color5;
-  border-bottom: 2px solid @color13;
+  border-bottom: 0.175rem solid @color13;
   color: white;
 }
 
 .widget-buttons-grid > flowbox > flowboxchild > button.toggle:checked:hover {
-  text-shadow: 0 0 5px white !important;
+  text-shadow: 0 0 0.3125rem white !important;
   background-color: @color13;
-  border-bottom: 2px solid @color5;
+  border-bottom: 0.175rem solid @color5;
   color: white;
 }
 
