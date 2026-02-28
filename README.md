@@ -126,7 +126,7 @@ NeKoRoSHELL is currently being developed by one person (*cough* [CONTRIBUTING](h
 | Dmenu Overhaul - Replace wofi with rofi | ✅ |
 | Theme System - Set all skins in one go | ✅ |
 | wlogout integration | ✅ |
-| Support for hi-res monitors | 🛠️ |
+| Support for hi-res monitors | ✅ |
 | Wiki/Docs | 🛠️ |
 | BETA<br>Support for other distros; Verified to be working on: Arch | 🔍 |
 | BETA<br>Make NeKoRoSHELL init-agnostic; Verified to be working on: Arch | 🔍 |
