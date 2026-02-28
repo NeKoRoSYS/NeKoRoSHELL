@@ -13,29 +13,29 @@
 #waybar {
     font-weight: 700;
     background: transparent;
-    font-size: 12px;
+    font-size: 9pt;
     color: @text;
-    border-radius: 15px;
-    padding: 0 15px;
+    border-radius: 0.9375rem;
+    padding: 0 0.9375rem;
 }
 
 .modules-left,
 .modules-center,
 .modules-right {
-    margin-bottom: -10px;
-    margin-left: 10px;
-    margin-right: 10px;
-    padding: 10px;
+    margin-bottom: -0.625rem;
+    margin-left: 0.625rem;
+    margin-right: 0.625rem;
+    padding: 0.625rem;
 }
 
 tooltip {
-    padding: 8px;
-    border-radius: 15px;
+    padding: 0.5rem;
+    border-radius: 0.9375rem;
     background: @tooltip-bg;
 }
 
 tooltip label {
-    padding: 8px;
+    padding: 0.5rem;
     font-weight: bold;
     color: @text;
 }
@@ -47,39 +47,39 @@ tooltip label {
 
 #tray {
     background: @background;
-    border: 1px solid @border;
-    border-radius: 8px;
-    padding: 2px 6px;
-    margin-left: 6px;
+    border: 0.0625rem solid @border;
+    border-radius: 0.5rem;
+    padding: 0.125rem 0.375rem;
+    margin-left: 0.375rem;
 }
 
 #tray menu, 
 menu {
     background: @text-invert;
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: 0.625rem;
+    font-size: 10.5pt;
     font-weight: 700;
     color: @text;
 }
 
 #tray menu > *, 
 menu > * {
-    padding: 3px 0px;
+    padding: 0.1875rem 0rem;
 }
 
 #tray menu > *:hover, 
 menu > *:hover {
-    border-radius: 10px;
+    border-radius: 0.625rem;
     background-color: @inactive;
 }
 
 #custom-tray-icon {
     color: @foreground;
-    padding: 0 10px;
+    padding: 0 0.625rem;
 }
 
 #tray-drawer:hover #custom-tray-icon {
-    text-shadow: 0 0 5px black, 0 0 4px black, 0 0 2px black;
+    text-shadow: 0 0 0.3125rem black, 0 0 0.25rem black, 0 0 0.125rem black;
     color: @accent;
 }
 
@@ -93,7 +93,7 @@ menu > *:hover {
 #network, 
 #temperature, 
 #wireplumber {
-    padding: 2px 7px;
+    padding: 0.125rem 0.4375rem;
 }
 
 #backlight, 
@@ -108,8 +108,8 @@ menu > *:hover {
 #wireplumber, 
 #workspaces {
     background: transparent;
-    border-radius: 15px;
-    margin: 0 2px;
+    border-radius: 0.9375rem;
+    margin: 0 0.125rem;
 }
 
 #custom-ctlcenter, 
@@ -120,29 +120,29 @@ menu > *:hover {
 #gright1, 
 #gright2, 
 #power-profiles-daemon {
-    padding: 2px 9px;
-    border-bottom: 2px solid @color5;
-    border-radius: 15px;
+    padding: 0.125rem 0.5625rem;
+    border-bottom: 0.125rem solid @color5;
+    border-radius: 0.9375rem;
     background: alpha(@background, 0.75);
 }
 
 #clock {
-    padding: 2px 18px;
-    border-radius: 15px;
-    border-bottom: 2px solid @color5;
+    padding: 0.125rem 1.125rem;
+    border-radius: 0.9375rem;
+    border-bottom: 0.125rem solid @color5;
     background: alpha(@background, 0.75);
 }
 
-#gleft1 { margin: 0 0 0 8px; }
-#gleft2 { margin: 0 8px; }
-#gright1 { margin: 0 8px 0 0; }
-#gright2 { margin: 0 8px; }
+#gleft1 { margin: 0 0 0 0.5rem; }
+#gleft2 { margin: 0 0.5rem; }
+#gright1 { margin: 0 0.5rem 0 0; }
+#gright2 { margin: 0 0.5rem; }
 
 #workspaces button {
     color: @workspace-fg;
-    font-size: 14px;
-    border-radius: 15px;
-    margin: 0 7px;
+    font-size: 10.5pt;
+    border-radius: 0.9375rem;
+    margin: 0 0.4375rem;
 }
 
 #workspaces button:hover {
@@ -151,19 +151,19 @@ menu > *:hover {
 
 #custom-logout {
     color: @red;
-    margin-right: 5px;
-    padding: 0 12px;
+    margin-right: 0.3125rem;
+    padding: 0 0.75rem;
 }
 
 #custom-ctlcenter {
     color: @color11;
-    margin-right: 5px;
-    padding: 0 12px;
+    margin-right: 0.3125rem;
+    padding: 0 0.75rem;
 }
 
 #power-profiles-daemon {
-    margin-left: 5px;
-    padding: 0 12px;
+    margin-left: 0.3125rem;
+    padding: 0 0.75rem;
     color: @text;
 }
 
