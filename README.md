@@ -1,7 +1,3 @@
-> [!TIP]
-> Please star the repo if you like the dotfiles. Thank you 🙏
-<br>
-
 <div align="center">
 
 ![Screenshot](showcase/image.png) 
