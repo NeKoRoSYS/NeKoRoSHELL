@@ -433,7 +433,7 @@ patch_hardcoded_paths() {
 }
 
 inject_shell_rc() {
-    local inject_func() {
+    inject_func() {
         local shell_rc="$1"
         local source_rc="$2"
         
