@@ -1,3 +1,7 @@
+> [!TIP]
+> [NeKoRoSHELL DLux](https://github.com/NeKoRoSYS/NeKoRoSHELL-DLux-Shell/) is under development. Check it out now!
+<br>
+
 <div align="center">
 
 ![Screenshot](showcase/image.png) 
