@@ -240,10 +240,10 @@ In the near future, I plan to expand upon what makes NeKoRoSHELL, well, "NeKoRoS
 
   <p>or...</p>
   <a href="https://paypal.me/genecromarky" target="_blank" style="display: inline-block;">
-    <img src="https://img.shields.io/badge/Donate-PayPal-blue.svg?style=flat-square&logo=paypal" align="center"/>
+    <img src="https://img.shields.io/badge/-Paypal_Me-6C3BAA?style=for-the-badge&logo=paypal&logoColor=000000&labelColor=39FF14" alt="Donate via PayPal" align="center"/>
   </a>
   <a href="https://ko-fi.com/nekorosys" target="_blank" style="display: inline-block;">
-    <img src="https://img.shields.io/badge/Donate-Ko--fi-F16061.svg?style=flat-square&logo=ko-fi" align="center"/>
+    <img src="https://img.shields.io/badge/-Buy_Me_Coffee-6C3BAA?style=for-the-badge&logo=ko-fi&logoColor=000000&labelColor=39FF14" alt="Donate via Ko-fi" align="center"/>
   </a>
 </div>
 
