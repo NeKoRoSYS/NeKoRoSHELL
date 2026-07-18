@@ -23,6 +23,12 @@
 > [!TIP]
 > [NeKoRoSHELL DLux](https://github.com/NeKoRoSYS/NeKoRoSHELL-DLux-Shell/) is under development. Check it out now!
 
+> [!WARNING]
+> **Development is Paused, Indefinitely.**<br>
+>
+> I intended to regularly update NeKoRoSHELL (and subsequently, DLux) in order to support the bleeding-edge changes that are regularly introduced to its dependencies which is mainly Hyperland. However, as of the time I am writing this, I have recently bought a new laptop and I don't really want to risk voiding any of its warranties yet so I can't realy bring myself to reinstall Arch. Will I hop on Linux again? Maybe, but not now. Feel free to fork the repo and introduce your own changes. I'm very sorry for the inconvenience!
+>
+
 <br>
 
 The best way to say *"I use Linux btw 🤓"* is if your desktop environment looks sleek and suave.
